@@ -11,7 +11,7 @@ class SetCreateAdapter(setCreateActivity: SetCreateActivity, wordsList: ArrayLis
     lateinit var context:Context
     var words:ArrayList<Word> = wordsList
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SetCreateHolder {
-       val view = LayoutInflater.from(parent.context).inflate(R.layout.row_set_create_word,null)
+       val view = LayoutInflater.from(parent.context).inflate(R.layout.row_set_create_word,parent,false)
         return SetCreateHolder(view)
     }
 
