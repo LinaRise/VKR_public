@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="title_list">List</string>
+    <string name="title_camera">Camera</string>
+    <string name="title_profile">Profile</string>
+    <string name="set_title_text">Set title</string>
+    <string name="language_input_text">Language input</string>
+    <string name="language_output_text">Language output</string>
+    <string name="title_hint">Title</string>
+</resources>
