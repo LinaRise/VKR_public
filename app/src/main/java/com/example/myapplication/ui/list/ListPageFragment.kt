@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,7 +20,7 @@ class ListPageFragment : Fragment(),IListPageView {
     lateinit var presenter: ListPagePresenter
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var addSetButton: FloatingActionButton
-    var sets_displayed: ArrayList<Set> = ArrayList<Set>()
+    var setsDisplayed: ArrayList<Set> = ArrayList<Set>()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -36,7 +37,7 @@ class ListPageFragment : Fragment(),IListPageView {
 
         getSetsList();
         recyclerView.layoutManager = LinearLayoutManager(this.context)
-        val adapter = SetAdapter(this.context, sets_displayed)
+        val adapter = SetAdapter(this.context, setsDisplayed)
         recyclerView.adapter = adapter
 //       val textView: TextView = root.findViewById(R.id.text_home)
 //        homeViewModel.text.observe(viewLifecycleOwner, Observer {
@@ -48,6 +49,11 @@ class ListPageFragment : Fragment(),IListPageView {
         return root
     }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        (activity as AppCompatActivity?)!!.supportActionBar?.title = "Sets"
+    }
+
     private fun clickOnAddSetButton() {
         presenter.openSet()
     }
@@ -57,7 +63,7 @@ class ListPageFragment : Fragment(),IListPageView {
     }
 
     override fun setData(sets: List<Set>) {
-       sets_displayed.addAll(sets)
+       setsDisplayed.addAll(sets)
     }
 
     override fun openSetInfoActivity() {
