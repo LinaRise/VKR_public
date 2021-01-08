@@ -11,14 +11,14 @@
 
 
     <androidx.cardview.widget.CardView
+        xmlns:card_view="http://schemas.android.com/tools"
         android:id="@+id/word_add_cardview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_margin="10dp"
         app:cardCornerRadius="8dp"
-        app:cardElevation="3dp"
+        card_view:contentPadding="10dp"
+        app:cardElevation="2dp"
         app:cardUseCompatPadding="true">
 
 
@@ -72,12 +72,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
                         <Button
-                            android:layout_height="30dp"
-                            app:backgroundTint="#EA417A"
-                            android:src="@drawable/ic_action_name"
-                            android:layout_width="30dp"
-                            android:background="@drawable/ic_check"
-                            android:layout_alignParentEnd="true"/>
+                            android:id="@+id/word_add_button"
+                            android:layout_height="wrap_content"
+                            app:backgroundTint="#D15B52"
+                            android:layout_width="wrap_content"
+                            android:text="@string/add_text_on_button"
+                            android:layout_centerHorizontal="true"
+                            android:layout_alignParentEnd="false"/>
 
                     </RelativeLayout>
                 </LinearLayout>

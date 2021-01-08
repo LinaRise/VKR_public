@@ -7,4 +7,6 @@
     <string name="language_input_text">Language input</string>
     <string name="language_output_text">Language output</string>
     <string name="title_hint">Title</string>
+    <string name="add_text_on_button">Add</string>
+    <string name="fill_in_both_lines">Fill in both lines</string>
 </resources>

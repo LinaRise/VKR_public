@@ -6,68 +6,62 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.entity.Set
-import com.example.myapplication.ui.setAdd.SetCreateActivity
+import com.example.myapplication.ui.setCreate.SetCreateActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
-class ListPageFragment : Fragment() {
-
+class ListPageFragment : Fragment(),IListPageView {
+    lateinit var presenter: ListPagePresenter
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var addSetButton: FloatingActionButton
-    var states: ArrayList<Set> = ArrayList<Set>()
+    var sets_displayed: ArrayList<Set> = ArrayList<Set>()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         homeViewModel =
-            ViewModelProviders.of(this).get(HomeViewModel::class.java)
+            ViewModelProvider(this).get(HomeViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_list, container, false)
         val recyclerView: RecyclerView = root.findViewById(R.id.set_list)
-        setInitialData();
+
+        presenter = ListPagePresenter(this)
+
+
+        getSetsList();
         recyclerView.layoutManager = LinearLayoutManager(this.context)
-        val adapter = SetAdapter(this.context, states)
+        val adapter = SetAdapter(this.context, sets_displayed)
+        recyclerView.adapter = adapter
 //       val textView: TextView = root.findViewById(R.id.text_home)
 //        homeViewModel.text.observe(viewLifecycleOwner, Observer {
 //            textView.text = it
 //        })
         addSetButton = root.findViewById(R.id.fab)
         addSetButton.setOnClickListener { clickOnAddSetButton() }
-        recyclerView.adapter = adapter
+
         return root
     }
 
     private fun clickOnAddSetButton() {
-        val intent = Intent(activity, SetCreateActivity::class.java)
-        startActivity(intent)
+        presenter.openSet()
     }
 
-    private fun setInitialData() {
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
-        states.add(Set("Бразилия", "Бразилиа"))
+    private fun getSetsList() {
+        presenter.loadData()
+    }
+
+    override fun setData(sets: List<Set>) {
+       sets_displayed.addAll(sets)
+    }
+
+    override fun openSetInfoActivity() {
+        val intent = Intent(activity, SetCreateActivity::class.java)
+        startActivity(intent)
     }
 }

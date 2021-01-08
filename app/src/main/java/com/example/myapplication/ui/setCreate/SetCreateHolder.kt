@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.setAdd
+package com.example.myapplication.ui.setCreate
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView

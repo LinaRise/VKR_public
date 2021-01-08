@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.setAdd
+package com.example.myapplication.ui.setCreate
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,9 +7,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.entity.Word
 
-class SetCreateAdapter(setCreateActivity: SetCreateActivity, wordsList: ArrayList<Word>) : RecyclerView.Adapter<SetCreateHolder>() {
+class SetCreateAdapter(setCreateActivity: SetCreateActivity, wordsList:List<Word>) : RecyclerView.Adapter<SetCreateHolder>() {
     lateinit var context:Context
-    var words:ArrayList<Word> = wordsList
+    var words:List<Word> = wordsList
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SetCreateHolder {
        val view = LayoutInflater.from(parent.context).inflate(R.layout.row_set_create_word,parent,false)
         return SetCreateHolder(view)

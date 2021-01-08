@@ -10,7 +10,7 @@ import com.example.myapplication.R
 import com.example.myapplication.entity.Set
 
 
-class SetAdapter internal constructor(context: Context?, private val states: List<Set>) :
+class SetAdapter internal constructor(context: Context?, private val sets: List<Set>) :
     RecyclerView.Adapter<SetAdapter.ViewHolder>() {
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -19,18 +19,22 @@ class SetAdapter internal constructor(context: Context?, private val states: Lis
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val state: Set = states[position]
-        holder.nameView.text = state.name
-        holder.capitalView.text = state.capital
+        val state: Set = sets[position]
+        holder.setTitle.text = state.name
+        holder.languageInput.text = state.languageInput
+        holder.languageOutput.text = state.languageOutput
+        holder.wordsAmount.text = state.languageInput
     }
 
     override fun getItemCount(): Int {
-        return states.size
+        return sets.size
     }
 
     class ViewHolder internal constructor(view: View) : RecyclerView.ViewHolder(view) {
-        val nameView: TextView = view.findViewById(R.id.name)
-        val capitalView: TextView = view.findViewById(R.id.capital)
+        val setTitle: TextView = view.findViewById(R.id.set_title)
+        val languageInput: TextView = view.findViewById(R.id.language_input)
+        val languageOutput: TextView = view.findViewById(R.id.language_output)
+        val wordsAmount: TextView = view.findViewById(R.id.words_amount)
 
     }
 
