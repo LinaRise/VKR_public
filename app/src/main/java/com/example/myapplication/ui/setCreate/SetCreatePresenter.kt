@@ -7,7 +7,7 @@ class SetCreatePresenter(view: ISetCreateView) {
     private var mView: ISetCreateView = view
     private var word: Word = Word()
     private var set: Set = Set()
-    var words = ArrayList<Word>()
+    private var words = ArrayList<Word>()
 
     fun loadData(){
         //пока просто список - будет обращение к бд

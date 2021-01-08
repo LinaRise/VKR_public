@@ -18,11 +18,11 @@ import kotlinx.android.synthetic.main.activity_set_create.*
 
 class SetCreateActivity : AppCompatActivity(), ISetCreateView {
     private lateinit var deletedWord: Word
-    lateinit var recyclerView: RecyclerView
-    lateinit var setCreateAdapter: SetCreateAdapter
-    lateinit var wordAddButton: Button
-    lateinit var originalText: TextInputEditText
-    lateinit var translatedText: TextInputEditText
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var setCreateAdapter: SetCreateAdapter
+    private lateinit var wordAddButton: Button
+    private lateinit var originalText: TextInputEditText
+    private lateinit var translatedText: TextInputEditText
     lateinit var presenter: SetCreatePresenter
 
     // которые отображаются на экране
@@ -50,7 +50,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView {
 
     }
 
-    fun onAddWordBtnClick() {
+    private fun onAddWordBtnClick() {
         val original: String = originalText.text.toString().trim()
         val translated: String = translatedText.text.toString().trim()
         presenter.addNewWord(original, translated)
@@ -115,11 +115,11 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView {
             recyclerView,
             "${deletedWord.original} is deleted",
             Snackbar.LENGTH_LONG
-        ).setAction("UNDO",
-            View.OnClickListener {
-                wordsDisplayed.add(position, deletedWord)
-                setCreateAdapter.notifyItemInserted(position)
-            }).show()
+        ).setAction("UNDO"
+        ) {
+            wordsDisplayed.add(position, deletedWord)
+            setCreateAdapter.notifyItemInserted(position)
+        }.show()
     }
 
     override fun hideKeyboard() {

@@ -17,10 +17,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
 class ListPageFragment : Fragment(),IListPageView {
-    lateinit var presenter: ListPagePresenter
+    private lateinit var presenter: ListPagePresenter
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var addSetButton: FloatingActionButton
-    var setsDisplayed: ArrayList<Set> = ArrayList<Set>()
+    private var setsDisplayed: ArrayList<Set> = ArrayList()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -35,7 +35,7 @@ class ListPageFragment : Fragment(),IListPageView {
         presenter = ListPagePresenter(this)
 
 
-        getSetsList();
+        getSetsList()
         recyclerView.layoutManager = LinearLayoutManager(this.context)
         val adapter = SetAdapter(this.context, setsDisplayed)
         recyclerView.adapter = adapter

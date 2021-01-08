@@ -18,7 +18,7 @@ import com.example.myapplication.ui.chathead.ChatHeadService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
-    var switchAB: ToggleButton? = null
+    private var switchAB: ToggleButton? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -62,9 +62,9 @@ class MainActivity : AppCompatActivity() {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_switch_layout, menu)
         val item: MenuItem = menu.findItem(R.id.switchId) as MenuItem
-        item.setActionView(R.layout.switch_layout);
+        item.setActionView(R.layout.switch_layout)
         switchAB = item
-            .actionView.findViewById<ToggleButton>(R.id.toggle_btn)
+            .actionView.findViewById(R.id.toggle_btn)
         switchAB?.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 Toast.makeText(application, "ON", Toast.LENGTH_SHORT)
@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity() {
 
             //Check if the permission is granted or not.
             // Settings activity never returns proper value so instead check with following method
-            if (if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     Settings.canDrawOverlays(this)
                 } else {
                     TODO("VERSION.SDK_INT < M")

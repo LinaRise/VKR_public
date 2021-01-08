@@ -58,9 +58,9 @@ class ChatHeadService : Service() {
 
         //Set the close button.
         val closeButton: ImageView = mChatHeadView!!.findViewById<View>(R.id.close_btn) as ImageView
-        closeButton.setOnClickListener(View.OnClickListener { //close the service and remove the chat head from the window
+        closeButton.setOnClickListener { //close the service and remove the chat head from the window
             stopSelf()
-        })
+        }
 
 //Drag and move chat head using user's touch action.
 
@@ -95,8 +95,8 @@ class ChatHeadService : Service() {
                         //we have to check if the previous action was ACTION_DOWN
                         //to identify if the user clicked the view or not.
 
-                        if ((Math.abs(initialTouchX - event.getRawX()) < 5) && (Math.abs(
-                                initialTouchY - event.getRawY()
+                        if ((Math.abs(initialTouchX - event.rawX) < 5) && (Math.abs(
+                                initialTouchY - event.rawY
                             ) < 5)
                         ) {
                             val intent = Intent(this@ChatHeadService, ChatActivity::class.java)
@@ -111,7 +111,7 @@ class ChatHeadService : Service() {
                         , "It's not a click !",
                     Toast.LENGTH_LONG
                         )
-                        .show();
+                        .show()
                     lastAction = event.action
                         return true
 

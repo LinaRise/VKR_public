@@ -1,24 +1,21 @@
 package com.example.myapplication.ui.chathead
 
 
-import android.content.ClipData
-import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.R
 
 
 class ChatActivity : AppCompatActivity() {
 
-    var textView: TextView? = null
+    private var textView: TextView? = null
 
     private lateinit var clipboard: ClipboardManager
 
-    fun getCopy() {
+    private fun getCopy() {
         textView = findViewById<TextView>(R.id.textview)
         val words = clipboard.getClipboardText(this)
                 textView!!.text = words + "\n"

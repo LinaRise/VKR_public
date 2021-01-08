@@ -9,7 +9,7 @@ import com.example.myapplication.entity.Word
 
 class SetCreateAdapter(setCreateActivity: SetCreateActivity, wordsList:List<Word>) : RecyclerView.Adapter<SetCreateHolder>() {
     lateinit var context:Context
-    var words:List<Word> = wordsList
+    private var words:List<Word> = wordsList
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SetCreateHolder {
        val view = LayoutInflater.from(parent.context).inflate(R.layout.row_set_create_word,parent,false)
         return SetCreateHolder(view)

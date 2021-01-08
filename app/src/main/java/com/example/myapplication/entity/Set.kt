@@ -5,6 +5,4 @@ class Set(// название
     var languageInput: String = "-",
     var languageOutput: String = "-",
     var wordsAmount: Int = 0
-) {
-
-}
+)

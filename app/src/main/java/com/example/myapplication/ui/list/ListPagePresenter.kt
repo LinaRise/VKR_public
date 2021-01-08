@@ -1,14 +1,12 @@
 package com.example.myapplication.ui.list
 
 import com.example.myapplication.entity.Set
-import com.example.myapplication.entity.Word
-import com.example.myapplication.ui.setCreate.ISetCreateView
 
 class ListPagePresenter(view: IListPageView)  {
     private var mView: IListPageView = view
     private var set: Set = Set()
 
-    var sets = ArrayList<Set>()
+    private var sets = ArrayList<Set>()
 
     fun loadData(){
         //пока просто список - будет обращение к бд
