@@ -10,4 +10,9 @@
     <string name="add_text_on_button">Add</string>
     <string name="fill_in_both_lines">Fill in both lines</string>
     <string name="add_set_button_text">Add set button</string>
+    <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
+    <string name="ok">OK</string>
+    <string name="low_storage_error">Ocr dependencies cannot be downloaded due to low device storage</string>
+    <string name="no_camera_permission">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
+
 </resources>
