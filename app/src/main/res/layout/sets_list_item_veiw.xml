@@ -17,12 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:orientation="vertical">
-<!--        <TextView-->
-<!--            android:id="@+id/set_title"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_alignParentTop="true"-->
-<!--            android:textStyle="bold"/>-->
+
         <RelativeLayout android:id="@+id/RelativeLayout01"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -47,8 +42,8 @@
                    android:id="@+id/language_input"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="50dp"
-                    android:text="asdasd"
+                    android:layout_marginLeft="20dp"
+                    android:text="@string/language_input_text"
                     android:textColor="#404040"
                     android:textSize="20sp" />
 
@@ -57,10 +52,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:layout_marginRight="50dp"
+                    android:layout_marginRight="20dp"
                     android:textColor="#404040"
                     android:textSize="20sp"
-                    android:text="asdasd" />
+                    android:text="@string/language_output_text" />
 
             </RelativeLayout>
     <RelativeLayout

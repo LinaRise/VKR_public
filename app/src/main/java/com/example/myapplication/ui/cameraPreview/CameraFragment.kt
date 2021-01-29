@@ -364,6 +364,8 @@ class CameraFragment : Fragment() {
 
    inner class CaptureGestureListener : SimpleOnGestureListener() {
         override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+            Toast.makeText(context, "TOAST", Toast.LENGTH_SHORT)
+                .show()
             return this@CameraFragment.onTap(e.rawX, e.rawY) || super.onSingleTapConfirmed(e)
         }
     }

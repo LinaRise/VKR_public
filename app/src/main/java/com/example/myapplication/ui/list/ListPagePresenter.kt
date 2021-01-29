@@ -1,31 +1,28 @@
 package com.example.myapplication.ui.list
 
-import com.example.myapplication.entity.Set
+import com.example.myapplication.entity.Sett
 
 class ListPagePresenter(view: IListPageView)  {
     private var mView: IListPageView = view
-    private var set: Set = Set()
+    private var set: Sett = Sett()
 
-    private var sets = ArrayList<Set>()
+    private var sets = ArrayList<Sett>()
 
     fun loadData(){
         //пока просто список - будет обращение к бд
 
-        var set1 = Set("111111111111111111111", "1","",1)
-        var set2 = Set("2", "2","@",23)
-        var set3 = Set("3111111111111", "3","23",23)
-        var set4 = Set("4111111111", "4","234",345)
-        var set5 = Set("5", "6","@34",345)
+        var set1 = Sett(1, "1",1,1)
+        var set2 = Sett(2, "2",1,23)
+        var set3 = Sett(2, "3",2,23)
+
         sets.add(set1)
         sets.add(set2)
         sets.add(set3)
-        sets.add(set4)
-        sets.add(set5)
 
         mView.setData(sets)
     }
 
     fun openSet(){
-        mView.openSetInfoActivity()
+        mView.openDialogForSetCreation()
     }
 }

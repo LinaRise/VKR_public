@@ -7,29 +7,31 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
-import com.example.myapplication.entity.Set
+import com.example.myapplication.entity.Sett
 
-
-class SetAdapter internal constructor(context: Context?, private val sets: List<Set>) :
+// класс адаптер для отображения наборов слов через RecyclerView
+class SetAdapter internal constructor(context: Context?, private val sets: List<Sett>) :
     RecyclerView.Adapter<SetAdapter.ViewHolder>() {
     private val inflater: LayoutInflater = LayoutInflater.from(context)
+    //передаем шаблон строки
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view: View = inflater.inflate(R.layout.sets_list_item_veiw, parent, false)
         return ViewHolder(view)
     }
-
+// передаем информацию для отображения
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val state: Set = sets[position]
-        holder.setTitle.text = state.name
-        holder.languageInput.text = state.languageInput
-        holder.languageOutput.text = state.languageOutput
-        holder.wordsAmount.text = state.languageInput
+        val state: Sett = sets[position]
+        holder.setTitle.text = state.settTitle
+        holder.languageInput.text = state.languageInput_id.toString()
+        holder.languageOutput.text = state.languageOutput_id.toString()
+        holder.wordsAmount.text = state.wordsAmount.toString()
     }
-
+// возврат размера
     override fun getItemCount(): Int {
         return sets.size
     }
 
+    //конструктор
     class ViewHolder internal constructor(view: View) : RecyclerView.ViewHolder(view) {
         val setTitle: TextView = view.findViewById(R.id.set_title)
         val languageInput: TextView = view.findViewById(R.id.language_input)

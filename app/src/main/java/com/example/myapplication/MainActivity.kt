@@ -14,24 +14,30 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.example.myapplication.database.DBHelper
 import com.example.myapplication.ui.chathead.ChatHeadService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
+
+    lateinit var dbhelper:DBHelper
     private var switchAB: ToggleButton? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        dbhelper = DBHelper(this)
+        //находим файл xml с BottomNavigationView
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
-
+        // находим файл xml с фрагментом к которму будет прикреплять BottomNavigationView
         val navController = findNavController(R.id.nav_host_fragment)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+        // Передаем ID каждого меню как set ID
         val appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.navigation_list, R.id.navigation_camera, R.id.navigation_profile
             )
         )
+        //Настривает ActionBar возвращенный  [AppCompatActivity.getSupportActionBar] для использования
+        //с [NavController].
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 

@@ -14,5 +14,11 @@
     <string name="ok">OK</string>
     <string name="low_storage_error">Ocr dependencies cannot be downloaded due to low device storage</string>
     <string name="no_camera_permission">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
-
+    <string-array name="available_translation_languages">
+        <item>Russian</item>
+        <item>English</item>
+        <item>German</item>
+        <item>French</item>
+        <item>Czech</item>
+    </string-array>
 </resources>

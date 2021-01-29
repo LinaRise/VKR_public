@@ -1,15 +1,19 @@
 package com.example.myapplication.ui.setCreate
 
 import android.content.Context
+import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
-import android.view.View
+import android.view.Menu
+import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
+import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.Word
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
@@ -24,31 +28,81 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView {
     private lateinit var originalText: TextInputEditText
     private lateinit var translatedText: TextInputEditText
     lateinit var presenter: SetCreatePresenter
+    lateinit var dbhelper:DBHelper
+    lateinit var db: SQLiteDatabase
+
+    private lateinit var setTitle:String
+    private lateinit var inputLanguage:String
+    private lateinit var outputLanguage:String
 
     // которые отображаются на экране
     var wordsDisplayed = ArrayList<Word>()
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        presenter = SetCreatePresenter(this)
-
+        dbhelper = DBHelper(this)
+        presenter = SetCreatePresenter(this, dbhelper)
         setContentView(R.layout.activity_set_create)
+
+        val extras = intent.extras
+        if (extras != null) {
+            setTitle = extras.getString("setTitle").toString()
+            inputLanguage = extras.getString("inputLanguage").toString()
+            outputLanguage = extras.getString("outputLanguage").toString()
+        }
+
+        db = dbhelper.writableDatabase
+        // showing the back button in action bar
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         recyclerView = findViewById(R.id.recyclerivew_set_create)
         wordAddButton = findViewById(R.id.word_add_button)
         originalText = findViewById(R.id.original_input)
         translatedText = findViewById(R.id.translated_input)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        getWordList()
-        setCreateAdapter = SetCreateAdapter(this, wordsDisplayed)
+
+        setCreateAdapter = SetCreateAdapter(this)
         recyclerView.adapter = setCreateAdapter
 
+        setCreateAdapter.setData(wordsDisplayed)
+//        getWordList()
         val itemTouchHelper = ItemTouchHelper(simpleCallBack)
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
         word_add_button.setOnClickListener { onAddWordBtnClick() }
 
     }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.add_new_activity_bar, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle item selection
+        return when (item.itemId) {
+            R.id.home -> {
+                finish()
+                return true
+            }
+            R.id.check_icon -> {
+                presenter.onDoneButtonWasClicked(wordsDisplayed,setTitle,inputLanguage,outputLanguage)
+                Toast.makeText(this, "added successfully", Toast.LENGTH_SHORT).show()
+                finish()
+                return true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+
+
+
+//    private fun onDoneButtonWasClicked() {
+//        presenter.addAllToDatabase(wordsDisplayed, setTitle, inputLanguage, outputLanguage, db )
+//        Toast.makeText(this, "added successfully", Toast.LENGTH_SHORT).show()
+//        finish()
+//    }
+
 
     private fun onAddWordBtnClick() {
         val original: String = originalText.text.toString().trim()
@@ -57,8 +111,8 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView {
     }
 
     private fun getWordList() {
-        //вызов загрузки
-        presenter.loadData()
+//        вызов загрузки
+//        presenter.loadData()
     }
 
     private var simpleCallBack =
@@ -113,9 +167,10 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView {
     override fun showUndoDeleteWord(position: Int) {
         Snackbar.make(
             recyclerView,
-            "${deletedWord.original} is deleted",
+            "${deletedWord.originalWord} is deleted",
             Snackbar.LENGTH_LONG
-        ).setAction("UNDO"
+        ).setAction(
+            "UNDO"
         ) {
             wordsDisplayed.add(position, deletedWord)
             setCreateAdapter.notifyItemInserted(position)

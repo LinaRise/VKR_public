@@ -23,7 +23,7 @@
             android:value="ocr" />
 
         <activity android:name=".ui.setCreate.SetCreateActivity"
-            android:parentActivityName = ".MainActivity">
+           >
 
         </activity>
         <activity
