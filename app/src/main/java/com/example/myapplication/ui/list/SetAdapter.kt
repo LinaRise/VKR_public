@@ -9,34 +9,71 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.entity.Sett
 
+
 // класс адаптер для отображения наборов слов через RecyclerView
-class SetAdapter internal constructor(context: Context?, private val sets: List<Sett>) :
+class SetAdapter internal constructor(
+    context: Context?, onSetListener: OnSetListener,
+    private val sets: LinkedHashMap<Sett, List<String>>
+) :
     RecyclerView.Adapter<SetAdapter.ViewHolder>() {
     private val inflater: LayoutInflater = LayoutInflater.from(context)
+    var onSetListener: OnSetListener = onSetListener
+
     //передаем шаблон строки
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view: View = inflater.inflate(R.layout.sets_list_item_veiw, parent, false)
-        return ViewHolder(view)
+        return ViewHolder(view, onSetListener)
     }
-// передаем информацию для отображения
+
+    // передаем информацию для отображения
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val state: Sett = sets[position]
-        holder.setTitle.text = state.settTitle
-        holder.languageInput.text = state.languageInput_id.toString()
-        holder.languageOutput.text = state.languageOutput_id.toString()
-        holder.wordsAmount.text = state.wordsAmount.toString()
+//        val state: Sett = sets[position]
+        val listValues: List<List<String>> = ArrayList<List<String>>(sets.values)
+        val listKeys: List<Sett> = ArrayList<Sett>(sets.keys)
+        val langList: List<*> = listValues[position]
+        holder.setTitle.text = listKeys[position].settTitle
+        holder.languageInput.text = langList[0].toString()
+        holder.languageOutput.text = langList[1].toString()
+        holder.wordsAmount.text = listKeys[position].wordsAmount.toString()
     }
-// возврат размера
+
+    // возврат размера
     override fun getItemCount(): Int {
         return sets.size
     }
 
     //конструктор
-    class ViewHolder internal constructor(view: View) : RecyclerView.ViewHolder(view) {
+   /* class ViewHolder internal constructor(view: View, val onSetListener: OnSetListener) : RecyclerView.ViewHolder(view), View.OnClickListener {
+
         val setTitle: TextView = view.findViewById(R.id.set_title)
         val languageInput: TextView = view.findViewById(R.id.language_input)
         val languageOutput: TextView = view.findViewById(R.id.language_output)
         val wordsAmount: TextView = view.findViewById(R.id.words_amount)
+
+        override fun onClick(p0: View?) {
+            onSetListener.onSetClicked(adapterPosition)
+        }
+
+    }*/
+
+    class ViewHolder(view: View, onNoteListener: OnSetListener) :
+        RecyclerView.ViewHolder(view), View.OnClickListener {
+        val setTitle: TextView = view.findViewById(R.id.set_title)
+        val languageInput: TextView = view.findViewById(R.id.language_input)
+        val languageOutput: TextView = view.findViewById(R.id.language_output)
+        val wordsAmount: TextView = view.findViewById(R.id.words_amount)
+        var mOnSetListener: OnSetListener = onNoteListener
+        override fun onClick(view: View) {
+            mOnSetListener.onSetClicked(adapterPosition)
+        }
+
+        init {
+            itemView.setOnClickListener(this)
+        }
+    }
+
+    interface OnSetListener {
+        fun onSetClicked(position: Int)
 
     }
 

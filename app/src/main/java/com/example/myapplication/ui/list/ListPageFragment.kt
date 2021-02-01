@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.list
 
+import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,15 +15,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.Sett
+import com.example.myapplication.ui.chathead.ChatHeadService
 import com.example.myapplication.ui.setCreate.SetUpDialog
+import com.example.myapplication.ui.setView.SetViewActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
-class ListPageFragment : Fragment(), IListPageView {
+class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
     private lateinit var presenter: ListPagePresenter
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var addSetButton: FloatingActionButton
-    private var setsDisplayed: ArrayList<Sett> = ArrayList()
+    private var setsDisplayed: LinkedHashMap <Sett, List<String>> = LinkedHashMap ()
     private lateinit var emptyTextView: TextView
     private lateinit var recyclerView: RecyclerView
 
@@ -47,7 +50,7 @@ class ListPageFragment : Fragment(), IListPageView {
 
         getSetsList()
         recyclerView.layoutManager = LinearLayoutManager(this.context)
-        val adapter = SetAdapter(this.context, setsDisplayed)
+        val adapter = SetAdapter(this.context, this, setsDisplayed)
         recyclerView.adapter = adapter
 //       val textView: TextView = root.findViewById(R.id.text_home)
 //        homeViewModel.text.observe(viewLifecycleOwner, Observer {
@@ -72,10 +75,10 @@ class ListPageFragment : Fragment(), IListPageView {
         presenter.loadData()
     }
 
-    override fun setData(sets: List<Sett>) {
+    override fun setData(sets: LinkedHashMap <Sett, List<String>>) {
         recyclerView.visibility = View.VISIBLE;
         emptyTextView.visibility = View.GONE;
-        setsDisplayed.addAll(sets)
+        setsDisplayed = sets
     }
 
     override fun openDialogForSetCreation() {
@@ -88,6 +91,13 @@ class ListPageFragment : Fragment(), IListPageView {
     override fun showMessage() {
         recyclerView.visibility = View.GONE;
         emptyTextView.visibility = View.VISIBLE;
+    }
+
+    override fun onSetClicked(position: Int) {
+        val listKeys: List<Sett> = ArrayList<Sett>(setsDisplayed.keys)
+        var intent = Intent(requireContext(), SetViewActivity::class.java)
+        intent.putExtra("settId" ,listKeys[position].settId)
+        startActivity(intent)
     }
 
 

@@ -17,7 +17,7 @@ class SetWordRepo(val dbhelper: DBHelper):IRepository<SetWord>  {
         TODO("Not yet implemented")
     }
 
-    override fun get(id: Long) {
+    override fun get(id: Long): SetWord {
         TODO("Not yet implemented")
     }
 
