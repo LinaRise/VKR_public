@@ -1,25 +1,27 @@
 package com.example.myapplication.ui.list
 
+import android.util.Log
+import com.example.myapplication.database.DBHelper
+import com.example.myapplication.database.repo.SettRepo
 import com.example.myapplication.entity.Sett
 
-class ListPagePresenter(view: IListPageView)  {
+class ListPagePresenter(view: IListPageView, dbhelper: DBHelper)  {
     private var mView: IListPageView = view
     private var set: Sett = Sett()
 
     private var sets = ArrayList<Sett>()
-
+    var mSettRepo: SettRepo = SettRepo(dbhelper)
     fun loadData(){
-        //пока просто список - будет обращение к бд
+        //обращение к бд
+        val setList =  mSettRepo.getAll()
 
-        var set1 = Sett(1, "1",1,1)
-        var set2 = Sett(2, "2",1,23)
-        var set3 = Sett(2, "3",2,23)
-
-        sets.add(set1)
-        sets.add(set2)
-        sets.add(set3)
-
-        mView.setData(sets)
+        if (setList!=null) {
+            mView.setData(setList)
+        }
+        else{
+           //показать сообщение, что спсиок сетов пустой
+            mView.showMessage()
+        }
     }
 
     fun openSet(){

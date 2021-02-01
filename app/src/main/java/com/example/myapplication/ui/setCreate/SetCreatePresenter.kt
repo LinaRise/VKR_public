@@ -5,6 +5,12 @@ import android.util.Log
 import android.widget.Toast
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.TablesAndColumns
+import com.example.myapplication.database.repo.LanguageRepo
+import com.example.myapplication.database.repo.SetWordRepo
+import com.example.myapplication.database.repo.SettRepo
+import com.example.myapplication.database.repo.WordRepo
+import com.example.myapplication.entity.Language
+import com.example.myapplication.entity.SetWord
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
 
@@ -14,7 +20,10 @@ class SetCreatePresenter(
 ) {
     private var mView: ISetCreateView = view
 
-    var mRepository: SetCreateRepo = SetCreateRepo(dbhelper)
+    var mLanguageRepo: LanguageRepo = LanguageRepo(dbhelper)
+    var mWordRepo: WordRepo = WordRepo(dbhelper)
+    var mSettRepo: SettRepo = SettRepo(dbhelper)
+    var mSetWordRepo: SetWordRepo = SetWordRepo(dbhelper)
     private var word: Word = Word()
     private var set: Sett = Sett()
     private var words = ArrayList<Word>()
@@ -35,21 +44,17 @@ class SetCreatePresenter(
         wordsDisplayed: List<Word>, setTitle: String, inputLanguage: String,
         outputLanguage: String
     ) {
-        Log.e("SetCreate", inputLanguage.trim())
-        val languageInputInfo = mRepository.getLanguageByTitle(inputLanguage.trim())
-        val languageOutputInfo = mRepository.getLanguageByTitle(outputLanguage.trim())
-        Log.e("SetCreate", languageInputInfo?.languageId.toString())
-        Log.e("SetCreate", languageOutputInfo?.languageId.toString())
-        Log.e("SetCreate", languageInputInfo!!.languageId.toString())
+        val languageInputInfo = mLanguageRepo.getByTitle(inputLanguage.trim())
+        val languageOutputInfo = mLanguageRepo.getByTitle(outputLanguage.trim())
+
 
         var newSet = Sett(0, setTitle, wordsAmount = wordsDisplayed.size)
         if (languageInputInfo != null) {
             if (languageInputInfo.languageId != 0L) {
                 newSet.languageInput_id = languageInputInfo.languageId
             } else {
-                val newInputLangId = mRepository.addLanguage(inputLanguage)
-                Log.e("SetCreate!", languageOutputInfo?.languageTitle.toString())
-                Log.e("SetCreate!", newInputLangId.toString())
+                val newInputLangId =
+                    mLanguageRepo.create(Language(languageTitle = inputLanguage.trim()))
                 newSet.languageInput_id = newInputLangId
             }
         }
@@ -58,20 +63,20 @@ class SetCreatePresenter(
                 newSet.languageOutput_id = languageOutputInfo.languageId
             } else {
                 if (outputLanguage.trim() != inputLanguage.trim()) {
-                    val newOutputLangId = mRepository.addLanguage(outputLanguage)
+                    val newOutputLangId =
+                        mLanguageRepo.create(Language(languageTitle = outputLanguage.trim()))
                     newSet.languageOutput_id = newOutputLangId
-                }
-                else{
+                } else {
                     newSet.languageOutput_id = newSet.languageInput_id
                 }
             }
         }
 
-        val setId = mRepository.addSet(newSet)
+        val settId = mSettRepo.create(newSet)
 
         for (word in wordsDisplayed) {
-            val wordId = mRepository.addWord(word)
-            mRepository.bindSetWord(wordId = wordId, settId = setId)
+            val wordId = mWordRepo.create(word)
+            mSetWordRepo.create(SetWord(settId = settId, wordId = wordId))
         }
     }
 

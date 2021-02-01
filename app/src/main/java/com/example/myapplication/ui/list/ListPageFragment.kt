@@ -1,28 +1,34 @@
 package com.example.myapplication.ui.list
 
-import android.content.Intent
+import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
+import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.Sett
-import com.example.myapplication.ui.setCreate.SetCreateActivity
 import com.example.myapplication.ui.setCreate.SetUpDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
-class ListPageFragment : Fragment(),IListPageView {
+class ListPageFragment : Fragment(), IListPageView {
     private lateinit var presenter: ListPagePresenter
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var addSetButton: FloatingActionButton
     private var setsDisplayed: ArrayList<Sett> = ArrayList()
+    private lateinit var emptyTextView: TextView
+    private lateinit var recyclerView: RecyclerView
+
+    lateinit var dbhelper: DBHelper
+    lateinit var db: SQLiteDatabase
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -32,9 +38,11 @@ class ListPageFragment : Fragment(),IListPageView {
         homeViewModel =
             ViewModelProvider(this).get(HomeViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_list, container, false)
-        val recyclerView: RecyclerView = root.findViewById(R.id.set_list)
+        recyclerView = root.findViewById(R.id.set_list)
+        emptyTextView = root.findViewById(R.id.empty_view) as TextView
+        dbhelper = DBHelper(requireContext())
 
-        presenter = ListPagePresenter(this)
+        presenter = ListPagePresenter(this, dbhelper)
 
 
         getSetsList()
@@ -65,14 +73,21 @@ class ListPageFragment : Fragment(),IListPageView {
     }
 
     override fun setData(sets: List<Sett>) {
-       setsDisplayed.addAll(sets)
+        recyclerView.visibility = View.VISIBLE;
+        emptyTextView.visibility = View.GONE;
+        setsDisplayed.addAll(sets)
     }
 
     override fun openDialogForSetCreation() {
         val setUpDialog = SetUpDialog()
-        setUpDialog.show(parentFragmentManager,"Set Up Dialog")
+        setUpDialog.show(parentFragmentManager, "Set Up Dialog")
 //        val intent = Intent(activity, SetCreateActivity::class.java)
 //        startActivity(intent)
+    }
+
+    override fun showMessage() {
+        recyclerView.visibility = View.GONE;
+        emptyTextView.visibility = View.VISIBLE;
     }
 
 
