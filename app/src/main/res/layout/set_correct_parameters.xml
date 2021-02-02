@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="18dp">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/edit_set_title"
+        android:hint="Set title"/>
+
+    <AutoCompleteTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/edit_language_input"
+        android:hint="Input language"
+        android:layout_below="@+id/edit_set_title"
+        android:completionThreshold="1"
+        android:completionHint="Choose input language"/>
+
+    <AutoCompleteTextView
+        android:id="@+id/edit_language_output"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:completionHint="Choose output language"
+        android:completionThreshold="1"
+        android:layout_below="@+id/edit_language_input"
+        android:hint="Output language" />
+</RelativeLayout>

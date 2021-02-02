@@ -1,4 +1,4 @@
-package com.example.myapplication.database.repo
+package com.example.myapplication.database.repo.language
 
 import android.content.ContentValues
 import android.database.Cursor
@@ -7,6 +7,7 @@ import android.provider.BaseColumns
 import android.util.Log
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.TablesAndColumns
+import com.example.myapplication.database.repo.IRepository
 import com.example.myapplication.entity.Language
 import java.lang.Exception
 
@@ -15,14 +16,14 @@ class LanguageRepo(val dbhelper: DBHelper) : IRepository<Language> {
     lateinit var db: SQLiteDatabase
     override fun create(entity: Language): Long {
         db = dbhelper.writableDatabase
-        db.setTransactionSuccessful()
+        db.beginTransaction()
         var id = -1L
         try {
             val cv = ContentValues()
             cv.clear();
             cv.put(TablesAndColumns.LanguageEntry.COL_LANGUAGE_TITLE, entity.languageTitle)
             cv.put(TablesAndColumns.LanguageEntry.COL_SUPPORTS_TRANSLATION, 0)
-            var id = db.insertOrThrow(TablesAndColumns.LanguageEntry.TABLE_NAME, null, cv)
+            id = db.insertOrThrow(TablesAndColumns.LanguageEntry.TABLE_NAME, null, cv)
             db.setTransactionSuccessful()
         } catch (e: Exception) {
             Log.d("LanguageRepo", "Error while trying to add post to database");

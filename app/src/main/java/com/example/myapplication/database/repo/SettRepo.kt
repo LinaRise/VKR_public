@@ -15,7 +15,7 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
     lateinit var db: SQLiteDatabase
     override fun create(entity: Sett): Long {
         db = dbhelper.writableDatabase
-        db.setTransactionSuccessful()
+        db.beginTransaction()
         var id = -1L
         try {
             val cv = ContentValues()

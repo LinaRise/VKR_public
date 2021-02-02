@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.Sett
-import com.example.myapplication.ui.chathead.ChatHeadService
 import com.example.myapplication.ui.setCreate.SetUpDialog
 import com.example.myapplication.ui.setView.SetViewActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -25,12 +24,14 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
     private lateinit var presenter: ListPagePresenter
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var addSetButton: FloatingActionButton
-    private var setsDisplayed: LinkedHashMap <Sett, List<String>> = LinkedHashMap ()
+    private var setsDisplayed: LinkedHashMap<Sett, List<String>> = LinkedHashMap()
     private lateinit var emptyTextView: TextView
     private lateinit var recyclerView: RecyclerView
 
     lateinit var dbhelper: DBHelper
     lateinit var db: SQLiteDatabase
+    private lateinit var adapter: SetAdapter
+    private var allowRefresh: Boolean = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,11 +48,6 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
 
         presenter = ListPagePresenter(this, dbhelper)
 
-
-        getSetsList()
-        recyclerView.layoutManager = LinearLayoutManager(this.context)
-        val adapter = SetAdapter(this.context, this, setsDisplayed)
-        recyclerView.adapter = adapter
 //       val textView: TextView = root.findViewById(R.id.text_home)
 //        homeViewModel.text.observe(viewLifecycleOwner, Observer {
 //            textView.text = it
@@ -61,6 +57,24 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
 
         return root
     }
+
+    override fun onStart() {
+        super.onStart()
+        setsDisplayed.clear()
+        getSetsList()
+        recyclerView.layoutManager = LinearLayoutManager(this.context)
+        adapter = SetAdapter(this.context, this, setsDisplayed)
+        recyclerView.adapter = adapter
+    }
+
+//    override fun onResume() {
+//        super.onResume()
+////        setsDisplayed.clear() //clear array
+//         // notify adapter
+//        getSetsList() // getdatas from service
+//        adapter.notifyDataSetChanged()
+//    }
+
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -75,10 +89,11 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
         presenter.loadData()
     }
 
-    override fun setData(sets: LinkedHashMap <Sett, List<String>>) {
+    override fun setData(setsInfo: LinkedHashMap<Sett, List<String>>) {
         recyclerView.visibility = View.VISIBLE;
         emptyTextView.visibility = View.GONE;
-        setsDisplayed = sets
+        setsDisplayed = setsInfo
+//        adapter.notifyDataSetChanged()
     }
 
     override fun openDialogForSetCreation() {
@@ -96,9 +111,15 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
     override fun onSetClicked(position: Int) {
         val listKeys: List<Sett> = ArrayList<Sett>(setsDisplayed.keys)
         var intent = Intent(requireContext(), SetViewActivity::class.java)
-        intent.putExtra("settId" ,listKeys[position].settId)
+        intent.putExtra("settId", listKeys[position].settId)
         startActivity(intent)
     }
+
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        dbhelper.close()
+//
+//    }
 
 
 }

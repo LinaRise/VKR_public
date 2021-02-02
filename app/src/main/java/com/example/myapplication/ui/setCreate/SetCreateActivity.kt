@@ -6,7 +6,9 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
+import android.widget.AutoCompleteTextView
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -17,10 +19,11 @@ import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.Word
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_set_create.*
 
 
-class SetCreateActivity : AppCompatActivity(), ISetCreateView {
+class SetCreateActivity : AppCompatActivity(), ISetCreateView,ISetInputData {
     private lateinit var deletedWord: Word
     private lateinit var recyclerView: RecyclerView
     private lateinit var setCreateAdapter: SetCreateAdapter
@@ -28,13 +31,16 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView {
     private lateinit var originalText: TextInputEditText
     private lateinit var translatedText: TextInputEditText
     lateinit var presenter: SetCreatePresenter
-    lateinit var dbhelper:DBHelper
+    lateinit var dbhelper: DBHelper
     lateinit var db: SQLiteDatabase
 
-    private lateinit var setTitle:String
-    private lateinit var inputLanguage:String
-    private lateinit var outputLanguage:String
+    private lateinit var setTitle: String
+    private lateinit var inputLanguage: String
+    private lateinit var outputLanguage: String
+    private var editTextTitle: EditText? = null
 
+    private var editTextInputLang: AutoCompleteTextView? = null
+    private var editTextOutputLang: AutoCompleteTextView? = null
     // которые отображаются на экране
     var wordsDisplayed = ArrayList<Word>()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,10 +78,13 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView {
         word_add_button.setOnClickListener { onAddWordBtnClick() }
 
     }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.add_new_activity_bar, menu)
         return true
     }
+
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle item selection
@@ -85,9 +94,25 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView {
                 return true
             }
             R.id.check_icon -> {
-                presenter.onDoneButtonWasClicked(wordsDisplayed,setTitle,inputLanguage,outputLanguage)
+                presenter.onDoneButtonWasClicked(
+                    wordsDisplayed,
+                    setTitle,
+                    inputLanguage,
+                    outputLanguage
+                )
                 Toast.makeText(this, "added successfully", Toast.LENGTH_SHORT).show()
                 finish()
+                return true
+            }
+            R.id.ic_settings -> {
+                val setCorrectInfoDialog = SetCorrectInfoDialog()
+                val args = Bundle()
+                args.putString("settTitle", setTitle)
+                args.putString("inputLanguage", inputLanguage)
+                args.putString("outputLanguage", outputLanguage)
+                setCorrectInfoDialog.arguments = args
+                val manager = supportFragmentManager
+                setCorrectInfoDialog.show(manager, "Set Up Dialog")
                 return true
             }
             else -> super.onOptionsItemSelected(item)
@@ -141,6 +166,14 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView {
 
         }
 
+
+
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        dbhelper.close()
+//
+//    }
+
     override fun setData(words: List<Word>) {
         wordsDisplayed.addAll(words)
     }
@@ -190,6 +223,12 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView {
         translatedText.setText("")
 
 
+    }
+
+    override fun onInputedData(list: ArrayList<String>) {
+        setTitle = list[0].trim()
+        inputLanguage = list[1].trim()
+        outputLanguage = list[2].trim()
     }
 
 

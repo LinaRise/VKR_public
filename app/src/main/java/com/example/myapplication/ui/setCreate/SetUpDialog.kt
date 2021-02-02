@@ -15,8 +15,7 @@ import com.example.myapplication.R
 class SetUpDialog : AppCompatDialogFragment() {
 
     companion object {
-        private val LANGAUGES = arrayListOf<String>("Russian", "English", "Chinese", "German")
-
+        private val LANGAUGES = arrayListOf<String>("Russian", "English", "French", "German","Czech")
     }
 
     private var editTextTitle: EditText? = null
@@ -50,7 +49,7 @@ class SetUpDialog : AppCompatDialogFragment() {
             requireContext(), R.array.available_translation_languages, android.R.layout.simple_list_item_1)
         editTextInputLang!!.setAdapter(adapter)
         editTextOutputLang!!.setAdapter(adapter)
-        return alertDialogBuilder.create();
+        return alertDialogBuilder.create()
 
 
     }

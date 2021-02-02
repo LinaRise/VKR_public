@@ -1,12 +1,13 @@
-package com.example.myapplication.database.repo
+package com.example.myapplication.database.repo.word
 
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.TablesAndColumns
+import com.example.myapplication.database.repo.IRepository
 import com.example.myapplication.entity.Word
 
-class WordRepo(val dbhelper: DBHelper):IRepository<Word> {
+class WordRepo(val dbhelper: DBHelper): IRepository<Word> {
     lateinit var db: SQLiteDatabase
     override fun create(entity: Word): Long {
         db = dbhelper.writableDatabase

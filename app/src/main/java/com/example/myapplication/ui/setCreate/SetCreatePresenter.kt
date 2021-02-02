@@ -1,25 +1,25 @@
 package com.example.myapplication.ui.setCreate
 
-import android.database.sqlite.SQLiteDatabase
-import android.util.Log
-import android.widget.Toast
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.TablesAndColumns
-import com.example.myapplication.database.repo.LanguageRepo
+import com.example.myapplication.database.repo.language.LanguageRepo
 import com.example.myapplication.database.repo.SetWordRepo
 import com.example.myapplication.database.repo.SettRepo
-import com.example.myapplication.database.repo.WordRepo
+import com.example.myapplication.database.repo.word.WordCreateAsyncTask
+import com.example.myapplication.database.repo.word.WordRepo
 import com.example.myapplication.entity.Language
 import com.example.myapplication.entity.SetWord
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
+import java.util.*
+import kotlin.collections.ArrayList
 
 class SetCreatePresenter(
     view: ISetCreateView,
     dbhelper: DBHelper
 ) {
     private var mView: ISetCreateView = view
-
+    private var dbhelper = dbhelper
     var mLanguageRepo: LanguageRepo = LanguageRepo(dbhelper)
     var mWordRepo: WordRepo = WordRepo(dbhelper)
     var mSettRepo: SettRepo = SettRepo(dbhelper)
@@ -46,9 +46,7 @@ class SetCreatePresenter(
     ) {
         val languageInputInfo = mLanguageRepo.getByTitle(inputLanguage.trim())
         val languageOutputInfo = mLanguageRepo.getByTitle(outputLanguage.trim())
-
-
-        var newSet = Sett(0, setTitle, wordsAmount = wordsDisplayed.size)
+        var newSet = Sett(0, setTitle.trim(), wordsAmount = wordsDisplayed.size)
         if (languageInputInfo != null) {
             if (languageInputInfo.languageId != 0L) {
                 newSet.languageInput_id = languageInputInfo.languageId
@@ -75,8 +73,10 @@ class SetCreatePresenter(
         val settId = mSettRepo.create(newSet)
 
         for (word in wordsDisplayed) {
-            val wordId = mWordRepo.create(word)
-            mSetWordRepo.create(SetWord(settId = settId, wordId = wordId))
+            val wordCreateAsyncTask = WordCreateAsyncTask(dbhelper = dbhelper)
+            wordCreateAsyncTask.execute(wordsDisplayed as Any, settId as Any)
+           /* val wordId = mWordRepo.create(word)
+            mSetWordRepo.create(SetWord(settId = settId, wordId = wordId))*/
         }
     }
 
