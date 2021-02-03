@@ -57,7 +57,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView,ISetInputData {
             outputLanguage = extras.getString("outputLanguage").toString()
         }
 
-        db = dbhelper.writableDatabase
+//        db = dbhelper.writableDatabase
         // showing the back button in action bar
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -84,7 +84,10 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView,ISetInputData {
         return true
     }
 
-
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
+    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle item selection
@@ -115,7 +118,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView,ISetInputData {
                 setCorrectInfoDialog.show(manager, "Set Up Dialog")
                 return true
             }
-            else -> super.onOptionsItemSelected(item)
+            else ->false
         }
     }
 

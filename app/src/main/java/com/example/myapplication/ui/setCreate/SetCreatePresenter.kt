@@ -1,17 +1,14 @@
 package com.example.myapplication.ui.setCreate
 
 import com.example.myapplication.database.DBHelper
-import com.example.myapplication.database.TablesAndColumns
 import com.example.myapplication.database.repo.language.LanguageRepo
-import com.example.myapplication.database.repo.SetWordRepo
-import com.example.myapplication.database.repo.SettRepo
+import com.example.myapplication.database.repo.setword.SetWordRepo
+import com.example.myapplication.database.repo.sett.SettRepo
 import com.example.myapplication.database.repo.word.WordCreateAsyncTask
 import com.example.myapplication.database.repo.word.WordRepo
 import com.example.myapplication.entity.Language
-import com.example.myapplication.entity.SetWord
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
-import java.util.*
 import kotlin.collections.ArrayList
 
 class SetCreatePresenter(
@@ -72,12 +69,12 @@ class SetCreatePresenter(
 
         val settId = mSettRepo.create(newSet)
 
-        for (word in wordsDisplayed) {
-            val wordCreateAsyncTask = WordCreateAsyncTask(dbhelper = dbhelper)
-            wordCreateAsyncTask.execute(wordsDisplayed as Any, settId as Any)
+
+        val wordCreateAsyncTask = WordCreateAsyncTask(dbhelper = dbhelper)
+        wordCreateAsyncTask.execute(wordsDisplayed as Any, settId as Any)
            /* val wordId = mWordRepo.create(word)
             mSetWordRepo.create(SetWord(settId = settId, wordId = wordId))*/
-        }
+
     }
 
     fun addNewWord(original: String, translated: String) {

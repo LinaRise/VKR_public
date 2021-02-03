@@ -1,11 +1,13 @@
-package com.example.myapplication.database.repo
+package com.example.myapplication.database.repo.sett
 
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import android.provider.BaseColumns
 import android.util.Log
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.TablesAndColumns
+import com.example.myapplication.database.repo.IRepository
 import com.example.myapplication.entity.Language
 import com.example.myapplication.entity.Sett
 import java.lang.Error
@@ -42,8 +44,29 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
         TODO("Not yet implemented")
     }
 
-    override fun get(id: Long): Sett {
-        TODO("Not yet implemented")
+    override fun get(id: Long): Sett? {
+        db = dbhelper.readableDatabase
+        val cursor: Cursor? =
+            db.rawQuery(
+                "SELECT * FROM ${TablesAndColumns.SettEntry.TABLE_NAME} WHERE ${TablesAndColumns.SettEntry.TABLE_NAME}${BaseColumns._ID} = ?",
+                arrayOf(id.toString())
+            )
+        var sett: Sett? = null
+        if (cursor != null) {
+            sett = Sett()
+            if (cursor.moveToFirst()) {
+                sett.settId = cursor.getLong(0)
+                sett.settTitle = cursor.getString(1)
+                sett.languageInput_id = cursor.getLong(2)
+                sett.languageOutput_id = cursor.getLong(3)
+                sett.wordsAmount = cursor.getInt(4)
+
+            }
+            cursor.close()
+        }
+
+        db.close()
+        return sett
     }
 
     override fun getAll(): List<Sett>? {

@@ -2,7 +2,7 @@ package com.example.myapplication.ui.list
 
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.repo.language.LanguageRepo
-import com.example.myapplication.database.repo.SettRepo
+import com.example.myapplication.database.repo.sett.SettRepo
 import com.example.myapplication.entity.Sett
 
 class ListPagePresenter(view: IListPageView, dbhelper: DBHelper) {

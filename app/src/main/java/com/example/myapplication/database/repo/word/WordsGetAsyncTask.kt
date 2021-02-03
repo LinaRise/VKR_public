@@ -1,36 +1,33 @@
 package com.example.myapplication.database.repo.word
 
 import android.os.AsyncTask
+import android.util.Log
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.repo.setword.SetWordRepo
 import com.example.myapplication.entity.SetWord
 import com.example.myapplication.entity.Word
-import kotlin.collections.ArrayList
+import com.example.myapplication.ui.setView.SetViewAdapter
 
-class WordCreateAsyncTask(dbhelper: DBHelper) : AsyncTask<Any, Unit,Unit>() {
+class WordsGetAsyncTask (dbhelper: DBHelper, adapter: SetViewAdapter) : AsyncTask<Long, Unit, List<Word>>() {
 
     var mWordRepo: WordRepo = WordRepo(dbhelper)
-    var mSetWordRepo: SetWordRepo = SetWordRepo(dbhelper)
+    var mAdapter = adapter
 
     override fun onPreExecute() {
         super.onPreExecute()
     }
 
-    override fun onPostExecute(result: Unit?) {
+    override fun onPostExecute(result: List<Word>?) {
         super.onPostExecute(result)
 //        Log.d("DEBUG_TAG", "Language inserted with id $result")
+        mAdapter.setData(result)
+        mAdapter.notifyDataSetChanged();
 
     }
 
 
-    override fun doInBackground(vararg p0: Any) {
-        val wordList = p0[0] as ArrayList<Word>
-        val settId = p0[1] as Long
-        for (word in wordList) {
-            val wordId = mWordRepo.create(word)
-            mSetWordRepo.create(SetWord(settId = settId, wordId = wordId))
-        }
+    override fun doInBackground(vararg p0: Long?): List<Word>? {
+        Log.d("WordsGetAsyncTask class", "DoInBackground")
+        return mWordRepo.getWordsOfSet(settId = p0[0]!!)
     }
-
-
 }
