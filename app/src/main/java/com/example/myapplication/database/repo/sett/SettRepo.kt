@@ -26,10 +26,11 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
             cv.put(TablesAndColumns.SettEntry.COL_LANGUAGE_INPUT_ID, entity.languageInput_id)
             cv.put(TablesAndColumns.SettEntry.COL_LANGUAGE_OUTPUT_ID, entity.languageOutput_id)
             cv.put(TablesAndColumns.SettEntry.COL_WORDS_AMOUNT, entity.wordsAmount)
+            cv.put(TablesAndColumns.SettEntry.COL_AUTO_SUGGEST, entity.hasAutoSuggest)
             id = db.insertOrThrow(TablesAndColumns.SettEntry.TABLE_NAME, null, cv)
             db.setTransactionSuccessful();
         } catch (e: Exception) {
-            Log.d("LanguageRepo", "Error while trying to add post to database");
+            Log.d("SettRepo", "Error while trying to add sett to database");
         } finally {
             db.endTransaction()
             return id
@@ -51,15 +52,24 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
                 "SELECT * FROM ${TablesAndColumns.SettEntry.TABLE_NAME} WHERE ${TablesAndColumns.SettEntry.TABLE_NAME}${BaseColumns._ID} = ?",
                 arrayOf(id.toString())
             )
+
         var sett: Sett? = null
         if (cursor != null) {
+            val colSetTitle = cursor.getColumnIndex(TablesAndColumns.SettEntry.COL_SET_TITLE)
+            val colLangInputId =
+                cursor.getColumnIndex(TablesAndColumns.SettEntry.COL_LANGUAGE_INPUT_ID)
+            val colLangOutputId =
+                cursor.getColumnIndex(TablesAndColumns.SettEntry.COL_LANGUAGE_OUTPUT_ID)
+            val colWordsAmount = cursor.getColumnIndex(TablesAndColumns.SettEntry.COL_WORDS_AMOUNT)
+            val colAutoSuggest = cursor.getColumnIndex(TablesAndColumns.SettEntry.COL_AUTO_SUGGEST)
             sett = Sett()
             if (cursor.moveToFirst()) {
                 sett.settId = cursor.getLong(0)
-                sett.settTitle = cursor.getString(1)
-                sett.languageInput_id = cursor.getLong(2)
-                sett.languageOutput_id = cursor.getLong(3)
-                sett.wordsAmount = cursor.getInt(4)
+                sett.settTitle = cursor.getString(colSetTitle)
+                sett.languageInput_id = cursor.getLong(colLangInputId)
+                sett.languageOutput_id = cursor.getLong(colLangOutputId)
+                sett.wordsAmount = cursor.getInt(colWordsAmount)
+                sett.hasAutoSuggest = cursor.getInt(colAutoSuggest)
 
             }
             cursor.close()
@@ -91,6 +101,7 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
             val colLangOutputId =
                 cursor.getColumnIndex(TablesAndColumns.SettEntry.COL_LANGUAGE_OUTPUT_ID)
             val colWordsAmount = cursor.getColumnIndex(TablesAndColumns.SettEntry.COL_WORDS_AMOUNT)
+            val colAutoSuggest = cursor.getColumnIndex(TablesAndColumns.SettEntry.COL_AUTO_SUGGEST)
 
             try {
                 while (cursor.moveToNext()) {
@@ -100,6 +111,7 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
                     sett.languageInput_id = cursor.getLong(colLangInputId)
                     sett.languageOutput_id = cursor.getLong(colLangOutputId)
                     sett.wordsAmount = cursor.getInt(colWordsAmount)
+                    sett.hasAutoSuggest = cursor.getInt(colAutoSuggest)
                     settList.add(sett)
                 }
 

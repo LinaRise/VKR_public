@@ -38,7 +38,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView,ISetInputData {
     private lateinit var inputLanguage: String
     private lateinit var outputLanguage: String
     private var editTextTitle: EditText? = null
-
+    private var hasAutoSuggest = 0;
     private var editTextInputLang: AutoCompleteTextView? = null
     private var editTextOutputLang: AutoCompleteTextView? = null
     // которые отображаются на экране
@@ -55,6 +55,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView,ISetInputData {
             setTitle = extras.getString("setTitle").toString()
             inputLanguage = extras.getString("inputLanguage").toString()
             outputLanguage = extras.getString("outputLanguage").toString()
+            hasAutoSuggest = extras.getInt("hasAutoSuggest")
         }
 
 //        db = dbhelper.writableDatabase
@@ -101,7 +102,8 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView,ISetInputData {
                     wordsDisplayed,
                     setTitle,
                     inputLanguage,
-                    outputLanguage
+                    outputLanguage,
+                    hasAutoSuggest
                 )
                 Toast.makeText(this, "added successfully", Toast.LENGTH_SHORT).show()
                 finish()
@@ -113,6 +115,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView,ISetInputData {
                 args.putString("settTitle", setTitle)
                 args.putString("inputLanguage", inputLanguage)
                 args.putString("outputLanguage", outputLanguage)
+                args.putInt("hasAutoSuggest", hasAutoSuggest)
                 setCorrectInfoDialog.arguments = args
                 val manager = supportFragmentManager
                 setCorrectInfoDialog.show(manager, "Set Up Dialog")
@@ -228,10 +231,12 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView,ISetInputData {
 
     }
 
-    override fun onInputedData(list: ArrayList<String>) {
-        setTitle = list[0].trim()
-        inputLanguage = list[1].trim()
-        outputLanguage = list[2].trim()
+    override fun onInputedData(list: ArrayList<Any>) {
+        setTitle = (list[0] as String).trim()
+        inputLanguage = (list[1] as String).trim()
+        outputLanguage = (list[2] as String).trim()
+        hasAutoSuggest = list[3] as Int
+
     }
 
 

@@ -11,5 +11,6 @@ data class Sett(// название
 
     var languageInput_id: Long=0 ,
     var languageOutput_id: Long=0 ,
-    var wordsAmount: Int=0
+    var wordsAmount: Int=0,
+    var hasAutoSuggest: Int=0
 )

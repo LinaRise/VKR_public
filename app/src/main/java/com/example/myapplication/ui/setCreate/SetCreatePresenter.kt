@@ -39,11 +39,11 @@ class SetCreatePresenter(
 
     fun onDoneButtonWasClicked(
         wordsDisplayed: List<Word>, setTitle: String, inputLanguage: String,
-        outputLanguage: String
+        outputLanguage: String, hasAutoSuggest:Int
     ) {
         val languageInputInfo = mLanguageRepo.getByTitle(inputLanguage.trim())
         val languageOutputInfo = mLanguageRepo.getByTitle(outputLanguage.trim())
-        var newSet = Sett(0, setTitle.trim(), wordsAmount = wordsDisplayed.size)
+        var newSet = Sett(0, setTitle.trim(), wordsAmount = wordsDisplayed.size, hasAutoSuggest = hasAutoSuggest)
         if (languageInputInfo != null) {
             if (languageInputInfo.languageId != 0L) {
                 newSet.languageInput_id = languageInputInfo.languageId

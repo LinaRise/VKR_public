@@ -20,10 +20,12 @@ object TablesAndColumns {
          const val COL_LANGUAGE_INPUT_ID = "languageInput_id"
          const val COL_LANGUAGE_OUTPUT_ID = "languageOutput_id"
          const val COL_WORDS_AMOUNT = "words_amount"
+         const val COL_AUTO_SUGGEST = "has_auto_suggest"
     }
     object SettWordEntry : BaseColumns {
          const val TABLE_NAME  = "sett_word"
          const val COL_SET_ID = "sett_id"
          const val COL_WORD_ID = "word_id"
+
     }
 }

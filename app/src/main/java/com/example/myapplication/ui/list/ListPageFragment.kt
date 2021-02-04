@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
@@ -65,6 +66,7 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
         recyclerView.layoutManager = LinearLayoutManager(this.context)
         adapter = SetAdapter(this.context, this, setsDisplayed)
         recyclerView.adapter = adapter
+        recyclerView.itemAnimator = DefaultItemAnimator()
     }
 
 //    override fun onResume() {

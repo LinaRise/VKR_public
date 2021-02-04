@@ -45,12 +45,13 @@ class DBHelper(context: Context) :
         private const val CREATE_TABLE_SET =
             "CREATE TABLE ${SettEntry.TABLE_NAME} ( ${SettEntry.TABLE_NAME}${BaseColumns._ID}  INTEGER PRIMARY KEY autoincrement, " +
                     "${SettEntry.COL_SET_TITLE} TEXT not null, ${SettEntry.COL_LANGUAGE_INPUT_ID} INTEGER not null, ${SettEntry.COL_LANGUAGE_OUTPUT_ID} INTEGER not null, ${SettEntry.COL_WORDS_AMOUNT} INTEGER not null, " +
+                    "${SettEntry.COL_AUTO_SUGGEST} INTEGER not null DEFAULT 0, "+
                     "FOREIGN KEY (${SettEntry.COL_LANGUAGE_INPUT_ID}) REFERENCES ${LanguageEntry.TABLE_NAME} (${LanguageEntry.TABLE_NAME}${BaseColumns._ID}), " +
                     "FOREIGN KEY (${SettEntry.COL_LANGUAGE_OUTPUT_ID}) REFERENCES ${LanguageEntry.TABLE_NAME} (${LanguageEntry.TABLE_NAME}${BaseColumns._ID})," +
                     "UNIQUE (${SettEntry.COL_SET_TITLE} ,${SettEntry.COL_LANGUAGE_INPUT_ID},${SettEntry.COL_LANGUAGE_OUTPUT_ID}) );"
 
         private const val CREATE_TABLE_SET_WORD =
-            "CREATE TABLE ${SettWordEntry.TABLE_NAME} ( ${SettWordEntry.TABLE_NAME}${BaseColumns._ID} INTEGER PRIMARY KEY autoincrement, ${SettWordEntry.COL_SET_ID} INTEGER not null, ${SettWordEntry.COL_WORD_ID} INTEGER not null, " +
+            "CREATE TABLE ${SettWordEntry.TABLE_NAME} (${SettWordEntry.TABLE_NAME}${BaseColumns._ID} INTEGER PRIMARY KEY autoincrement, ${SettWordEntry.COL_SET_ID} INTEGER not null, ${SettWordEntry.COL_WORD_ID} INTEGER not null, " +
                     "FOREIGN KEY (${SettWordEntry.COL_SET_ID}) REFERENCES ${SettEntry.TABLE_NAME} (${SettEntry.TABLE_NAME}${BaseColumns._ID}), " +
                     "FOREIGN KEY (${SettWordEntry.COL_WORD_ID}) REFERENCES ${WordEntry.TABLE_NAME} (${WordEntry.TABLE_NAME}${BaseColumns._ID}) );"
 

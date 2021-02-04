@@ -50,14 +50,12 @@ class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
                         "LEFT OUTER JOIN ${TablesAndColumns.SettEntry.TABLE_NAME} s " +
                         "ON sw.sett_word_id = s.sett_id " +
                         "WHERE s.sett_id = ?",*/
-                "SELECT w.*" +
-                        " FROM  word w " +
+                "SELECT w.* FROM  word w " +
                         "JOIN sett_word sw " +
                         "ON w.word_id = sw.word_id " +
                         "JOIN sett s " +
-                        "ON sw.sett_word_id = s.sett_id " +
-                        "WHERE sw.sett_id = ?",
-                arrayOf(settId.toString())
+                        "ON sw.sett_id = s.sett_id ",
+               null
             )
         Log.d("word class","")
         var word: Word?

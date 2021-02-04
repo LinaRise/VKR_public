@@ -4,9 +4,7 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
-import android.widget.EditText
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDialogFragment
 import com.example.myapplication.R
@@ -15,7 +13,14 @@ import com.example.myapplication.R
 class SetUpDialog : AppCompatDialogFragment() {
 
     companion object {
-        private val LANGAUGES = arrayListOf<String>("Russian", "English", "French", "German","Czech")
+        private val LANGAUGES = arrayListOf<String>(
+            "Russian",
+            "English",
+            "French",
+            "German",
+            "Czech"
+        )
+        private var hasAutoSuggest = 0;
     }
 
     private var editTextTitle: EditText? = null
@@ -27,6 +32,18 @@ class SetUpDialog : AppCompatDialogFragment() {
         var alertDialogBuilder = AlertDialog.Builder(requireActivity())
         val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.set_parameters, null)
+
+        var checkBox =  view.findViewById<CheckBox>(R.id.checkbox)
+            .setOnCheckedChangeListener { buttonView, isChecked ->
+                hasAutoSuggest = if (isChecked){
+                    Toast.makeText(requireContext(),"Checked",Toast.LENGTH_SHORT).show()
+                    1
+                } else{
+                    Toast.makeText(requireContext(),"Unchecked",Toast.LENGTH_SHORT).show()
+                    0
+                }
+            }
+
         alertDialogBuilder.setView(view)
             .setTitle("New Set")
             .setNegativeButton("cancel",
@@ -40,13 +57,17 @@ class SetUpDialog : AppCompatDialogFragment() {
                 intent.putExtra("setTitle", setTitle)
                 intent.putExtra("inputLanguage", inputLang)
                 intent.putExtra("outputLanguage", outputLang)
+                intent.putExtra("hasAutoSuggest", hasAutoSuggest)
                 startActivity(intent)
             })
         editTextTitle = view.findViewById(R.id.edit_set_title)
         editTextInputLang = view.findViewById(R.id.edit_language_input) as AutoCompleteTextView
         editTextOutputLang = view.findViewById(R.id.edit_language_output) as AutoCompleteTextView
         val adapter = ArrayAdapter.createFromResource(
-            requireContext(), R.array.available_translation_languages, android.R.layout.simple_list_item_1)
+            requireContext(),
+            R.array.available_translation_languages,
+            android.R.layout.simple_list_item_1
+        )
         editTextInputLang!!.setAdapter(adapter)
         editTextOutputLang!!.setAdapter(adapter)
         return alertDialogBuilder.create()

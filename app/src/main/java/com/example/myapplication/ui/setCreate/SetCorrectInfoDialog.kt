@@ -19,23 +19,42 @@ class SetCorrectInfoDialog : AppCompatDialogFragment() {
     private var editTextTitle: EditText? = null
     private var editTextInputLang: AutoCompleteTextView? = null
     private var editTextOutputLang: AutoCompleteTextView? = null
-
+    private var hasAutoSuggest = 0
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         var alertDialogBuilder = AlertDialog.Builder(requireActivity())
         val inflater = requireActivity().layoutInflater
 
-        val view = inflater.inflate(R.layout.set_correct_parameters, null)
+        val view = inflater.inflate(R.layout.set_parameters, null)
         val setTitleReceived = requireArguments().getString("settTitle")
         editTextTitle = view.findViewById(R.id.edit_set_title)
         editTextInputLang = view.findViewById(R.id.edit_language_input) as AutoCompleteTextView
         editTextOutputLang = view.findViewById(R.id.edit_language_output) as AutoCompleteTextView
-        Toast.makeText(requireContext(),setTitleReceived,Toast.LENGTH_SHORT).show()
+        val checkBox = view.findViewById<CheckBox>(R.id.checkbox) as CheckBox
+        Toast.makeText(requireContext(), setTitleReceived, Toast.LENGTH_SHORT).show()
         val inputLangReceived = requireArguments().getString("inputLanguage")
         val outputLangReceived = requireArguments().getString("outputLanguage")
+        val hasAutoSuggestReceived = requireArguments().getInt("hasAutoSuggest")
+
+        checkBox.isChecked = hasAutoSuggestReceived == 1
+
+
+
         editTextTitle?.setText(setTitleReceived)
-        editTextInputLang?.setText(inputLangReceived,TextView.BufferType.EDITABLE)
-        editTextOutputLang?.setText(outputLangReceived,TextView.BufferType.EDITABLE)
+        editTextInputLang?.setText(inputLangReceived, TextView.BufferType.EDITABLE)
+        editTextOutputLang?.setText(outputLangReceived, TextView.BufferType.EDITABLE)
+
+        checkBox
+            .setOnCheckedChangeListener { buttonView, isChecked ->
+                if (isChecked) {
+                    Toast.makeText(requireContext(), "Checked", Toast.LENGTH_SHORT).show()
+                    hasAutoSuggest = 1
+                } else {
+                    Toast.makeText(requireContext(), "Unchecked", Toast.LENGTH_SHORT).show()
+                    hasAutoSuggest = 0
+                }
+            }
+
         alertDialogBuilder.setView(view)
             .setTitle("Edit Set")
             .setNegativeButton("cancel",
@@ -44,16 +63,18 @@ class SetCorrectInfoDialog : AppCompatDialogFragment() {
                 val setTitle: String = editTextTitle?.text.toString()
                 val inputLang: String = editTextInputLang?.text.toString()
                 val outputLang: String = editTextOutputLang?.text.toString()
-                val list = ArrayList<String>()
+                val list = ArrayList<Any>()
                 list.add(setTitle)
                 list.add(inputLang)
                 list.add(outputLang)
+                list.add(hasAutoSuggest)
+                Toast.makeText(requireContext(),hasAutoSuggest.toString(),Toast.LENGTH_SHORT).show()
 //                listener.applyTexts(setTitle, inputLang,outputLang);
-               /* targetFragment!!.onActivityResult(
-                    targetRequestCode,
-                    Activity.RESULT_OK,
-                    requireActivity().intent
-                )*/
+                /* targetFragment!!.onActivityResult(
+                     targetRequestCode,
+                     Activity.RESULT_OK,
+                     requireActivity().intent
+                 )*/
                 mCallback?.onInputedData(list)
             })
 
@@ -77,7 +98,10 @@ class SetCorrectInfoDialog : AppCompatDialogFragment() {
             try {
                 mCallback = activity as ISetInputData
             } catch (e: ClassNotFoundException) {
-                Log.d("SetCorrectInfoDialog", "Activity doesn't implement the ISelectedData interface");
+                Log.d(
+                    "SetCorrectInfoDialog",
+                    "Activity doesn't implement the ISelectedData interface"
+                );
             }
         }
     }

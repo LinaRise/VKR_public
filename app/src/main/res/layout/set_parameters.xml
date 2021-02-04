@@ -27,4 +27,31 @@
         android:completionThreshold="1"
         android:layout_below="@+id/edit_language_input"
         android:hint="Output language" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edit_language_output"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/checkbox"
+            style="?android:attr/textAppearanceMedium"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp" />
+
+        <TextView
+            android:layout_margin="5dp"
+            android:layout_width="0dp"
+            android:layout_weight="4"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="Auto-Suggest" />
+    </LinearLayout>
+
+
+
+
 </RelativeLayout>
