@@ -1,5 +1,7 @@
 package com.example.myapplication.database.repo.sett
 
+import android.R.attr.name
+import android.R.id
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
@@ -8,10 +10,8 @@ import android.util.Log
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.TablesAndColumns
 import com.example.myapplication.database.repo.IRepository
-import com.example.myapplication.entity.Language
 import com.example.myapplication.entity.Sett
-import java.lang.Error
-import java.lang.Exception
+
 
 class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
     lateinit var db: SQLiteDatabase
@@ -38,10 +38,29 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
     }
 
     override fun update(entity: Sett) {
-        TODO("Not yet implemented")
+        db = dbhelper.writableDatabase
+        db.beginTransaction()
+        try {
+            val cv = ContentValues()
+            cv.clear()
+            cv.put(TablesAndColumns.SettEntry.COL_SET_TITLE, entity.settTitle)
+            cv.put(TablesAndColumns.SettEntry.COL_LANGUAGE_INPUT_ID, entity.languageInput_id)
+            cv.put(TablesAndColumns.SettEntry.COL_LANGUAGE_OUTPUT_ID, entity.languageOutput_id)
+            cv.put(TablesAndColumns.SettEntry.COL_WORDS_AMOUNT, entity.wordsAmount)
+            cv.put(TablesAndColumns.SettEntry.COL_AUTO_SUGGEST, entity.hasAutoSuggest)
+        // обновляем по id
+        val updCount = db.update(TablesAndColumns.SettEntry.TABLE_NAME, cv, "sett_id = ?",
+            arrayOf(entity.settId.toString()))
+            db.setTransactionSuccessful()
+        } catch (e: Exception) {
+            Log.d("SettRepo", "Error while trying to update sett at database with id = ${entity.settId}");
+        } finally {
+            db.endTransaction()
+
+        }
     }
 
-    override fun delete(entity: Sett) {
+    override fun delete(entity: Sett): Long {
         TODO("Not yet implemented")
     }
 

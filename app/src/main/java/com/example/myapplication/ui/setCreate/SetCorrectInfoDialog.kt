@@ -35,7 +35,7 @@ class SetCorrectInfoDialog : AppCompatDialogFragment() {
         val inputLangReceived = requireArguments().getString("inputLanguage")
         val outputLangReceived = requireArguments().getString("outputLanguage")
         val hasAutoSuggestReceived = requireArguments().getInt("hasAutoSuggest")
-
+        hasAutoSuggest = hasAutoSuggestReceived
         checkBox.isChecked = hasAutoSuggestReceived == 1
 
 
@@ -46,12 +46,12 @@ class SetCorrectInfoDialog : AppCompatDialogFragment() {
 
         checkBox
             .setOnCheckedChangeListener { buttonView, isChecked ->
-                if (isChecked) {
+                hasAutoSuggest = if (isChecked) {
                     Toast.makeText(requireContext(), "Checked", Toast.LENGTH_SHORT).show()
-                    hasAutoSuggest = 1
+                    1
                 } else {
                     Toast.makeText(requireContext(), "Unchecked", Toast.LENGTH_SHORT).show()
-                    hasAutoSuggest = 0
+                    0
                 }
             }
 

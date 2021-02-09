@@ -1,5 +1,6 @@
 package com.example.myapplication.database.repo.word
 
+import android.R
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
@@ -7,9 +8,8 @@ import android.util.Log
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.TablesAndColumns
 import com.example.myapplication.database.repo.IRepository
-import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
-import java.lang.Error
+
 
 class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
     lateinit var db: SQLiteDatabase
@@ -23,11 +23,53 @@ class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
     }
 
     override fun update(entity: Word) {
-        TODO("Not yet implemented")
+        db = dbhelper.writableDatabase
+        val cv = ContentValues()
+        cv.put(TablesAndColumns.WordEntry.COL_ORIGINAL_WORD, entity.originalWord)
+        cv.put(TablesAndColumns.WordEntry.COL_TRANSLATED_WORD, entity.translatedWord)
+        // обновляем по id
+        db.beginTransaction()
+        try {
+            val updCount: Int = db.update(
+                TablesAndColumns.WordEntry.TABLE_NAME, cv, "word_id = ?", arrayOf<String>(
+                    entity.wordId.toString()
+                )
+            )
+            Log.d("Word Repo ","updated rows count = $updCount")
+            db.setTransactionSuccessful()
+        }
+        catch (e:java.lang.Error){
+
+        }
+        finally {
+            db.endTransaction()
+
+        }
+
+
     }
 
-    override fun delete(entity: Word) {
-        TODO("Not yet implemented")
+    override fun delete(entity: Word): Long {
+        db = dbhelper.writableDatabase
+        db.beginTransaction()
+        var delCount:Int = 0
+        try{
+            delCount  = db.delete(
+            TablesAndColumns.WordEntry.TABLE_NAME, "word_id = ?",
+            arrayOf(entity.wordId.toString())
+
+        )
+            db.setTransactionSuccessful()
+        Log.d("Word Repo", "deleted rows count = $delCount")
+        }
+        catch (e:java.lang.Error){
+
+        }
+        finally {
+            db.endTransaction()
+            return delCount.toLong()
+        }
+
     }
 
     override fun get(id: Long): Word {
@@ -54,10 +96,11 @@ class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
                         "JOIN sett_word sw " +
                         "ON w.word_id = sw.word_id " +
                         "JOIN sett s " +
-                        "ON sw.sett_id = s.sett_id ",
-               null
+                        "ON sw.sett_id = s.sett_id " +
+                        "WHERE s.sett_id = ?",
+                arrayOf(settId.toString())
             )
-        Log.d("word class","")
+        Log.d("word class", "")
         var word: Word?
         var wordList: ArrayList<Word> = ArrayList()
         if (cursor != null) {
@@ -65,7 +108,7 @@ class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
             val colTranslatedWord =
                 cursor.getColumnIndex(TablesAndColumns.WordEntry.COL_TRANSLATED_WORD)
 
-            Log.d("WordsGetAsyncTask","!!!")
+            Log.d("WordsGetAsyncTask", "!!!")
             try {
                 while (cursor.moveToNext()) {
                     word = Word()

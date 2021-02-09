@@ -52,8 +52,8 @@ class DBHelper(context: Context) :
 
         private const val CREATE_TABLE_SET_WORD =
             "CREATE TABLE ${SettWordEntry.TABLE_NAME} (${SettWordEntry.TABLE_NAME}${BaseColumns._ID} INTEGER PRIMARY KEY autoincrement, ${SettWordEntry.COL_SET_ID} INTEGER not null, ${SettWordEntry.COL_WORD_ID} INTEGER not null, " +
-                    "FOREIGN KEY (${SettWordEntry.COL_SET_ID}) REFERENCES ${SettEntry.TABLE_NAME} (${SettEntry.TABLE_NAME}${BaseColumns._ID}), " +
-                    "FOREIGN KEY (${SettWordEntry.COL_WORD_ID}) REFERENCES ${WordEntry.TABLE_NAME} (${WordEntry.TABLE_NAME}${BaseColumns._ID}) );"
+                    "FOREIGN KEY (${SettWordEntry.COL_SET_ID}) REFERENCES ${SettEntry.TABLE_NAME} (${SettEntry.TABLE_NAME}${BaseColumns._ID}) ON DELETE CASCADE, " +
+                    "FOREIGN KEY (${SettWordEntry.COL_WORD_ID}) REFERENCES ${WordEntry.TABLE_NAME} (${WordEntry.TABLE_NAME}${BaseColumns._ID}) ON DELETE CASCADE );"
 
         private const val INSERT_DEFAULT_LANGUAGES =
             "INSERT INTO ${LanguageEntry.TABLE_NAME} (${LanguageEntry.COL_LANGUAGE_TITLE},${LanguageEntry.COL_SUPPORTS_TRANSLATION}) VALUES ('English', 1), " +

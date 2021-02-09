@@ -38,7 +38,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView,ISetInputData {
     private lateinit var inputLanguage: String
     private lateinit var outputLanguage: String
     private var editTextTitle: EditText? = null
-    private var hasAutoSuggest = 0;
+    private var hasAutoSuggest = 0
     private var editTextInputLang: AutoCompleteTextView? = null
     private var editTextOutputLang: AutoCompleteTextView? = null
     // которые отображаются на экране
@@ -76,7 +76,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView,ISetInputData {
         val itemTouchHelper = ItemTouchHelper(simpleCallBack)
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
-        word_add_button.setOnClickListener { onAddWordBtnClick() }
+        wordAddButton.setOnClickListener { onAddWordBtnClick() }
 
     }
 
@@ -180,9 +180,9 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView,ISetInputData {
 //
 //    }
 
-    override fun setData(words: List<Word>) {
-        wordsDisplayed.addAll(words)
-    }
+//    override fun setData(words: List<Word>) {
+//        wordsDisplayed.addAll(words)
+//    }
 
     override fun updateRecyclerViewInserted(word: Word) {
         wordsDisplayed.add(word)

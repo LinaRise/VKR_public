@@ -3,7 +3,7 @@ package com.example.myapplication.ui.setView
 import com.example.myapplication.entity.Word
 
 interface ISetViewView {
-    fun setData(words: List<Word>)
+//    fun setData(words: List<Word>)
     fun updateRecyclerViewInserted(word: Word)
     fun updateRecyclerViewDeleted(position: Int)
     fun showWordInputError()

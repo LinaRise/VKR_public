@@ -80,6 +80,7 @@ class SetCreatePresenter(
     fun addNewWord(original: String, translated: String) {
         if (original == "" || translated == "") {
             mView.showWordInputError()
+            return
         }
         mView.hideKeyboard()
         val word =

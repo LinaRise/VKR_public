@@ -2,6 +2,7 @@ package com.example.myapplication.database.repo.setword
 
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
+import android.util.Log
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.TablesAndColumns
 import com.example.myapplication.database.repo.IRepository
@@ -22,7 +23,7 @@ class SetWordRepo(val dbhelper: DBHelper): IRepository<SetWord> {
         TODO("Not yet implemented")
     }
 
-    override fun delete(entity: SetWord) {
+    override fun delete(entity: SetWord): Long {
         TODO("Not yet implemented")
     }
 

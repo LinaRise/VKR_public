@@ -1,17 +1,29 @@
 package com.example.myapplication.ui.setCreate
 
 import android.content.Context
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.entity.Word
+import com.google.android.material.textfield.TextInputEditText
 
-class SetCreateAdapter(setCreateActivity: SetCreateActivity) : RecyclerView.Adapter<SetCreateHolder>() {
+
+class SetCreateAdapter(setCreateActivity: SetCreateActivity) : RecyclerView.Adapter<SetCreateAdapter.SetCreateHolder>() {
     lateinit var context:Context
-    private var words = emptyList<Word?>()
+
+    var words:List<Word?> = ArrayList<Word?>()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SetCreateHolder {
-       val view = LayoutInflater.from(parent.context).inflate(R.layout.row_set_create_word,parent,false)
+       val view = LayoutInflater.from(parent.context).inflate(
+           R.layout.row_set_create_word,
+           parent,
+           false
+       )
         return SetCreateHolder(view)
     }
 
@@ -28,4 +40,44 @@ class SetCreateAdapter(setCreateActivity: SetCreateActivity) : RecyclerView.Adap
         this.words = word
         notifyDataSetChanged()
     }
+   inner class SetCreateHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var original: TextInputEditText = itemView.findViewById(R.id.original_input)
+        var translated: TextInputEditText = itemView.findViewById(R.id.translated_input)
+
+        init {
+            original.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(
+                    charSequence: CharSequence,
+                    i: Int,
+                    i1: Int,
+                    i2: Int
+                ) {
+                }
+
+                override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+                    words[adapterPosition]!!.originalWord = original.text.toString()
+
+                }
+
+                override fun afterTextChanged(editable: Editable) {}
+            })
+
+            translated.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(
+                    charSequence: CharSequence,
+                    i: Int,
+                    i1: Int,
+                    i2: Int
+                ) {
+                }
+
+                override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+                    words[adapterPosition]!!.translatedWord = translated.text.toString()
+                }
+
+                override fun afterTextChanged(editable: Editable) {}
+            })
+        }
+    }
+
 }

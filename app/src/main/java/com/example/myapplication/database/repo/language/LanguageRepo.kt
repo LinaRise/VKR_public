@@ -38,7 +38,7 @@ class LanguageRepo(val dbhelper: DBHelper) : IRepository<Language> {
         TODO("Not yet implemented")
     }
 
-    override fun delete(entity: Language) {
+    override fun delete(entity: Language): Long {
         TODO("Not yet implemented")
     }
 
