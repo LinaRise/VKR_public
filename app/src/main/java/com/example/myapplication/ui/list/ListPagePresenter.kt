@@ -4,6 +4,7 @@ import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.repo.language.LanguageRepo
 import com.example.myapplication.database.repo.sett.SettRepo
 import com.example.myapplication.entity.Sett
+import com.example.myapplication.entity.Word
 
 class ListPagePresenter(view: IListPageView, dbhelper: DBHelper) {
     private var mView: IListPageView = view
@@ -42,5 +43,12 @@ class ListPagePresenter(view: IListPageView, dbhelper: DBHelper) {
 
     fun openSet() {
         mView.openDialogForSetCreation()
+    }
+
+    fun deleteSett(sett: Sett   ,position:Int) {
+        //здесь будет удаление из бд - пока просто из списка
+        mView.updateRecyclerViewDeleted(position)
+        mView.showUndoDeleteWord(position)
+
     }
 }

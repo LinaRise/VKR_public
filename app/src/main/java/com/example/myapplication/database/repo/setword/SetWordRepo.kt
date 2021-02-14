@@ -1,5 +1,6 @@
 package com.example.myapplication.database.repo.setword
 
+/*
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.util.Log
@@ -36,4 +37,4 @@ class SetWordRepo(val dbhelper: DBHelper): IRepository<SetWord> {
     }
 
 
-}
+}*/

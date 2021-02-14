@@ -1,7 +1,5 @@
 package com.example.myapplication.database.repo.sett
 
-import android.R.attr.name
-import android.R.id
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
@@ -37,8 +35,9 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
         }
     }
 
-    override fun update(entity: Sett) {
+    override fun update(entity: Sett): Long {
         db = dbhelper.writableDatabase
+        var updCount = -1L
         db.beginTransaction()
         try {
             val cv = ContentValues()
@@ -48,21 +47,24 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
             cv.put(TablesAndColumns.SettEntry.COL_LANGUAGE_OUTPUT_ID, entity.languageOutput_id)
             cv.put(TablesAndColumns.SettEntry.COL_WORDS_AMOUNT, entity.wordsAmount)
             cv.put(TablesAndColumns.SettEntry.COL_AUTO_SUGGEST, entity.hasAutoSuggest)
-        // обновляем по id
-        val updCount = db.update(TablesAndColumns.SettEntry.TABLE_NAME, cv, "sett_id = ?",
-            arrayOf(entity.settId.toString()))
+            // обновляем по id
+            updCount = db.update(
+                TablesAndColumns.SettEntry.TABLE_NAME, cv, "sett_id = ?",
+                arrayOf(entity.settId.toString())
+            ).toLong()
             db.setTransactionSuccessful()
         } catch (e: Exception) {
-            Log.d("SettRepo", "Error while trying to update sett at database with id = ${entity.settId}");
+            Log.d(
+                "SettRepo",
+                "Error while trying to update sett at database with id = ${entity.settId}"
+            );
         } finally {
             db.endTransaction()
-
+            return entity.settId
         }
     }
 
-    override fun delete(entity: Sett): Long {
-        TODO("Not yet implemented")
-    }
+
 
     override fun get(id: Long): Sett? {
         db = dbhelper.readableDatabase
@@ -144,5 +146,25 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
         }
         return null
 
+    }
+
+    override fun delete(entity: Sett): Long {
+        db = dbhelper.writableDatabase
+        db.beginTransaction()
+        var delCount: Int = 0
+        try {
+            delCount = db.delete(
+                TablesAndColumns.SettEntry.TABLE_NAME, "sett_id = ?",
+                arrayOf(entity.settId.toString())
+
+            )
+            db.setTransactionSuccessful()
+            Log.d("Sett Repo", "deleted rows count = $delCount")
+        } catch (e: java.lang.Error) {
+
+        } finally {
+            db.endTransaction()
+            return delCount.toLong()
+        }
     }
 }

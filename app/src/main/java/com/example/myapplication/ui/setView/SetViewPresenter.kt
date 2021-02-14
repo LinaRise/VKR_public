@@ -4,7 +4,6 @@ import android.util.Log
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.repo.language.LanguageRepo
 import com.example.myapplication.database.repo.sett.SettRepo
-import com.example.myapplication.database.repo.setword.SetWordRepo
 import com.example.myapplication.database.repo.word.WordCreateAsyncTask
 import com.example.myapplication.database.repo.word.WordDeleteAsyncTask
 import com.example.myapplication.database.repo.word.WordRepo
@@ -24,7 +23,7 @@ class SetViewPresenter(
     var mLanguageRepo: LanguageRepo = LanguageRepo(dbhelper)
     var mWordRepo: WordRepo = WordRepo(dbhelper)
     var mSettRepo: SettRepo = SettRepo(dbhelper)
-    var mSetWordRepo: SetWordRepo = SetWordRepo(dbhelper)
+//    var mSetWordRepo: SetWordRepo = SetWordRepo(dbhelper)
 
     fun addNewWord(original: String, translated: String) {
         if (original == "" || translated == "") {
@@ -99,8 +98,7 @@ class SetViewPresenter(
                     }
                 } else {
                     if (element != null) {
-
-                        WordDeleteAsyncTask(dbhelper).execute(sett.settId as Any,element as Any)
+                        WordDeleteAsyncTask(dbhelper).execute(element)
                     }
                 }
 
@@ -111,9 +109,10 @@ class SetViewPresenter(
             if (wordsOriginal.size < wordsEdited.size) {
                 var createList = ArrayList<Word?>()
                 for (i in wordsOriginal.size until wordsEdited.size) {
+                    wordsEdited[i]?.settId  = settId
                     createList.add(wordsEdited[i])
                 }
-                WordCreateAsyncTask(dbhelper).execute(createList.filterNotNull() as Any,sett.settId as Any)
+                WordCreateAsyncTask(dbhelper).execute(createList.filterNotNull() as ArrayList<Word>)
             }
         }
 

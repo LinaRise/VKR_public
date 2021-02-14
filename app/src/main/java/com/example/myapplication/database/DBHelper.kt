@@ -1,14 +1,12 @@
 package com.example.myapplication.database
 
-import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
 import com.example.myapplication.database.TablesAndColumns.LanguageEntry
-import com.example.myapplication.database.TablesAndColumns.WordEntry
 import com.example.myapplication.database.TablesAndColumns.SettEntry
-import com.example.myapplication.database.TablesAndColumns.SettWordEntry
+import com.example.myapplication.database.TablesAndColumns.WordEntry
 
 
 class DBHelper(context: Context) :
@@ -40,7 +38,9 @@ class DBHelper(context: Context) :
             "CREATE TABLE ${LanguageEntry.TABLE_NAME} (${LanguageEntry.TABLE_NAME}${BaseColumns._ID} INTEGER PRIMARY KEY autoincrement, ${LanguageEntry.COL_LANGUAGE_TITLE} TEXT not null UNIQUE, ${LanguageEntry.COL_SUPPORTS_TRANSLATION} INTEGER DEFAULT 0);"
 
         private const val CREATE_TABLE_WORD =
-            "CREATE TABLE ${WordEntry.TABLE_NAME}  (${WordEntry.TABLE_NAME}${BaseColumns._ID} INTEGER PRIMARY KEY autoincrement, ${WordEntry.COL_ORIGINAL_WORD} text not null, ${WordEntry.COL_TRANSLATED_WORD} TEXT );"
+            "CREATE TABLE ${WordEntry.TABLE_NAME}  (${WordEntry.TABLE_NAME}${BaseColumns._ID} INTEGER PRIMARY KEY autoincrement, ${WordEntry.COL_ORIGINAL_WORD} text not null, ${WordEntry.COL_TRANSLATED_WORD} TEXT, " +
+                    "${WordEntry.COL_SET_ID} INTEGER not null, " +
+                    "FOREIGN KEY (${WordEntry.COL_SET_ID}) REFERENCES ${SettEntry.TABLE_NAME} (${SettEntry.TABLE_NAME}${BaseColumns._ID}) ON DELETE CASCADE);"
 
         private const val CREATE_TABLE_SET =
             "CREATE TABLE ${SettEntry.TABLE_NAME} ( ${SettEntry.TABLE_NAME}${BaseColumns._ID}  INTEGER PRIMARY KEY autoincrement, " +
@@ -50,11 +50,11 @@ class DBHelper(context: Context) :
                     "FOREIGN KEY (${SettEntry.COL_LANGUAGE_OUTPUT_ID}) REFERENCES ${LanguageEntry.TABLE_NAME} (${LanguageEntry.TABLE_NAME}${BaseColumns._ID})," +
                     "UNIQUE (${SettEntry.COL_SET_TITLE} ,${SettEntry.COL_LANGUAGE_INPUT_ID},${SettEntry.COL_LANGUAGE_OUTPUT_ID}) );"
 
-        private const val CREATE_TABLE_SET_WORD =
+       /* private const val CREATE_TABLE_SET_WORD =
             "CREATE TABLE ${SettWordEntry.TABLE_NAME} (${SettWordEntry.TABLE_NAME}${BaseColumns._ID} INTEGER PRIMARY KEY autoincrement, ${SettWordEntry.COL_SET_ID} INTEGER not null, ${SettWordEntry.COL_WORD_ID} INTEGER not null, " +
                     "FOREIGN KEY (${SettWordEntry.COL_SET_ID}) REFERENCES ${SettEntry.TABLE_NAME} (${SettEntry.TABLE_NAME}${BaseColumns._ID}) ON DELETE CASCADE, " +
                     "FOREIGN KEY (${SettWordEntry.COL_WORD_ID}) REFERENCES ${WordEntry.TABLE_NAME} (${WordEntry.TABLE_NAME}${BaseColumns._ID}) ON DELETE CASCADE );"
-
+*/
         private const val INSERT_DEFAULT_LANGUAGES =
             "INSERT INTO ${LanguageEntry.TABLE_NAME} (${LanguageEntry.COL_LANGUAGE_TITLE},${LanguageEntry.COL_SUPPORTS_TRANSLATION}) VALUES ('English', 1), " +
                     "('Russian', 1), " +
@@ -79,12 +79,16 @@ class DBHelper(context: Context) :
         db.execSQL(CREATE_TABLE_LANGUAGE)
         db.execSQL(CREATE_TABLE_WORD)
         db.execSQL(CREATE_TABLE_SET)
-        db.execSQL(CREATE_TABLE_SET_WORD)
+//        db.execSQL(CREATE_TABLE_SET_WORD)
         db.execSQL(INSERT_DEFAULT_LANGUAGES)
+    }
+    override fun onOpen(db: SQLiteDatabase) {
+        super.onOpen(db)
+        db.execSQL("PRAGMA foreign_keys=ON")
     }
 
     override fun onUpgrade(database: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        database.execSQL("DROP TABLE IF EXISTS ${SettWordEntry.TABLE_NAME};")
+//        database.execSQL("DROP TABLE IF EXISTS ${SettWordEntry.TABLE_NAME};")
         database.execSQL("DROP TABLE IF EXISTS ${SettEntry.TABLE_NAME}")
         database.execSQL("DROP TABLE IF EXISTS ${WordEntry.TABLE_NAME};")
         database.execSQL("DROP TABLE IF EXISTS ${LanguageEntry.TABLE_NAME};")

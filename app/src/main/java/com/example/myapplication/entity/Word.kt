@@ -6,20 +6,19 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "word")
 data class Word (
-    @PrimaryKey(autoGenerate = true)
+
     var  wordId: Long=0,
-    @ColumnInfo(name = "original_word")
     var originalWord:String="",
-    @ColumnInfo(name = "translated_word")
-    var translatedWord:String=""
+    var translatedWord:String="",
+    var settId:Long = -1,
 
 ): Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readLong(),
         parcel.readString().toString(),
-        parcel.readString().toString()
+        parcel.readString().toString(),
+        parcel.readLong()
     ) {
     }
 
@@ -27,6 +26,7 @@ data class Word (
         parcel.writeLong(wordId)
         parcel.writeString(originalWord)
         parcel.writeString(translatedWord)
+        parcel.writeLong(settId)
     }
 
     override fun describeContents(): Int {
@@ -42,5 +42,5 @@ data class Word (
             return arrayOfNulls(size)
         }
     }
-
 }
+

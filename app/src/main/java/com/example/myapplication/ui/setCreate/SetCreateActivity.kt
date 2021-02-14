@@ -164,7 +164,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView,ISetInputData {
                 when (direction) {
                     ItemTouchHelper.LEFT -> {
                         deletedWord = wordsDisplayed[position]
-                        presenter.deleteWord(deletedWord)
+                        presenter.deleteWord(deletedWord,position)
 
                     }
                 }

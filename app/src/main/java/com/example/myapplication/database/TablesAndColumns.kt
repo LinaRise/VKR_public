@@ -13,6 +13,7 @@ object TablesAndColumns {
          const val TABLE_NAME  = "word"
          const val COL_ORIGINAL_WORD = "original_word"
          const val COL_TRANSLATED_WORD = "translated_word"
+         const val COL_SET_ID ="sett_id"
     }
     object SettEntry : BaseColumns {
          const val TABLE_NAME  = "sett"
@@ -22,10 +23,10 @@ object TablesAndColumns {
          const val COL_WORDS_AMOUNT = "words_amount"
          const val COL_AUTO_SUGGEST = "has_auto_suggest"
     }
-    object SettWordEntry : BaseColumns {
+    /*object SettWordEntry : BaseColumns {
          const val TABLE_NAME  = "sett_word"
          const val COL_SET_ID = "sett_id"
          const val COL_WORD_ID = "word_id"
 
-    }
+    }*/
 }

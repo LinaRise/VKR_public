@@ -2,13 +2,13 @@ package com.example.myapplication.ui.setCreate
 
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.repo.language.LanguageRepo
-import com.example.myapplication.database.repo.setword.SetWordRepo
 import com.example.myapplication.database.repo.sett.SettRepo
 import com.example.myapplication.database.repo.word.WordCreateAsyncTask
 import com.example.myapplication.database.repo.word.WordRepo
 import com.example.myapplication.entity.Language
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
+import java.text.FieldPosition
 import kotlin.collections.ArrayList
 
 class SetCreatePresenter(
@@ -20,10 +20,9 @@ class SetCreatePresenter(
     var mLanguageRepo: LanguageRepo = LanguageRepo(dbhelper)
     var mWordRepo: WordRepo = WordRepo(dbhelper)
     var mSettRepo: SettRepo = SettRepo(dbhelper)
-    var mSetWordRepo: SetWordRepo = SetWordRepo(dbhelper)
     private var word: Word = Word()
     private var set: Sett = Sett()
-    private var words = ArrayList<Word>()
+//    private var words = ArrayList<Word>()
 
 
 //    fun loadData() {
@@ -69,9 +68,11 @@ class SetCreatePresenter(
 
         val settId = mSettRepo.create(newSet)
 
-
         val wordCreateAsyncTask = WordCreateAsyncTask(dbhelper = dbhelper)
-        wordCreateAsyncTask.execute(wordsDisplayed as Any, settId as Any)
+        for (word in wordsDisplayed){
+            word.settId = settId
+        }
+        wordCreateAsyncTask.execute(wordsDisplayed as ArrayList<Word>)
            /* val wordId = mWordRepo.create(word)
             mSetWordRepo.create(SetWord(settId = settId, wordId = wordId))*/
 
@@ -86,15 +87,14 @@ class SetCreatePresenter(
         val word =
             Word(0, original.trim(), translated.trim())
 
-        words.add(word)
+//        words.add(word)
         mView.cleanInputFields()
         mView.updateRecyclerViewInserted(word)
     }
 
-    fun deleteWord(word: Word) {
+    fun deleteWord(word: Word,position: Int) {
         //здесь будет удаление из бд - пока просто из списка
-        val position = words.indexOf(word)
-        words.removeAt(position)
+//        words.removeAt(position)
         mView.updateRecyclerViewDeleted(position)
         mView.showUndoDeleteWord(position)
 

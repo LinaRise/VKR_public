@@ -2,14 +2,11 @@ package com.example.myapplication.database.repo.word
 
 import android.os.AsyncTask
 import com.example.myapplication.database.DBHelper
-import com.example.myapplication.database.repo.setword.SetWordRepo
-import com.example.myapplication.entity.SetWord
 import com.example.myapplication.entity.Word
 
-class WordDeleteAsyncTask(dbhelper: DBHelper) : AsyncTask<Any, Unit, Unit>() {
+class WordDeleteAsyncTask(dbhelper: DBHelper) : AsyncTask<Word, Unit, Unit>() {
 
     var mWordRepo: WordRepo = WordRepo(dbhelper)
-    var mSetWordRepo: SetWordRepo = SetWordRepo(dbhelper)
 
     override fun onPreExecute() {
         super.onPreExecute()
@@ -22,9 +19,8 @@ class WordDeleteAsyncTask(dbhelper: DBHelper) : AsyncTask<Any, Unit, Unit>() {
     }
 
 
-    override fun doInBackground(vararg p0: Any?) {
-        val settId = p0[0] as Long
-        val word = p0[1] as Word
+    override fun doInBackground(vararg p0: Word?) {
+        val word = p0[0] as Word
         val wordId = mWordRepo.delete(word)
 //        mSetWordRepo.delete(SetWord(settId = settId, wordId = wordId))
     }

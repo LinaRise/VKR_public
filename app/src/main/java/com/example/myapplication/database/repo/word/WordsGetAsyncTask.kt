@@ -3,8 +3,6 @@ package com.example.myapplication.database.repo.word
 import android.os.AsyncTask
 import android.util.Log
 import com.example.myapplication.database.DBHelper
-import com.example.myapplication.database.repo.setword.SetWordRepo
-import com.example.myapplication.entity.SetWord
 import com.example.myapplication.entity.Word
 import com.example.myapplication.ui.setView.SetViewAdapter
 

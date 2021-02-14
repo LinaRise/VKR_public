@@ -34,7 +34,7 @@ class LanguageRepo(val dbhelper: DBHelper) : IRepository<Language> {
         }
     }
 
-    override fun update(entity: Language) {
+    override fun update(entity: Language): Long {
         TODO("Not yet implemented")
     }
 

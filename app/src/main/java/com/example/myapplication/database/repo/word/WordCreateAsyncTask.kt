@@ -2,15 +2,14 @@ package com.example.myapplication.database.repo.word
 
 import android.os.AsyncTask
 import com.example.myapplication.database.DBHelper
-import com.example.myapplication.database.repo.setword.SetWordRepo
-import com.example.myapplication.entity.SetWord
 import com.example.myapplication.entity.Word
-import kotlin.collections.ArrayList
 
-class WordCreateAsyncTask(dbhelper: DBHelper) : AsyncTask<Any, Unit,Unit>() {
+//import com.example.myapplication.entity.Word
+
+class WordCreateAsyncTask(dbhelper: DBHelper) : AsyncTask<ArrayList<Word>, Unit, Unit>() {
 
     var mWordRepo: WordRepo = WordRepo(dbhelper)
-    var mSetWordRepo: SetWordRepo = SetWordRepo(dbhelper)
+//    var mSetWordRepo: SetWordRepo = SetWordRepo(dbhelper)
 
     override fun onPreExecute() {
         super.onPreExecute()
@@ -23,12 +22,11 @@ class WordCreateAsyncTask(dbhelper: DBHelper) : AsyncTask<Any, Unit,Unit>() {
     }
 
 
-    override fun doInBackground(vararg p0: Any) {
+    override fun doInBackground(vararg p0: ArrayList<Word>?) {
         val wordList = p0[0] as ArrayList<Word>
-        val settId = p0[1] as Long
         for (word in wordList) {
             val wordId = mWordRepo.create(word)
-            mSetWordRepo.create(SetWord(settId = settId, wordId = wordId))
+//            mSetWordRepo.create(SetWord(settId = settId, wordId = wordId))
         }
     }
 

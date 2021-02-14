@@ -26,6 +26,7 @@ import com.example.myapplication.entity.Language
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
 import com.example.myapplication.ui.setCreate.ISetInputData
+import com.example.myapplication.ui.setCreate.SetCorrectInfoDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.android.synthetic.main.activity_set_create.*
@@ -163,15 +164,15 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
             }
             R.id.ic_settings -> {
                 Toast.makeText(this, outputLanguageText, Toast.LENGTH_SHORT).show()
-//                val setCorrectInfoDialog = SetCorrectInfoDialog()
-//                val args = Bundle()
-//                args.putString("settTitle", setTitle)
-//                args.putString("inputLanguage", inputLanguageText)
-//                args.putString("outputLanguage", outputLanguageText)
-//                args.putInt("hasAutoSuggest", hasAutoSuggest)
-//                setCorrectInfoDialog.arguments = args
-//                val manager = supportFragmentManager
-//                setCorrectInfoDialog.show(manager, "Set Up Dialog")
+                val setCorrectInfoDialog = SetCorrectInfoDialog()
+                val args = Bundle()
+                args.putString("settTitle", setTitle)
+                args.putString("inputLanguage", inputLanguageText)
+                args.putString("outputLanguage", outputLanguageText)
+                args.putInt("hasAutoSuggest", hasAutoSuggest)
+                setCorrectInfoDialog.arguments = args
+                val manager = supportFragmentManager
+                setCorrectInfoDialog.show(manager, "Set Up Dialog")
                 return true
             }
 
