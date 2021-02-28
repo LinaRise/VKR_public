@@ -3,13 +3,12 @@ package com.example.myapplication.ui.setCreate
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
-import android.widget.AutoCompleteTextView
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,17 +18,20 @@ import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.Word
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
+import com.google.mlkit.nl.translate.TranslateLanguage
+import com.google.mlkit.nl.translate.Translation
+import com.google.mlkit.nl.translate.TranslatorOptions
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_set_create.*
 
 
-class SetCreateActivity : AppCompatActivity(), ISetCreateView,ISetInputData {
+class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData {
     private lateinit var deletedWord: Word
     private lateinit var recyclerView: RecyclerView
     private lateinit var setCreateAdapter: SetCreateAdapter
     private lateinit var wordAddButton: Button
     private lateinit var originalText: TextInputEditText
-    private lateinit var translatedText: TextInputEditText
+    private lateinit var translatedText: InstantAutoComplete
     lateinit var presenter: SetCreatePresenter
     lateinit var dbhelper: DBHelper
     lateinit var db: SQLiteDatabase
@@ -37,10 +39,23 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView,ISetInputData {
     private lateinit var setTitle: String
     private lateinit var inputLanguage: String
     private lateinit var outputLanguage: String
+
     private var editTextTitle: EditText? = null
     private var hasAutoSuggest = 0
     private var editTextInputLang: AutoCompleteTextView? = null
     private var editTextOutputLang: AutoCompleteTextView? = null
+
+    private var receivedTranslation: String = ""
+
+    val languagesAccordance = hashMapOf(
+        "English" to TranslateLanguage.ENGLISH,
+        "Russian" to TranslateLanguage.RUSSIAN,
+        "French" to TranslateLanguage.FRENCH,
+        "Czech" to TranslateLanguage.CZECH,
+        "German" to TranslateLanguage.GERMAN
+    )
+
+
     // которые отображаются на экране
     var wordsDisplayed = ArrayList<Word>()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,6 +92,112 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView,ISetInputData {
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
         wordAddButton.setOnClickListener { onAddWordBtnClick() }
+        originalText.addTextChangedListener(object : TextWatcher {
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+
+            }
+
+            override fun beforeTextChanged(
+                s: CharSequence, start: Int, count: Int,
+                after: Int
+            ) {
+                // TODO Auto-generated method stub
+            }
+
+            override fun afterTextChanged(s: Editable) {
+                if (hasAutoSuggest == 1) {
+                    val options = TranslatorOptions.Builder()
+                        .setSourceLanguage(languagesAccordance[inputLanguage].toString())
+                        .setTargetLanguage(languagesAccordance[outputLanguage].toString())
+                        .build()
+                    val translator = Translation.getClient(options)
+
+                    translator.downloadModelIfNeeded()
+                        .addOnSuccessListener {
+                            // Model downloaded successfully. Okay to start translating.
+                            // (Set a flag, unhide the translation UI, etc.)
+                            translator.translate(s.toString())
+                                .addOnSuccessListener { translatedTexts ->
+                                    Toast.makeText(
+                                        this@SetCreateActivity,
+                                        translatedTexts,
+                                        Toast.LENGTH_LONG
+                                    )
+                                        .show()
+                                    receivedTranslation = translatedTexts
+                                    val array = arrayOf(
+                                        receivedTranslation
+                                    )
+                                    Toast.makeText(
+                                        this@SetCreateActivity,
+                                        "HERE $receivedTranslation",
+                                        Toast.LENGTH_LONG
+                                    )
+                                        .show()
+
+                                    val adapter =
+                                        ArrayAdapter(
+                                            this@SetCreateActivity,
+                                            android.R.layout.simple_list_item_1,
+                                            array
+                                        )
+                                    translatedText.setAdapter(adapter)
+
+
+                                }
+                                .addOnFailureListener { exception ->
+                                    Toast.makeText(
+                                        this@SetCreateActivity,
+                                        "Translating problems: $exception",
+                                        Toast.LENGTH_LONG
+                                    )
+                                        .show()
+                                    // Error.
+                                    // ...
+                                }
+                        }
+                        .addOnFailureListener { exception ->
+                            Toast.makeText(
+                                this@SetCreateActivity,
+                                "Translating problems: $exception",
+                                Toast.LENGTH_LONG
+                            )
+                                .show()
+                            // Model couldn’t be downloaded or other internal error.
+                            // ...
+                        }
+                }
+            }
+        })
+
+  /*      translatedText.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                val array = arrayOf(
+                    receivedTranslation
+                )
+                Toast.makeText(
+                    this@SetCreateActivity,
+                    "HERE $receivedTranslation",
+                    Toast.LENGTH_LONG
+                )
+                    .show()
+
+                val adapter =
+                    ArrayAdapter(
+                        this@SetCreateActivity,
+                        android.R.layout.simple_list_item_1,
+                        array
+                    )
+//                val adapter = ArrayAdapter.createFromResource(
+//                    this@SetCreateActivity,
+//                    R.array.available_translation_languages,
+//                    android.R.layout.simple_list_item_1
+//                )
+                translatedText.setAdapter(adapter)
+                translatedText.showDropDown()
+            }
+        })*/
+
 
     }
 
@@ -121,11 +242,9 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView,ISetInputData {
                 setCorrectInfoDialog.show(manager, "Set Up Dialog")
                 return true
             }
-            else ->false
+            else -> false
         }
     }
-
-
 
 
 //    private fun onDoneButtonWasClicked() {
@@ -164,14 +283,13 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView,ISetInputData {
                 when (direction) {
                     ItemTouchHelper.LEFT -> {
                         deletedWord = wordsDisplayed[position]
-                        presenter.deleteWord(deletedWord,position)
+                        presenter.deleteWord(deletedWord, position)
 
                     }
                 }
             }
 
         }
-
 
 
 //    override fun onDestroy() {

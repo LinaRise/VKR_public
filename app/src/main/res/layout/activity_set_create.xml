@@ -54,19 +54,23 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        app:endIconMode="clear_text"
-                        android:layout_height="wrap_content"
-                        app:startIconDrawable="@drawable/ic_translated">
+<!--                    <com.google.android.material.textfield.TextInputLayout-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        app:endIconMode="clear_text"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        >-->
 
-                        <com.google.android.material.textfield.TextInputEditText
+                        <com.example.myapplication.ui.setCreate.InstantAutoComplete
+                            app:endIconMode="clear_text"
+                            android:layout_marginTop="15dp"
+                            android:drawableStart="@drawable/ic_translated"
                             android:id="@+id/translated_input"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:minHeight="45dp"
                             android:background="@drawable/textview_style1"
                             android:inputType="textCapSentences" />
-                    </com.google.android.material.textfield.TextInputLayout>
+<!--                    </com.google.android.material.textfield.TextInputLayout>-->
                     <RelativeLayout
                         android:layout_marginTop="10dp"
                         android:layout_width="match_parent"

@@ -6,7 +6,6 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.entity.Word
@@ -42,7 +41,7 @@ class SetCreateAdapter(setCreateActivity: SetCreateActivity) : RecyclerView.Adap
     }
    inner class SetCreateHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var original: TextInputEditText = itemView.findViewById(R.id.original_input)
-        var translated: TextInputEditText = itemView.findViewById(R.id.translated_input)
+        var translated = itemView.findViewById(R.id.translated_input) as InstantAutoComplete
 
         init {
             original.addTextChangedListener(object : TextWatcher {

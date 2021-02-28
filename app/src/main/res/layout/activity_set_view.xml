@@ -4,28 +4,25 @@
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
 
-    <androidx.cardview.widget.CardView
-        xmlns:card_view="http://schemas.android.com/tools"
+    <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/tools"
         android:id="@+id/word_add_cardview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         app:cardCornerRadius="8dp"
-        card_view:contentPadding="10dp"
         app:cardElevation="2dp"
-        app:cardUseCompatPadding="true">
-
+        app:cardUseCompatPadding="true"
+        card_view:contentPadding="10dp">
 
 
         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="20dp"
             android:layout_marginRight="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
             android:orientation="vertical">
 
             <com.google.android.material.textfield.TextInputLayout
@@ -46,35 +43,39 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    app:endIconMode="clear_text"
-                    android:layout_height="wrap_content"
-                    app:startIconDrawable="@drawable/ic_translated">
+                <!--                <com.google.android.material.textfield.TextInputLayout-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    app:endIconMode="clear_text"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    app:startIconDrawable="@drawable/ic_translated">-->
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/translated_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/textview_style1"
-                        android:inputType="textCapSentences" />
-                </com.google.android.material.textfield.TextInputLayout>
-                <RelativeLayout
-                    android:layout_marginTop="10dp"
+                <com.example.myapplication.ui.setCreate.InstantAutoComplete
+                    android:id="@+id/translated_input"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_marginTop="15dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="45dp"
+                    android:background="@drawable/textview_style1"
+                    android:drawableStart="@drawable/ic_translated"
+                    android:inputType="textCapSentences"
+                    app:endIconMode="clear_text" />
+                <!--                </com.google.android.material.textfield.TextInputLayout>-->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp">
+
                     <Button
                         android:id="@+id/word_add_button"
-                        android:layout_height="wrap_content"
-                        app:backgroundTint="#D15B52"
                         android:layout_width="wrap_content"
-                        android:text="@string/add_text_on_button"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="false"
                         android:layout_centerHorizontal="true"
-                        android:layout_alignParentEnd="false"/>
+                        android:text="@string/add_text_on_button"
+                        app:backgroundTint="#D15B52" />
 
                 </RelativeLayout>
             </LinearLayout>
-
 
 
         </LinearLayout>
@@ -84,14 +85,12 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="10dp"
-        android:background="@android:color/darker_gray"/>
+        android:background="@android:color/darker_gray" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerivew_set_create"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-
 
 
 </LinearLayout>
