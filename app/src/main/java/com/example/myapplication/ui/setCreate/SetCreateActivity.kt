@@ -7,6 +7,8 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.View.OnTouchListener
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -92,7 +94,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData {
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
         wordAddButton.setOnClickListener { onAddWordBtnClick() }
-        originalText.addTextChangedListener(object : TextWatcher {
+        translatedText.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
 
             }
@@ -101,11 +103,27 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData {
                 s: CharSequence, start: Int, count: Int,
                 after: Int
             ) {
-                // TODO Auto-generated method stub
+                Toast.makeText(
+                    this@SetCreateActivity,
+                    "hasAutoSuggest $hasAutoSuggest",
+                    Toast.LENGTH_LONG
+                )
+                    .show()
+
+
             }
 
+
             override fun afterTextChanged(s: Editable) {
+
+            }
+
+        })
+
+        translatedText.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(p0: View?) {
                 if (hasAutoSuggest == 1) {
+
                     val options = TranslatorOptions.Builder()
                         .setSourceLanguage(languagesAccordance[inputLanguage].toString())
                         .setTargetLanguage(languagesAccordance[outputLanguage].toString())
@@ -116,7 +134,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData {
                         .addOnSuccessListener {
                             // Model downloaded successfully. Okay to start translating.
                             // (Set a flag, unhide the translation UI, etc.)
-                            translator.translate(s.toString())
+                            translator.translate(originalText.text.toString())
                                 .addOnSuccessListener { translatedTexts ->
                                     Toast.makeText(
                                         this@SetCreateActivity,
@@ -125,6 +143,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData {
                                     )
                                         .show()
                                     receivedTranslation = translatedTexts
+
                                     val array = arrayOf(
                                         receivedTranslation
                                     )
@@ -132,8 +151,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData {
                                         this@SetCreateActivity,
                                         "HERE $receivedTranslation",
                                         Toast.LENGTH_LONG
-                                    )
-                                        .show()
+                                    ).show()
 
                                     val adapter =
                                         ArrayAdapter(
@@ -168,35 +186,36 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData {
                         }
                 }
             }
+
         })
 
-  /*      translatedText.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                val array = arrayOf(
-                    receivedTranslation
-                )
-                Toast.makeText(
-                    this@SetCreateActivity,
-                    "HERE $receivedTranslation",
-                    Toast.LENGTH_LONG
-                )
-                    .show()
+        /*  translatedText.setOnClickListener(object : View.OnClickListener {
+              override fun onClick(v: View?) {
+                  val array = arrayOf(
+                      receivedTranslation
+                  )
+                  Toast.makeText(
+                      this@SetCreateActivity,
+                      "HERE $receivedTranslation",
+                      Toast.LENGTH_LONG
+                  )
+                      .show()
 
-                val adapter =
-                    ArrayAdapter(
-                        this@SetCreateActivity,
-                        android.R.layout.simple_list_item_1,
-                        array
-                    )
-//                val adapter = ArrayAdapter.createFromResource(
-//                    this@SetCreateActivity,
-//                    R.array.available_translation_languages,
-//                    android.R.layout.simple_list_item_1
-//                )
-                translatedText.setAdapter(adapter)
-                translatedText.showDropDown()
-            }
-        })*/
+                  val adapter =
+                      ArrayAdapter(
+                          this@SetCreateActivity,
+                          android.R.layout.simple_list_item_1,
+                          array
+                      )
+  //                val adapter = ArrayAdapter.createFromResource(
+  //                    this@SetCreateActivity,
+  //                    R.array.available_translation_languages,
+  //                    android.R.layout.simple_list_item_1
+  //                )
+                  translatedText.setAdapter(adapter)
+                  translatedText.showDropDown()
+              }
+          })*/
 
 
     }
@@ -265,7 +284,8 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData {
 //        presenter.loadData()
     }
 
-    private var simpleCallBack =
+    private
+    var simpleCallBack =
         object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP.or(ItemTouchHelper.DOWN),
             ItemTouchHelper.LEFT.or(ItemTouchHelper.RIGHT)
@@ -278,7 +298,10 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData {
                 TODO("Not yet implemented")
             }
 
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            override fun onSwiped(
+                viewHolder: RecyclerView.ViewHolder,
+                direction: Int
+            ) {
                 val position = viewHolder.adapterPosition
                 when (direction) {
                     ItemTouchHelper.LEFT -> {
@@ -335,7 +358,8 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData {
     }
 
     override fun hideKeyboard() {
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm =
+            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(
             word_add_button.windowToken,
             InputMethodManager.RESULT_UNCHANGED_SHOWN

@@ -63,6 +63,9 @@
                         <com.example.myapplication.ui.setCreate.InstantAutoComplete
                             app:endIconMode="clear_text"
                             android:layout_marginTop="15dp"
+                            android:paddingLeft="15dp"
+                            android:paddingRight="15dp"
+                            android:drawablePadding="13dp"
                             android:drawableStart="@drawable/ic_translated"
                             android:id="@+id/translated_input"
                             android:layout_width="match_parent"

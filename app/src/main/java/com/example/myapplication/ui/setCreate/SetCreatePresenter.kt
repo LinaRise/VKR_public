@@ -38,11 +38,16 @@ class SetCreatePresenter(
 
     fun onDoneButtonWasClicked(
         wordsDisplayed: List<Word>, setTitle: String, inputLanguage: String,
-        outputLanguage: String, hasAutoSuggest:Int
+        outputLanguage: String, hasAutoSuggest: Int
     ) {
         val languageInputInfo = mLanguageRepo.getByTitle(inputLanguage.trim())
         val languageOutputInfo = mLanguageRepo.getByTitle(outputLanguage.trim())
-        var newSet = Sett(0, setTitle.trim(), wordsAmount = wordsDisplayed.size, hasAutoSuggest = hasAutoSuggest)
+        var newSet = Sett(
+            0,
+            setTitle.trim(),
+            wordsAmount = wordsDisplayed.size,
+            hasAutoSuggest = hasAutoSuggest
+        )
         if (languageInputInfo != null) {
             if (languageInputInfo.languageId != 0L) {
                 newSet.languageInput_id = languageInputInfo.languageId
@@ -69,12 +74,16 @@ class SetCreatePresenter(
         val settId = mSettRepo.create(newSet)
 
         val wordCreateAsyncTask = WordCreateAsyncTask(dbhelper = dbhelper)
-        for (word in wordsDisplayed){
+        for (word in wordsDisplayed) {
             word.settId = settId
         }
-        wordCreateAsyncTask.execute(wordsDisplayed as ArrayList<Word>)
-           /* val wordId = mWordRepo.create(word)
-            mSetWordRepo.create(SetWord(settId = settId, wordId = wordId))*/
+        for (word in wordsDisplayed) {
+            wordCreateAsyncTask.execute(word)
+
+        }
+//        wordCreateAsyncTask.execute(wordsDisplayed as ArrayList<Word>)
+        /* val wordId = mWordRepo.create(word)
+         mSetWordRepo.create(SetWord(settId = settId, wordId = wordId))*/
 
     }
 
@@ -92,7 +101,7 @@ class SetCreatePresenter(
         mView.updateRecyclerViewInserted(word)
     }
 
-    fun deleteWord(word: Word,position: Int) {
+    fun deleteWord(word: Word, position: Int) {
         //здесь будет удаление из бд - пока просто из списка
 //        words.removeAt(position)
         mView.updateRecyclerViewDeleted(position)

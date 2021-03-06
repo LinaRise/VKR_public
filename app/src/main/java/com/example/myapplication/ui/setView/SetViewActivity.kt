@@ -26,6 +26,7 @@ import com.example.myapplication.entity.Language
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
 import com.example.myapplication.ui.setCreate.ISetInputData
+import com.example.myapplication.ui.setCreate.InstantAutoComplete
 import com.example.myapplication.ui.setCreate.SetCorrectInfoDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
@@ -42,14 +43,14 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
 
     private lateinit var wordAddButton: Button
     private lateinit var originalText: TextInputEditText
-    private lateinit var translatedText: TextInputEditText
+    private lateinit var translatedText: InstantAutoComplete
 
     private lateinit var setViewAdapter: SetViewAdapter
     private var openedSett: Sett? = null
     private  var inputLanguage: Language = Language()
     private  var outputLanguage: Language = Language()
     var wordsDisplayed = ArrayList<Word?>()
-    var wordsEdited = ArrayList<Word?>()
+//    var wordsEdited = ArrayList<Word?>()
     var wordsOriginal = ArrayList<Word>()
     private lateinit var deletedWord: Word
 
@@ -86,7 +87,7 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
             // Get extra data included in the Intent
 //            wordsOriginal = intent.getParcelableArrayListExtra("data")
             wordsDisplayed =  intent.getParcelableArrayListExtra("data")
-            wordsEdited = ArrayList(wordsDisplayed)
+//            wordsEdited = ArrayList(wordsDisplayed)
             for (word in wordsDisplayed)
                 if (word != null) {
                     wordsOriginal.add(Word(word.wordId,word.originalWord,word.translatedWord))
@@ -146,12 +147,10 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
 //                wordsDisplayed.forEach { print(it) }
 //                wordsOriginal.forEach { print(it) }
 //                wordsEdited.forEach { print(it) }
-                Toast.makeText(this, "wordsEdited size = ${wordsEdited.size}", Toast.LENGTH_SHORT).show()
-                Toast.makeText(this, "wordsOrgigna size = ${wordsOriginal[0]}}", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this, "wordsEdited size = ${wordsEdited.size}", Toast.LENGTH_SHORT).show()
                 presenter.onDoneButtonWasClicked(
                     wordsDisplayed,
                     wordsOriginal,
-                    wordsEdited,
                     openedSett,
                     inputLanguage.languageTitle,
                     outputLanguage.languageTitle,
@@ -206,8 +205,8 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
 
     override fun updateRecyclerViewInserted(word: Word) {
         wordsDisplayed.add(word)
-        wordsEdited.add(word)
-        Toast.makeText(this, "wordsEdited size = ${wordsEdited.size}", Toast.LENGTH_SHORT).show()
+//        wordsEdited.add(word)
+//        Toast.makeText(this, "wordsEdited size = ${wordsEdited.size}", Toast.LENGTH_SHORT).show()
         setViewAdapter.notifyItemInserted(wordsDisplayed.size-1)
 
 
@@ -215,7 +214,7 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
 
 
     override fun updateRecyclerViewDeleted(position: Int) {
-        wordsEdited[position] = null
+//        wordsEdited[position] = null
         setViewAdapter.notifyItemRemoved(position)
         wordsDisplayed.removeAt(position)
 
@@ -239,7 +238,7 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         ) {
             wordsDisplayed.add(position, deletedWord)
             setViewAdapter.notifyItemInserted(position)
-            wordsEdited.add(position, deletedWord)
+//            wordsEdited.add(position, deletedWord)
         }.show()
     }
 

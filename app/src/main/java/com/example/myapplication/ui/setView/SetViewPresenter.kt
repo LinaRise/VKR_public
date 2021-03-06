@@ -11,6 +11,7 @@ import com.example.myapplication.database.repo.word.WordUpdateAsyncTask
 import com.example.myapplication.entity.Language
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
+import java.lang.reflect.Array
 
 class SetViewPresenter(
     view: ISetViewView,
@@ -37,7 +38,7 @@ class SetViewPresenter(
         mView.updateRecyclerViewInserted(word)
     }
 
-    fun deleteWord(word: Word, position:Int) {
+    fun deleteWord(word: Word, position: Int) {
         //здесь будет удаление из бд - пока просто из списка
 //        val position = words.indexOf(word)
 //        words.removeAt(position)
@@ -49,13 +50,14 @@ class SetViewPresenter(
     fun onDoneButtonWasClicked(
         wordsDisplayed: List<Word?>,
         wordsOriginal: List<Word?>,
-        wordsEdited: List<Word?>,
         sett: Sett?,
         inputLanguage: String,
         outputLanguage: String,
         hasAutoSuggest: Int
     ) {
-
+        Log.d("wordsDisplayed", wordsDisplayed.toString())
+        Log.d("wordsOriginal", wordsOriginal.toString())
+//        Log.d("wordsEdited", wordsEdited.toString())
         val languageInputInfo = mLanguageRepo.getByTitle(inputLanguage.trim())
         val languageOutputInfo = mLanguageRepo.getByTitle(outputLanguage.trim())
         if (sett != null) {
@@ -87,39 +89,70 @@ class SetViewPresenter(
             }
 
             val settId = mSettRepo.update(sett)
+            var wordsLeft = ArrayList(wordsOriginal)
+            wordsDisplayed.forEachIndexed { index, element ->
+                val filtered = wordsOriginal.filter { it!!.wordId == element?.wordId }
+                if (filtered.isNullOrEmpty()) {
+                    element!!.settId  = settId
+                    WordCreateAsyncTask(dbhelper).execute(element)
+                    wordsLeft.remove(element)
+                } else {
+                    if (element!!.originalWord!=(filtered[0]!!.originalWord) || element.originalWord!=(filtered[0]!!.originalWord) )
+                        WordUpdateAsyncTask(dbhelper).execute(element)
+                    wordsLeft.remove(filtered[0])
+                }
+            }
 
-            wordsOriginal.forEachIndexed { index, element ->
-                if (wordsEdited[index] != null) {
-                    Log.d("wordsEdited[$index]", wordsEdited[index].toString())
-                    Log.d("element", element.toString())
-                    if (wordsEdited[index] != element) {
+            if (wordsLeft.isNotEmpty()) {
+                wordsLeft.forEachIndexed { index, element ->
+                    WordDeleteAsyncTask(dbhelper).execute(element)
+                }
 
-                        WordUpdateAsyncTask(dbhelper).execute(wordsEdited[index])
+/*
+            if (element !in wordsOriginal) {
+                if (element?.wordId != null) {
+                    val filtered = wordsOriginal.filter { it!!.wordId == element.wordId }
+                    if (filtered.isNotEmpty()) {
+                        WordUpdateAsyncTask(dbhelper).execute(filtered[0])
+                    } else {
+                        WordDeleteAsyncTask(dbhelper).execute(element)
                     }
                 } else {
-                    if (element != null) {
+                    WordCreateAsyncTask(dbhelper).execute(element)
+                }
+            }*/
+            }
+        }
+    }
+}
+/*        wordsOriginal.forEachIndexed { index, element ->
+            if (wordsEdited[index] != null) {
+                Log.d("wordsEdited[$index]", wordsEdited[index].toString())
+                Log.d("element", element.toString())
+                if (wordsEdited[index] != element) {
+                    WordUpdateAsyncTask(dbhelper).execute(wordsEdited[index])
+                } else {
                         WordDeleteAsyncTask(dbhelper).execute(element)
                     }
                 }
-
-
             }
-            Log.d("wordsOriginal.size", wordsOriginal.size.toString())
-            Log.d("wordsEdited.size", wordsEdited.size.toString())
-            if (wordsOriginal.size < wordsEdited.size) {
-                var createList = ArrayList<Word?>()
-                for (i in wordsOriginal.size until wordsEdited.size) {
-                    wordsEdited[i]?.settId  = settId
-                    createList.add(wordsEdited[i])
-                }
-                WordCreateAsyncTask(dbhelper).execute(createList.filterNotNull() as ArrayList<Word>)
+
+        Log.d("wordsOriginal.size", wordsOriginal.size.toString())
+        Log.d("wordsEdited.size", wordsEdited.size.toString())
+        if (wordsOriginal.size < wordsEdited.size) {
+            var createList = ArrayList<Word?>()
+            for (i in wordsOriginal.size until wordsEdited.size) {
+                wordsEdited[i]?.settId  = settId
+                createList.add(wordsEdited[i])
             }
-        }
-
-    }
-
+            WordCreateAsyncTask(dbhelper).execute(createList.filterNotNull() as ArrayList<Word>)
+        }*/
+/*    }
 
 }
+
+
+}*/
 
 
 //        val wordCreateAsyncTask = WordCreateAsyncTask(dbhelper = dbhelper)

@@ -12,6 +12,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.entity.Word
+import com.example.myapplication.ui.setCreate.InstantAutoComplete
 import com.google.android.material.textfield.TextInputEditText
 
 
@@ -53,7 +54,7 @@ class SetViewAdapter(setViewActivity: SetViewActivity) : RecyclerView.Adapter<Se
 
     inner class SetViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var original: TextInputEditText = itemView.findViewById(R.id.original_input)
-        var translated: TextInputEditText = itemView.findViewById(R.id.translated_input)
+        var translated: InstantAutoComplete = itemView.findViewById(R.id.translated_input)
 
         init {
             original.addTextChangedListener(object : TextWatcher {
