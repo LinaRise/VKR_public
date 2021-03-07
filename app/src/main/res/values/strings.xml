@@ -15,6 +15,9 @@
     <string name="low_storage_error">Ocr dependencies cannot be downloaded due to low device storage</string>
     <string name="no_camera_permission">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
     <string name="no_data_available">No set available</string>
+    <string name="study_set">Study set</string>
+    <string name="edit_set">Edit set</string>
+    <string name="save">Save</string>
     <string-array name="available_translation_languages">
         <item>Russian</item>
         <item>English</item>

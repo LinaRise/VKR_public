@@ -4,25 +4,22 @@
     <item
         android:id="@+id/ic_study"
         android:icon="@drawable/ic_study"
-        app:showAsAction="always"
-
+        app:showAsAction="ifRoom"
         android:actionLayout="@layout/activity_set_create"
-        android:title="Study set">
+        android:title="@string/study_set">
     </item>
     <item
         android:id="@+id/ic_settings"
         android:icon="@drawable/ic_settings"
-        app:showAsAction="always"
-
+        app:showAsAction="ifRoom"
         android:actionLayout="@layout/activity_set_create"
-        android:title="Create">
+        android:title="@string/edit_set">
     </item>
     <item
         android:id="@+id/check_icon"
         android:icon="@drawable/ic_check"
-
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         android:actionLayout="@layout/activity_set_create"
-        android:title="Create">
+        android:title="@string/save">
     </item>
 </menu>

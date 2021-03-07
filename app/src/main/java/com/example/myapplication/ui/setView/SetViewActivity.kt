@@ -28,6 +28,7 @@ import com.example.myapplication.entity.Word
 import com.example.myapplication.ui.setCreate.ISetInputData
 import com.example.myapplication.ui.setCreate.InstantAutoComplete
 import com.example.myapplication.ui.setCreate.SetCorrectInfoDialog
+import com.example.myapplication.ui.study.StudyActivity
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.android.synthetic.main.activity_set_create.*
@@ -47,10 +48,11 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
 
     private lateinit var setViewAdapter: SetViewAdapter
     private var openedSett: Sett? = null
-    private  var inputLanguage: Language = Language()
-    private  var outputLanguage: Language = Language()
+    private var inputLanguage: Language = Language()
+    private var outputLanguage: Language = Language()
     var wordsDisplayed = ArrayList<Word?>()
-//    var wordsEdited = ArrayList<Word?>()
+
+    //    var wordsEdited = ArrayList<Word?>()
     var wordsOriginal = ArrayList<Word>()
     private lateinit var deletedWord: Word
 
@@ -75,7 +77,7 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(
             mMessageReceiver,
-             IntentFilter ("sending-list")
+            IntentFilter("sending-list")
         )
         Log.d("SetViewActivity", "onCreate")
         wordAddButton = findViewById(R.id.word_add_button)
@@ -86,18 +88,22 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         override fun onReceive(context: Context?, intent: Intent) {
             // Get extra data included in the Intent
 //            wordsOriginal = intent.getParcelableArrayListExtra("data")
-            wordsDisplayed =  intent.getParcelableArrayListExtra("data")
+            wordsDisplayed = intent.getParcelableArrayListExtra("data")
 //            wordsEdited = ArrayList(wordsDisplayed)
             for (word in wordsDisplayed)
                 if (word != null) {
-                    wordsOriginal.add(Word(word.wordId,word.originalWord,word.translatedWord))
+                    wordsOriginal.add(Word(word.wordId, word.originalWord, word.translatedWord))
 //                    wordsEdited.add(Word(word.wordId,word.originalWord,word.translatedWord))
                     //            wordsOriginal = ArrayList(intent.getParcelableArrayListExtra("data"))
                     Log.d("wordsOriginal", wordsOriginal.size.toString())
 
                 }
             Log.d("wordsOriginal", wordsOriginal.size.toString())
-            Toast.makeText(this@SetViewActivity,"words received ${wordsOriginal.size.toString()}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this@SetViewActivity,
+                "words received ${wordsOriginal.size.toString()}",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -174,6 +180,21 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
                 setCorrectInfoDialog.show(manager, "Set Up Dialog")
                 return true
             }
+            R.id.ic_study -> {
+                if (wordsDisplayed.size < 5) {
+                    Snackbar.make(
+                        recyclerView,
+                        "You need at least 5 words to start studying",
+                        Snackbar.LENGTH_LONG
+                    ).show()
+                } else {
+                    val intent = Intent(this, StudyActivity::class.java)
+                    intent.putExtra("wordsDisplayed",wordsDisplayed)
+                    startActivity(intent)
+                }
+                return true
+
+            }
 
             else -> false
         }
@@ -207,7 +228,7 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         wordsDisplayed.add(word)
 //        wordsEdited.add(word)
 //        Toast.makeText(this, "wordsEdited size = ${wordsEdited.size}", Toast.LENGTH_SHORT).show()
-        setViewAdapter.notifyItemInserted(wordsDisplayed.size-1)
+        setViewAdapter.notifyItemInserted(wordsDisplayed.size - 1)
 
 
     }
@@ -285,7 +306,7 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
                 when (direction) {
                     ItemTouchHelper.LEFT -> {
                         deletedWord = wordsDisplayed[position]!!
-                        presenter.deleteWord(deletedWord,position)
+                        presenter.deleteWord(deletedWord, position)
 
                     }
                 }
