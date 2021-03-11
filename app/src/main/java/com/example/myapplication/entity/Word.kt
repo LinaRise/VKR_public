@@ -2,22 +2,21 @@ package com.example.myapplication.entity
 
 import android.os.Parcel
 import android.os.Parcelable
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 
 data class Word (
 
-    var  wordId: Long=0,
+    var wordId: Long=0,
     var originalWord:String="",
     var translatedWord:String="",
+    var recallPoint:Long=0,
     var settId:Long = -1,
 
-): Parcelable {
+    ): Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readLong(),
         parcel.readString().toString(),
         parcel.readString().toString(),
+        parcel.readLong(),
         parcel.readLong()
     ) {
     }
@@ -26,6 +25,7 @@ data class Word (
         parcel.writeLong(wordId)
         parcel.writeString(originalWord)
         parcel.writeString(translatedWord)
+        parcel.writeLong(recallPoint)
         parcel.writeLong(settId)
     }
 
@@ -42,5 +42,6 @@ data class Word (
             return arrayOfNulls(size)
         }
     }
+
 }
 

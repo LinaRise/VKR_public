@@ -19,6 +19,7 @@ class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
         cv.put(TablesAndColumns.WordEntry.COL_ORIGINAL_WORD, entity.originalWord)
         cv.put(TablesAndColumns.WordEntry.COL_TRANSLATED_WORD, entity.translatedWord)
         cv.put(TablesAndColumns.WordEntry.COL_SET_ID, entity.settId)
+        cv.put(TablesAndColumns.WordEntry.COL_RECALL_POINT, entity.recallPoint)
         return db.insert(TablesAndColumns.WordEntry.TABLE_NAME, null, cv)
     }
 
@@ -29,6 +30,7 @@ class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
         cv.put(TablesAndColumns.WordEntry.COL_ORIGINAL_WORD, entity.originalWord)
         cv.put(TablesAndColumns.WordEntry.COL_TRANSLATED_WORD, entity.translatedWord)
         cv.put(TablesAndColumns.WordEntry.COL_SET_ID, entity.settId)
+        cv.put(TablesAndColumns.WordEntry.COL_RECALL_POINT, entity.recallPoint)
         // обновляем по id
         db.beginTransaction()
         try {
@@ -110,7 +112,8 @@ class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
                 cursor.getColumnIndex(TablesAndColumns.WordEntry.COL_TRANSLATED_WORD)
             val colSettId =
                 cursor.getColumnIndex(TablesAndColumns.WordEntry.COL_SET_ID)
-
+            val colRecallPoints =
+                cursor.getColumnIndex(TablesAndColumns.WordEntry.COL_RECALL_POINT)
             Log.d("WordsGetAsyncTask", "!!!")
             try {
                 while (cursor.moveToNext()) {
@@ -118,6 +121,7 @@ class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
                     word.wordId = cursor.getLong(0)
                     word.originalWord = cursor.getString(colOriginalWord)
                     word.translatedWord = cursor.getString(colTranslatedWord)
+                    word.recallPoint = cursor.getLong(colRecallPoints)
                     word.settId = cursor.getLong(colSettId)
                     wordList.add(word)
                     Log.d("word class", word.originalWord)

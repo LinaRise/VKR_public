@@ -3,13 +3,11 @@ package com.example.myapplication.ui.setCreate
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.repo.language.LanguageRepo
 import com.example.myapplication.database.repo.sett.SettRepo
-import com.example.myapplication.database.repo.word.WordCreateAsyncTask
+import com.example.myapplication.database.repo.word.WordCreateManyAsyncTask
 import com.example.myapplication.database.repo.word.WordRepo
 import com.example.myapplication.entity.Language
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
-import java.text.FieldPosition
-import kotlin.collections.ArrayList
 
 class SetCreatePresenter(
     view: ISetCreateView,
@@ -73,14 +71,12 @@ class SetCreatePresenter(
 
         val settId = mSettRepo.create(newSet)
 
-        val wordCreateAsyncTask = WordCreateAsyncTask(dbhelper = dbhelper)
+        val wordCreateAsyncTask = WordCreateManyAsyncTask(dbhelper = dbhelper)
         for (word in wordsDisplayed) {
             word.settId = settId
         }
-        for (word in wordsDisplayed) {
-            wordCreateAsyncTask.execute(word)
+            wordCreateAsyncTask.execute(wordsDisplayed)
 
-        }
 //        wordCreateAsyncTask.execute(wordsDisplayed as ArrayList<Word>)
         /* val wordId = mWordRepo.create(word)
          mSetWordRepo.create(SetWord(settId = settId, wordId = wordId))*/

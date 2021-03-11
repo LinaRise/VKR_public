@@ -4,14 +4,10 @@ import android.util.Log
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.repo.language.LanguageRepo
 import com.example.myapplication.database.repo.sett.SettRepo
-import com.example.myapplication.database.repo.word.WordCreateAsyncTask
-import com.example.myapplication.database.repo.word.WordDeleteAsyncTask
-import com.example.myapplication.database.repo.word.WordRepo
-import com.example.myapplication.database.repo.word.WordUpdateAsyncTask
+import com.example.myapplication.database.repo.word.*
 import com.example.myapplication.entity.Language
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
-import java.lang.reflect.Array
 
 class SetViewPresenter(
     view: ISetViewView,

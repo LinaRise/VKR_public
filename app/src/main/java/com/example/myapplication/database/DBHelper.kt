@@ -40,6 +40,7 @@ class DBHelper(context: Context) :
         private const val CREATE_TABLE_WORD =
             "CREATE TABLE ${WordEntry.TABLE_NAME}  (${WordEntry.TABLE_NAME}${BaseColumns._ID} INTEGER PRIMARY KEY autoincrement, ${WordEntry.COL_ORIGINAL_WORD} text not null, ${WordEntry.COL_TRANSLATED_WORD} TEXT, " +
                     "${WordEntry.COL_SET_ID} INTEGER not null, " +
+                    "${WordEntry.COL_RECALL_POINT} INTEGER not null DEFAULT 0, "+
                     "FOREIGN KEY (${WordEntry.COL_SET_ID}) REFERENCES ${SettEntry.TABLE_NAME} (${SettEntry.TABLE_NAME}${BaseColumns._ID}) ON DELETE CASCADE);"
 
         private const val CREATE_TABLE_SET =
