@@ -8,7 +8,11 @@ import android.widget.*
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.R
+import com.example.myapplication.database.DBHelper
+import com.example.myapplication.database.repo.word.WordUpdateAsyncTask
+import com.example.myapplication.database.repo.word.WordUpdateManyAsyncTask
 import com.example.myapplication.entity.Word
+import com.example.myapplication.ui.setCreate.SetCorrectInfoDialog
 import kotlinx.android.synthetic.main.activity_study.*
 import kotlin.collections.ArrayList
 
@@ -23,6 +27,7 @@ class StudyActivity : AppCompatActivity() {
     lateinit var option3B: Button
     lateinit var option4B: Button
     lateinit var linearLayout: LinearLayout
+    lateinit var dbhelper: DBHelper
     private val progressBarIds = arrayListOf<Int>(
         R.id.point1,
         R.id.point2,
@@ -47,7 +52,7 @@ class StudyActivity : AppCompatActivity() {
     )
 
     //для отображения правильного и неправильного ответа (зеленый/красный)
-    var rightWrong = arrayOf(
+    var rightWrong = booleanArrayOf(
         false, false, false, false, false, false, false, false, false, false, false, false,
         false, false, false, false, false, false, false, false
     )
@@ -56,6 +61,7 @@ class StudyActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_study)
+        dbhelper = DBHelper(this)
 
         questionTV = findViewById<TextView>(R.id.question_textview)
         option1B = findViewById<Button>(R.id.option1)
@@ -412,9 +418,38 @@ class StudyActivity : AppCompatActivity() {
                     break
                 }
             }
-        }
-        currentQuestion++
+            currentQuestion++
+            if (currentQuestion == newList.size) {
+                Log.d("here", "here")
+                val setStudyEnd = SetStudyEnd()
+                val args = Bundle()
+                val asked = rightWrong.take(currentQuestion)
+                val rightAnswers = asked.count { it }
+                val wrongAnswers = asked.count { !it }
+                args.putInt("rightAnswers", rightAnswers)
+                args.putInt("wrongAnswers", wrongAnswers)
+//            args.putParcelableArrayList("newList", newList as ArrayList)
+                setStudyEnd.arguments = args
+                val manager = supportFragmentManager
+                setStudyEnd.show(manager, "Set study")
 
+                for ((index, word) in newList.withIndex()) {
+                    println("The element at $index is $word")
+                    if (asked[index])
+                        word.recallPoint = word.recallPoint + 1
+                    else {
+                        if (word.recallPoint > 1)
+                            word.recallPoint = word.recallPoint - 2
+
+                    }
+                }
+                WordUpdateManyAsyncTask(dbhelper).execute(newList)
+
+
+            }
+
+
+        }
     }
 
 }

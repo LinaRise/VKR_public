@@ -8,7 +8,7 @@ data class Word (
     var wordId: Long=0,
     var originalWord:String="",
     var translatedWord:String="",
-    var recallPoint:Long=0,
+    var recallPoint:Int=0,
     var settId:Long = -1,
 
     ): Parcelable {
@@ -16,7 +16,7 @@ data class Word (
         parcel.readLong(),
         parcel.readString().toString(),
         parcel.readString().toString(),
-        parcel.readLong(),
+        parcel.readInt(),
         parcel.readLong()
     ) {
     }
@@ -25,7 +25,7 @@ data class Word (
         parcel.writeLong(wordId)
         parcel.writeString(originalWord)
         parcel.writeString(translatedWord)
-        parcel.writeLong(recallPoint)
+        parcel.writeInt(recallPoint)
         parcel.writeLong(settId)
     }
 
