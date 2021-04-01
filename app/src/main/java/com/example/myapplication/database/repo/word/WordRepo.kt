@@ -121,7 +121,7 @@ class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
                     word.wordId = cursor.getLong(0)
                     word.originalWord = cursor.getString(colOriginalWord)
                     word.translatedWord = cursor.getString(colTranslatedWord)
-                    word.recallPoint = cursor.getLong(colRecallPoints)
+                    word.recallPoint = cursor.getInt(colRecallPoints)
                     word.settId = cursor.getLong(colSettId)
                     wordList.add(word)
                     Log.d("word class", word.originalWord)

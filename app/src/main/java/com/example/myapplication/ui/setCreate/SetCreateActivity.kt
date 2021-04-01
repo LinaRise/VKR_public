@@ -3,12 +3,11 @@ package com.example.myapplication.ui.setCreate
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
+import android.os.StrictMode
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.View.OnTouchListener
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -16,18 +15,28 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
+import com.example.myapplication.connectivity.base.ConnectivityProvider
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.Word
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
+import com.google.auth.oauth2.GoogleCredentials
+import com.google.cloud.translate.Translate
+import com.google.cloud.translate.TranslateOptions
 import com.google.mlkit.nl.translate.TranslateLanguage
-import com.google.mlkit.nl.translate.Translation
-import com.google.mlkit.nl.translate.TranslatorOptions
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_set_create.*
+import java.io.IOException
 
 
-class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData {
+class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
+    ConnectivityProvider.ConnectivityStateListener {
+    private var connected = false
+    var translate: Translate? = null
+
+    private val provider: ConnectivityProvider by lazy { ConnectivityProvider.createProvider(this) }
+
+    private var hasInternet: Boolean = false;
+
     private lateinit var deletedWord: Word
     private lateinit var recyclerView: RecyclerView
     private lateinit var setCreateAdapter: SetCreateAdapter
@@ -49,6 +58,9 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData {
 
     private var receivedTranslation: String = ""
 
+    lateinit var adapter: ArrayAdapter<Any>
+
+
     val languagesAccordance = hashMapOf(
         "English" to TranslateLanguage.ENGLISH,
         "Russian" to TranslateLanguage.RUSSIAN,
@@ -57,6 +69,43 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData {
         "German" to TranslateLanguage.GERMAN
     )
 
+    val translateService: Unit
+        get() {
+            val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+            StrictMode.setThreadPolicy(policy)
+            try {
+
+                resources.openRawResource(R.raw.credentials).use { `is` ->
+
+                    //Get credentials:
+                    val myCredentials = GoogleCredentials.fromStream(`is`)
+
+                    //Set credentials and get translate service:
+                    val translateOptions =
+                        TranslateOptions.newBuilder().setCredentials(myCredentials).build()
+                    translate = translateOptions.service
+                }
+            } catch (ioe: IOException) {
+                ioe.printStackTrace()
+            }
+        }
+
+    fun translate(originalText: String): String {
+        if (originalText != "") {
+            return try {
+                val translation: com.google.cloud.translate.Translation = translate!!.translate(
+                    originalText,
+                    Translate.TranslateOption.targetLanguage("en"),
+                    Translate.TranslateOption.sourceLanguage("ru")
+                )
+                translation.translatedText;
+            } catch (e: Exception) {
+                ""
+            }
+        }
+        return "";
+
+    }
 
     // которые отображаются на экране
     var wordsDisplayed = ArrayList<Word>()
@@ -93,132 +142,100 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData {
         val itemTouchHelper = ItemTouchHelper(simpleCallBack)
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
+
+
         wordAddButton.setOnClickListener { onAddWordBtnClick() }
-        translatedText.addTextChangedListener(object : TextWatcher {
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+        /* translatedText.addTextChangedListener(object : TextWatcher {
+             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
 
-            }
+             }
 
-            override fun beforeTextChanged(
-                s: CharSequence, start: Int, count: Int,
-                after: Int
-            ) {
-                Toast.makeText(
-                    this@SetCreateActivity,
-                    "hasAutoSuggest $hasAutoSuggest",
-                    Toast.LENGTH_LONG
-                )
-                    .show()
-
-
-            }
+             override fun beforeTextChanged(
+                 s: CharSequence, start: Int, count: Int,
+                 after: Int
+             ) {
+                 Toast.makeText(
+                     this@SetCreateActivity,
+                     "hasAutoSuggest $hasAutoSuggest",
+                     Toast.LENGTH_LONG
+                 )
+                     .show()
 
 
-            override fun afterTextChanged(s: Editable) {
-
-            }
-
-        })
-
-        translatedText.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(p0: View?) {
-                if (hasAutoSuggest == 1) {
-
-                    val options = TranslatorOptions.Builder()
-                        .setSourceLanguage(languagesAccordance[inputLanguage].toString())
-                        .setTargetLanguage(languagesAccordance[outputLanguage].toString())
-                        .build()
-                    val translator = Translation.getClient(options)
-
-                    translator.downloadModelIfNeeded()
-                        .addOnSuccessListener {
-                            // Model downloaded successfully. Okay to start translating.
-                            // (Set a flag, unhide the translation UI, etc.)
-                            translator.translate(originalText.text.toString())
-                                .addOnSuccessListener { translatedTexts ->
-                                    Toast.makeText(
-                                        this@SetCreateActivity,
-                                        translatedTexts,
-                                        Toast.LENGTH_LONG
-                                    )
-                                        .show()
-                                    receivedTranslation = translatedTexts
-
-                                    val array = arrayOf(
-                                        receivedTranslation
-                                    )
-                                    Toast.makeText(
-                                        this@SetCreateActivity,
-                                        "HERE $receivedTranslation",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-
-                                    val adapter =
-                                        ArrayAdapter(
-                                            this@SetCreateActivity,
-                                            android.R.layout.simple_list_item_1,
-                                            array
-                                        )
-                                    translatedText.setAdapter(adapter)
+             }
 
 
-                                }
-                                .addOnFailureListener { exception ->
-                                    Toast.makeText(
-                                        this@SetCreateActivity,
-                                        "Translating problems: $exception",
-                                        Toast.LENGTH_LONG
-                                    )
-                                        .show()
-                                    // Error.
-                                    // ...
-                                }
-                        }
-                        .addOnFailureListener { exception ->
+             override fun afterTextChanged(s: Editable) {
+
+             }
+
+         })*/
+
+        /* originalText.onFocusChangeListener = View.OnFocusChangeListener { p0, p1 ->
+             if (p1) {
+                 receivedTranslation = ""
+             }
+         }*/
+        translatedText.onFocusChangeListener = object : View.OnFocusChangeListener {
+            override fun onFocusChange(p0: View?, p1: Boolean) {
+                if (p1) {
+                    if (hasAutoSuggest == 1) {
+                        if (hasInternet) {
+                            translateService
+                            receivedTranslation = translate(originalText.text.toString())
+                            Log.d("receivedTranslation", receivedTranslation)
+
+                            val array = arrayOf(
+                                receivedTranslation
+                            )
+
                             Toast.makeText(
                                 this@SetCreateActivity,
-                                "Translating problems: $exception",
+                                "HERE $receivedTranslation",
                                 Toast.LENGTH_LONG
-                            )
-                                .show()
-                            // Model couldn’t be downloaded or other internal error.
-                            // ...
+                            ).show()
+
+                            adapter =
+                                ArrayAdapter(
+                                    this@SetCreateActivity,
+                                    android.R.layout.simple_list_item_1,
+                                    array
+                                )
+                            adapter.notifyDataSetChanged()
+
+                            translatedText.setAdapter(adapter)
+
                         }
+                        Toast.makeText(
+                            this@SetCreateActivity,
+                            "HERE 2 $receivedTranslation",
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                    }
                 }
+//                } else if (!p1) {
+//                    adapter.clear()
+//                    adapter.notifyDataSetChanged()
+//                }
+
             }
 
-        })
 
-        /*  translatedText.setOnClickListener(object : View.OnClickListener {
-              override fun onClick(v: View?) {
-                  val array = arrayOf(
-                      receivedTranslation
-                  )
-                  Toast.makeText(
-                      this@SetCreateActivity,
-                      "HERE $receivedTranslation",
-                      Toast.LENGTH_LONG
-                  )
-                      .show()
-
-                  val adapter =
-                      ArrayAdapter(
-                          this@SetCreateActivity,
-                          android.R.layout.simple_list_item_1,
-                          array
-                      )
-  //                val adapter = ArrayAdapter.createFromResource(
-  //                    this@SetCreateActivity,
-  //                    R.array.available_translation_languages,
-  //                    android.R.layout.simple_list_item_1
-  //                )
-                  translatedText.setAdapter(adapter)
-                  translatedText.showDropDown()
-              }
-          })*/
-
-
+        }
     }
+
+
+    override fun onStart() {
+        super.onStart()
+        provider.addListener(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        provider.removeListener(this)
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.add_new_activity_bar, menu)
@@ -276,6 +293,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData {
     private fun onAddWordBtnClick() {
         val original: String = originalText.text.toString().trim()
         val translated: String = translatedText.text.toString().trim()
+        adapter.clear()
         presenter.addNewWord(original, translated)
     }
 
@@ -381,5 +399,12 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData {
 
     }
 
+    override fun onStateChange(state: ConnectivityProvider.NetworkState) {
+        hasInternet = state.hasInternet()
+    }
+
+    private fun ConnectivityProvider.NetworkState.hasInternet(): Boolean {
+        return (this as? ConnectivityProvider.NetworkState.ConnectedState)?.hasInternet == true
+    }
 
 }
