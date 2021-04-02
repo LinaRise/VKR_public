@@ -20,8 +20,8 @@ class InstantAutoComplete : androidx.appcompat.widget.AppCompatAutoCompleteTextV
         previouslyFocusedRect: Rect?
     ) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect)
-        if (focused && filter != null) {
-            performFiltering(text, 0)
+        if (focused && adapter != null) {
+            performFiltering(text, 0);
         }
     }
 }

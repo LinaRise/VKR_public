@@ -204,6 +204,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
                             adapter.notifyDataSetChanged()
 
                             translatedText.setAdapter(adapter)
+                            translatedText.showDropDown();
 
                         }
                         Toast.makeText(
@@ -294,6 +295,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
         val original: String = originalText.text.toString().trim()
         val translated: String = translatedText.text.toString().trim()
         adapter.clear()
+        adapter.notifyDataSetChanged()
         presenter.addNewWord(original, translated)
     }
 
