@@ -5,10 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.os.StrictMode
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -18,6 +21,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
+import com.example.myapplication.connectivity.base.ConnectivityProvider
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.repo.language.LanguageRepo
 import com.example.myapplication.database.repo.sett.SettGetAsyncTask
@@ -25,17 +29,28 @@ import com.example.myapplication.database.repo.word.WordsGetAsyncTask
 import com.example.myapplication.entity.Language
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
+import com.example.myapplication.translation.TranslationUtils
 import com.example.myapplication.ui.setCreate.ISetInputData
 import com.example.myapplication.ui.setCreate.InstantAutoComplete
 import com.example.myapplication.ui.setCreate.SetCorrectInfoDialog
 import com.example.myapplication.ui.study.StudyActivity
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
+import com.google.auth.oauth2.GoogleCredentials
+import com.google.cloud.translate.Translate
+import com.google.cloud.translate.TranslateOptions
 import kotlinx.android.synthetic.main.activity_set_create.*
+import java.io.IOException
 
 
 class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.TaskListener,
-    ISetInputData {
+    ISetInputData, ConnectivityProvider.ConnectivityStateListener {
+
+    private val provider: ConnectivityProvider by lazy { ConnectivityProvider.createProvider(this) }
+
+    private var hasInternet: Boolean = false
+
+    private var receivedTranslation: String = ""
 
     lateinit var presenter: SetViewPresenter
     lateinit var dbhelper: DBHelper
@@ -62,6 +77,32 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
     private var editTextTitle: EditText? = null
     private var hasAutoSuggest = 0
 
+    var translate: Translate? = null
+
+
+    lateinit var adapter: ArrayAdapter<Any>
+
+
+    private val translateService: Unit
+        get() {
+            val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+            StrictMode.setThreadPolicy(policy)
+            try {
+
+                resources.openRawResource(R.raw.credentials).use { `is` ->
+
+                    //Get credentials:
+                    val myCredentials = GoogleCredentials.fromStream(`is`)
+
+                    //Set credentials and get translate service:
+                    val translateOptions =
+                        TranslateOptions.newBuilder().setCredentials(myCredentials).build()
+                    translate = translateOptions.service
+                }
+            } catch (ioe: IOException) {
+                ioe.printStackTrace()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,6 +123,14 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         Log.d("SetViewActivity", "onCreate")
         wordAddButton = findViewById(R.id.word_add_button)
         wordAddButton.setOnClickListener { onAddWordBtnClick() }
+
+        recyclerView = findViewById(R.id.recyclerivew_set_create)
+        originalText = findViewById(R.id.original_input)
+        translatedText = findViewById(R.id.translated_input)
+
+
+
+
     }
 
     var mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -105,14 +154,16 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
                 Toast.LENGTH_SHORT
             ).show()
         }
+
+
     }
 
     override fun onStart() {
         super.onStart()
+        provider.addListener(this)
+
         SettGetAsyncTask(dbhelper, this).execute(settId)
-        recyclerView = findViewById(R.id.recyclerivew_set_create)
-        originalText = findViewById(R.id.original_input)
-        translatedText = findViewById(R.id.translated_input)
+
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         setViewAdapter = SetViewAdapter(this)
@@ -120,12 +171,83 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         val itemTouchHelper = ItemTouchHelper(simpleCallBack)
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
+        var languageTitleAndCode: Map<String, String> = hashMapOf()
+        translateService
+        if (translate != null) {
+            val languages: List<com.google.cloud.translate.Language> = translate!!.listSupportedLanguages()
+            languageTitleAndCode = languages.map { it.name to it.code }.toMap()
+        }
+
+        translatedText.onFocusChangeListener = object : View.OnFocusChangeListener {
+            override fun onFocusChange(p0: View?, p1: Boolean) {
+                if (p1) {
+                    if (hasAutoSuggest == 1) {
+                        if (hasInternet) {
+
+                            receivedTranslation =
+                                TranslationUtils.translate(
+                                    translate!!,
+                                    languageTitleAndCode,
+                                    originalText.text.toString(),
+                                    inputLanguageText!!.trim(),
+                                    outputLanguageText!!.trim()
+                                )
+                            Log.d("receivedTranslation", receivedTranslation)
+
+                            val array = arrayOf(
+                                receivedTranslation
+                            )
+
+                            Toast.makeText(
+                                this@SetViewActivity,
+                                "HERE $inputLanguage, $outputLanguage",
+                                Toast.LENGTH_LONG
+                            ).show()
+
+                            adapter =
+                                ArrayAdapter(
+                                    this@SetViewActivity,
+                                    android.R.layout.simple_list_item_1,
+                                    array
+                                )
+                            adapter.notifyDataSetChanged()
+
+                            translatedText.setAdapter(adapter)
+                            translatedText.showDropDown();
+
+                        }
+                        Toast.makeText(
+                            this@SetViewActivity,
+                            "HERE 2 $receivedTranslation",
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                    }
+                }
+//                } else if (!p1) {
+//                    adapter.clear()
+//                    adapter.notifyDataSetChanged()
+//                }
+
+            }
+
+
+        }
+
     }
 
     private fun onAddWordBtnClick() {
         val original: String = originalText.text.toString().trim()
         val translated: String = translatedText.text.toString().trim()
+        adapter.clear()
+        adapter.notifyDataSetChanged()
         presenter.addNewWord(original, translated)
+    }
+
+
+    override fun onStop() {
+        super.onStop()
+        provider.removeListener(this)
     }
 
 
@@ -189,7 +311,7 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
                     ).show()
                 } else {
                     val intent = Intent(this, StudyActivity::class.java)
-                    intent.putExtra("wordsDisplayed",wordsDisplayed)
+                    intent.putExtra("wordsDisplayed", wordsDisplayed)
                     startActivity(intent)
                 }
                 return true
@@ -313,6 +435,15 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
             }
 
         }
+
+
+    override fun onStateChange(state: ConnectivityProvider.NetworkState) {
+        hasInternet = state.hasInternet()
+    }
+
+    private fun ConnectivityProvider.NetworkState.hasInternet(): Boolean {
+        return (this as? ConnectivityProvider.NetworkState.ConnectedState)?.hasInternet == true
+    }
 
 
 }

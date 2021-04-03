@@ -18,12 +18,13 @@ import com.example.myapplication.R
 import com.example.myapplication.connectivity.base.ConnectivityProvider
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.Word
+import com.example.myapplication.translation.TranslationUtils
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.auth.oauth2.GoogleCredentials
+import com.google.cloud.translate.Language
 import com.google.cloud.translate.Translate
 import com.google.cloud.translate.TranslateOptions
-import com.google.mlkit.nl.translate.TranslateLanguage
 import kotlinx.android.synthetic.main.activity_set_create.*
 import java.io.IOException
 
@@ -61,15 +62,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
     lateinit var adapter: ArrayAdapter<Any>
 
 
-    val languagesAccordance = hashMapOf(
-        "English" to TranslateLanguage.ENGLISH,
-        "Russian" to TranslateLanguage.RUSSIAN,
-        "French" to TranslateLanguage.FRENCH,
-        "Czech" to TranslateLanguage.CZECH,
-        "German" to TranslateLanguage.GERMAN
-    )
-
-    val translateService: Unit
+    private val translateService: Unit
         get() {
             val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
             StrictMode.setThreadPolicy(policy)
@@ -90,22 +83,6 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
             }
         }
 
-    fun translate(originalText: String): String {
-        if (originalText != "") {
-            return try {
-                val translation: com.google.cloud.translate.Translation = translate!!.translate(
-                    originalText,
-                    Translate.TranslateOption.targetLanguage("en"),
-                    Translate.TranslateOption.sourceLanguage("ru")
-                )
-                translation.translatedText;
-            } catch (e: Exception) {
-                ""
-            }
-        }
-        return "";
-
-    }
 
     // которые отображаются на экране
     var wordsDisplayed = ArrayList<Word>()
@@ -141,8 +118,12 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
 //        getWordList()
         val itemTouchHelper = ItemTouchHelper(simpleCallBack)
         itemTouchHelper.attachToRecyclerView(recyclerView)
-
-
+        var languageTitleAndCode: Map<String, String> = hashMapOf()
+        translateService
+        if (translate != null) {
+            val languages: List<Language> = translate!!.listSupportedLanguages()
+            languageTitleAndCode = languages.map { it.name to it.code }.toMap()
+        }
 
         wordAddButton.setOnClickListener { onAddWordBtnClick() }
         /* translatedText.addTextChangedListener(object : TextWatcher {
@@ -181,8 +162,15 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
                 if (p1) {
                     if (hasAutoSuggest == 1) {
                         if (hasInternet) {
-                            translateService
-                            receivedTranslation = translate(originalText.text.toString())
+
+                            receivedTranslation =
+                                TranslationUtils.translate(
+                                    translate!!,
+                                    languageTitleAndCode,
+                                    originalText.text.toString(),
+                                    inputLanguage.trim(),
+                                    outputLanguage.trim()
+                                )
                             Log.d("receivedTranslation", receivedTranslation)
 
                             val array = arrayOf(
@@ -191,7 +179,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
 
                             Toast.makeText(
                                 this@SetCreateActivity,
-                                "HERE $receivedTranslation",
+                                "HERE $inputLanguage, $outputLanguage",
                                 Toast.LENGTH_LONG
                             ).show()
 

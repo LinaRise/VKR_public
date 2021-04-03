@@ -8,6 +8,8 @@ import com.example.myapplication.database.repo.word.WordRepo
 import com.example.myapplication.entity.Language
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
+import com.example.myapplication.translation.TranslationUtils
+import com.google.cloud.translate.Translate
 
 class SetCreatePresenter(
     view: ISetCreateView,
@@ -20,7 +22,8 @@ class SetCreatePresenter(
     var mSettRepo: SettRepo = SettRepo(dbhelper)
     private var word: Word = Word()
     private var set: Sett = Sett()
-//    private var words = ArrayList<Word>()
+
+    //    private var words = ArrayList<Word>()
 
 
 //    fun loadData() {
@@ -75,7 +78,7 @@ class SetCreatePresenter(
         for (word in wordsDisplayed) {
             word.settId = settId
         }
-            wordCreateAsyncTask.execute(wordsDisplayed)
+        wordCreateAsyncTask.execute(wordsDisplayed)
 
 //        wordCreateAsyncTask.execute(wordsDisplayed as ArrayList<Word>)
         /* val wordId = mWordRepo.create(word)
@@ -104,6 +107,11 @@ class SetCreatePresenter(
         mView.showUndoDeleteWord(position)
 
     }
+
+
+
+
+
 //
 //     fun insertDataToDatabase(words: List<Word>) {
 //        for (word in words){

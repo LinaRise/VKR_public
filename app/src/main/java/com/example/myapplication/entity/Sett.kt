@@ -1,7 +1,5 @@
 package com.example.myapplication.entity
 
-import androidx.room.*
-import androidx.room.ForeignKey.CASCADE
 
 
 data class Sett(// название
