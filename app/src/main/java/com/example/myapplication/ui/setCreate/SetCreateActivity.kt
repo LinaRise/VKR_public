@@ -126,6 +126,13 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
 
         wordAddButton.setOnClickListener { onAddWordBtnClick() }
 
+        adapter =
+            ArrayAdapter(
+                this@SetCreateActivity,
+                android.R.layout.simple_list_item_1,
+                emptyArray()
+            )
+
         translatedText.onFocusChangeListener = object : View.OnFocusChangeListener {
             override fun onFocusChange(p0: View?, p1: Boolean) {
                 if (p1) {

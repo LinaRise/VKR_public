@@ -17,6 +17,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -33,6 +34,7 @@ import com.example.myapplication.translation.TranslationUtils
 import com.example.myapplication.ui.setCreate.ISetInputData
 import com.example.myapplication.ui.setCreate.InstantAutoComplete
 import com.example.myapplication.ui.setCreate.SetCorrectInfoDialog
+import com.example.myapplication.ui.setCreate.SetUpDialog
 import com.example.myapplication.ui.study.StudyActivity
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
@@ -129,8 +131,6 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         translatedText = findViewById(R.id.translated_input)
 
 
-
-
     }
 
     var mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -148,11 +148,11 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
 
                 }
             Log.d("wordsOriginal", wordsOriginal.size.toString())
-            Toast.makeText(
+            /*Toast.makeText(
                 this@SetViewActivity,
                 "words received ${wordsOriginal.size.toString()}",
                 Toast.LENGTH_SHORT
-            ).show()
+            ).show()*/
         }
 
 
@@ -174,9 +174,19 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         var languageTitleAndCode: Map<String, String> = hashMapOf()
         translateService
         if (translate != null) {
-            val languages: List<com.google.cloud.translate.Language> = translate!!.listSupportedLanguages()
+            val languages: List<com.google.cloud.translate.Language> =
+                translate!!.listSupportedLanguages()
             languageTitleAndCode = languages.map { it.name to it.code }.toMap()
         }
+
+        adapter =
+            ArrayAdapter(
+                this@SetViewActivity,
+                android.R.layout.simple_list_item_1,
+                emptyArray()
+            )
+
+
 
         translatedText.onFocusChangeListener = object : View.OnFocusChangeListener {
             override fun onFocusChange(p0: View?, p1: Boolean) {
@@ -216,12 +226,12 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
                             translatedText.showDropDown();
 
                         }
-                      /*  Toast.makeText(
-                            this@SetViewActivity,
-                            "HERE 2 $receivedTranslation",
-                            Toast.LENGTH_LONG
-                        ).show()
-*/
+                        /*  Toast.makeText(
+                              this@SetViewActivity,
+                              "HERE 2 $receivedTranslation",
+                              Toast.LENGTH_LONG
+                          ).show()
+  */
                     }
                 }
 
@@ -231,6 +241,7 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         }
 
     }
+
 
     private fun onAddWordBtnClick() {
         val original: String = originalText.text.toString().trim()
@@ -425,6 +436,13 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
                     ItemTouchHelper.LEFT -> {
                         deletedWord = wordsDisplayed[position]!!
                         presenter.deleteWord(deletedWord, position)
+
+                    }
+                    ItemTouchHelper.RIGHT -> {
+                        setViewAdapter.notifyItemChanged(viewHolder.adapterPosition)
+                        val sets = presenter.getAllSetsTitles()
+                        val copyCardDialog = CopyCardDialog(sets,wordsDisplayed[position],openedSett!!,dbhelper)
+                        copyCardDialog.show(supportFragmentManager, "Copy card dialog")
 
                     }
                 }

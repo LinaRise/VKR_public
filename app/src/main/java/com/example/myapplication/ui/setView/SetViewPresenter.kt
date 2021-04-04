@@ -38,9 +38,17 @@ class SetViewPresenter(
         //здесь будет удаление из бд - пока просто из списка
 //        val position = words.indexOf(word)
 //        words.removeAt(position)
+    /*    mWordRepo.delete(word)
+        val sett = mSettRepo.get(word.settId)
+        sett!!.wordsAmount = sett.wordsAmount + 1
+        mSettRepo.update(sett)*/
         mView.updateRecyclerViewDeleted(position)
         mView.showUndoDeleteWord(position)
 
+    }
+
+    fun getAllSetsTitles(): List<Sett>? {
+        return mSettRepo.getAll()
     }
 
     fun onDoneButtonWasClicked(
@@ -89,11 +97,11 @@ class SetViewPresenter(
             wordsDisplayed.forEachIndexed { index, element ->
                 val filtered = wordsOriginal.filter { it!!.wordId == element?.wordId }
                 if (filtered.isNullOrEmpty()) {
-                    element!!.settId  = settId
+                    element!!.settId = settId
                     WordCreateAsyncTask(dbhelper).execute(element)
                     wordsLeft.remove(element)
                 } else {
-                    if (element!!.originalWord!=(filtered[0]!!.originalWord) || element.originalWord!=(filtered[0]!!.originalWord) )
+                    if (element!!.originalWord != (filtered[0]!!.originalWord) || element.originalWord != (filtered[0]!!.originalWord))
                         WordUpdateAsyncTask(dbhelper).execute(element)
                     wordsLeft.remove(filtered[0])
                 }
