@@ -115,7 +115,6 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
         recyclerView.adapter = setCreateAdapter
 
         setCreateAdapter.setData(wordsDisplayed)
-//        getWordList()
         val itemTouchHelper = ItemTouchHelper(simpleCallBack)
         itemTouchHelper.attachToRecyclerView(recyclerView)
         var languageTitleAndCode: Map<String, String> = hashMapOf()
@@ -126,37 +125,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
         }
 
         wordAddButton.setOnClickListener { onAddWordBtnClick() }
-        /* translatedText.addTextChangedListener(object : TextWatcher {
-             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
 
-             }
-
-             override fun beforeTextChanged(
-                 s: CharSequence, start: Int, count: Int,
-                 after: Int
-             ) {
-                 Toast.makeText(
-                     this@SetCreateActivity,
-                     "hasAutoSuggest $hasAutoSuggest",
-                     Toast.LENGTH_LONG
-                 )
-                     .show()
-
-
-             }
-
-
-             override fun afterTextChanged(s: Editable) {
-
-             }
-
-         })*/
-
-        /* originalText.onFocusChangeListener = View.OnFocusChangeListener { p0, p1 ->
-             if (p1) {
-                 receivedTranslation = ""
-             }
-         }*/
         translatedText.onFocusChangeListener = object : View.OnFocusChangeListener {
             override fun onFocusChange(p0: View?, p1: Boolean) {
                 if (p1) {
@@ -177,11 +146,11 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
                                 receivedTranslation
                             )
 
-                            Toast.makeText(
+                          /*  Toast.makeText(
                                 this@SetCreateActivity,
                                 "HERE $inputLanguage, $outputLanguage",
                                 Toast.LENGTH_LONG
-                            ).show()
+                            ).show()*/
 
                             adapter =
                                 ArrayAdapter(
@@ -195,11 +164,11 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
                             translatedText.showDropDown();
 
                         }
-                        Toast.makeText(
+                      /*  Toast.makeText(
                             this@SetCreateActivity,
                             "HERE 2 $receivedTranslation",
                             Toast.LENGTH_LONG
-                        ).show()
+                        ).show()*/
 
                     }
                 }

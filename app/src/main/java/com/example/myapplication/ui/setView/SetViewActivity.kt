@@ -197,12 +197,12 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
                             val array = arrayOf(
                                 receivedTranslation
                             )
-
+/*
                             Toast.makeText(
                                 this@SetViewActivity,
                                 "HERE $inputLanguage, $outputLanguage",
                                 Toast.LENGTH_LONG
-                            ).show()
+                            ).show()*/
 
                             adapter =
                                 ArrayAdapter(
@@ -216,18 +216,14 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
                             translatedText.showDropDown();
 
                         }
-                        Toast.makeText(
+                      /*  Toast.makeText(
                             this@SetViewActivity,
                             "HERE 2 $receivedTranslation",
                             Toast.LENGTH_LONG
                         ).show()
-
+*/
                     }
                 }
-//                } else if (!p1) {
-//                    adapter.clear()
-//                    adapter.notifyDataSetChanged()
-//                }
 
             }
 

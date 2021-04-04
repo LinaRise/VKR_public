@@ -3,9 +3,9 @@ package com.example.myapplication.ui.setCreate
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
-import android.os.Bundle
-import android.os.StrictMode
-import android.view.View
+import android.os.*
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDialogFragment
@@ -24,6 +24,7 @@ class SetUpDialog : AppCompatDialogFragment(), ConnectivityProvider.Connectivity
             requireContext()
         )
     }
+
 
     private var hasInternet: Boolean = false
 
@@ -70,24 +71,40 @@ class SetUpDialog : AppCompatDialogFragment(), ConnectivityProvider.Connectivity
 
     //    private var listener: ExampleDialogListener? = null
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        var alertDialogBuilder = AlertDialog.Builder(requireActivity())
+        val alertDialogBuilder = AlertDialog.Builder(requireActivity())
         val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.set_parameters, null)
+
+        editTextTitle = view.findViewById(R.id.edit_set_title)
+        editTextInputLang = view.findViewById(R.id.edit_language_input) as AutoCompleteTextView
+        editTextOutputLang = view.findViewById(R.id.edit_language_output) as AutoCompleteTextView
 
 
         var checkBox = view.findViewById<CheckBox>(R.id.checkbox)
             .setOnCheckedChangeListener { buttonView, isChecked ->
                 hasAutoSuggest = if (isChecked) {
-                    Toast.makeText(requireContext(), "Checked", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(requireContext(), "Checked", Toast.LENGTH_SHORT).show()
                     1
                 } else {
-                    Toast.makeText(requireContext(), "Unchecked", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(requireContext(), "Unchecked", Toast.LENGTH_SHORT).show()
                     0
                 }
             }
 
+        editTextTitle!!.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable) {
+                // TODO Auto-generated method stub
+            }
 
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+                // TODO Auto-generated method stub
+            }
 
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                val dialog = dialog as AlertDialog?
+                dialog!!.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = true
+            }
+        })
 
         alertDialogBuilder.setView(view)
             .setTitle("New Set")
@@ -104,10 +121,25 @@ class SetUpDialog : AppCompatDialogFragment(), ConnectivityProvider.Connectivity
                 intent.putExtra("outputLanguage", outputLang)
                 intent.putExtra("hasAutoSuggest", hasAutoSuggest)
                 startActivity(intent)
+
+                /*  editTextTitle?.hint = "Enter title"
+
+                    val v =
+                        requireActivity().getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        v!!.vibrate(
+                            VibrationEffect.createOneShot(
+                                50,
+                                VibrationEffect.DEFAULT_AMPLITUDE
+                            )
+                        )
+                    } else {
+                        //deprecated in API 26
+                        v!!.vibrate(50)
+                    }
+                    break
+                }*/
             })
-        editTextTitle = view.findViewById(R.id.edit_set_title)
-        editTextInputLang = view.findViewById(R.id.edit_language_input) as AutoCompleteTextView
-        editTextOutputLang = view.findViewById(R.id.edit_language_output) as AutoCompleteTextView
 
 
 
@@ -116,6 +148,14 @@ class SetUpDialog : AppCompatDialogFragment(), ConnectivityProvider.Connectivity
 
 
     }
+    override fun onResume() {
+        super.onResume()
+
+        // disable positive button by default
+        val dialog = dialog as AlertDialog?
+        dialog!!.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
+    }
+
 
 
     override fun onStart() {
