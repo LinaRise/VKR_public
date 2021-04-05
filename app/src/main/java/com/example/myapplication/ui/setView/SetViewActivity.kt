@@ -81,7 +81,7 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
 
     var translate: Translate? = null
 
-
+    var languageTitleAndCode: Map<String, String> = hashMapOf()
     lateinit var adapter: ArrayAdapter<Any>
 
 
@@ -171,13 +171,8 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         val itemTouchHelper = ItemTouchHelper(simpleCallBack)
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
-        var languageTitleAndCode: Map<String, String> = hashMapOf()
-        translateService
-        if (translate != null) {
-            val languages: List<com.google.cloud.translate.Language> =
-                translate!!.listSupportedLanguages()
-            languageTitleAndCode = languages.map { it.name to it.code }.toMap()
-        }
+
+
 
         adapter =
             ArrayAdapter(
@@ -441,7 +436,8 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
                     ItemTouchHelper.RIGHT -> {
                         setViewAdapter.notifyItemChanged(viewHolder.adapterPosition)
                         val sets = presenter.getAllSetsTitles()
-                        val copyCardDialog = CopyCardDialog(sets,wordsDisplayed[position],openedSett!!,dbhelper)
+                        val copyCardDialog =
+                            CopyCardDialog(sets, wordsDisplayed[position], openedSett!!, dbhelper)
                         copyCardDialog.show(supportFragmentManager, "Copy card dialog")
 
                     }
@@ -453,6 +449,14 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
 
     override fun onStateChange(state: ConnectivityProvider.NetworkState) {
         hasInternet = state.hasInternet()
+        if (hasInternet) {
+            translateService
+            if (translate != null) {
+                val languages: List<com.google.cloud.translate.Language> =
+                    translate!!.listSupportedLanguages()
+                languageTitleAndCode = languages.map { it.name to it.code }.toMap()
+            }
+        }
     }
 
     private fun ConnectivityProvider.NetworkState.hasInternet(): Boolean {

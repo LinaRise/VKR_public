@@ -30,13 +30,6 @@ class SetUpDialog : AppCompatDialogFragment(), ConnectivityProvider.Connectivity
 
     companion object {
 
-        /* private val LANGAUGES = arrayListOf<String>(
-             "Russian",
-             "English",
-             "French",
-             "German",
-             "Czech"
-         )*/
         private var hasAutoSuggest = 0;
     }
 

@@ -61,6 +61,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
 
     lateinit var adapter: ArrayAdapter<Any>
 
+    var languageTitleAndCode: Map<String, String> = hashMapOf()
 
     private val translateService: Unit
         get() {
@@ -117,12 +118,6 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
         setCreateAdapter.setData(wordsDisplayed)
         val itemTouchHelper = ItemTouchHelper(simpleCallBack)
         itemTouchHelper.attachToRecyclerView(recyclerView)
-        var languageTitleAndCode: Map<String, String> = hashMapOf()
-        translateService
-        if (translate != null) {
-            val languages: List<Language> = translate!!.listSupportedLanguages()
-            languageTitleAndCode = languages.map { it.name to it.code }.toMap()
-        }
 
         wordAddButton.setOnClickListener { onAddWordBtnClick() }
 
@@ -153,11 +148,11 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
                                 receivedTranslation
                             )
 
-                          /*  Toast.makeText(
-                                this@SetCreateActivity,
-                                "HERE $inputLanguage, $outputLanguage",
-                                Toast.LENGTH_LONG
-                            ).show()*/
+                            /*  Toast.makeText(
+                                  this@SetCreateActivity,
+                                  "HERE $inputLanguage, $outputLanguage",
+                                  Toast.LENGTH_LONG
+                              ).show()*/
 
                             adapter =
                                 ArrayAdapter(
@@ -171,18 +166,10 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
                             translatedText.showDropDown();
 
                         }
-                      /*  Toast.makeText(
-                            this@SetCreateActivity,
-                            "HERE 2 $receivedTranslation",
-                            Toast.LENGTH_LONG
-                        ).show()*/
+
 
                     }
                 }
-//                } else if (!p1) {
-//                    adapter.clear()
-//                    adapter.notifyDataSetChanged()
-//                }
 
             }
 
@@ -367,6 +354,14 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
 
     override fun onStateChange(state: ConnectivityProvider.NetworkState) {
         hasInternet = state.hasInternet()
+        if (hasInternet) {
+            translateService
+            if (translate != null) {
+                val languages: List<com.google.cloud.translate.Language> =
+                    translate!!.listSupportedLanguages()
+                languageTitleAndCode = languages.map { it.name to it.code }.toMap()
+            }
+        }
     }
 
     private fun ConnectivityProvider.NetworkState.hasInternet(): Boolean {

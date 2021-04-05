@@ -15,6 +15,15 @@ class TranslationUtils {
                "German" to "de"
            )
    */
+        /**
+         * Метод для перевода текста
+         * @param translate переменная библиотеки класса перевода
+         * @param languageTitleAndCode Map поддерживаемых языков перевода и их кодов
+         * @param originalText текст для перевода
+         * @param sourceLanguage язык с которого необходим перевод
+         * @param targetLanguage язык на который нужно перевести
+         * @return переведенны текст
+         */
         fun translate(
             translate: Translate,
             languageTitleAndCode: Map<String, String>,
@@ -82,8 +91,6 @@ class TranslationUtils {
                         }
                     }
                 }
-
-
             }
             return ""
         }
