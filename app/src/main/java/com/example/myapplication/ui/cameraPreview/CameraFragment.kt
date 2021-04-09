@@ -38,18 +38,18 @@ class CameraFragment : Fragment() {
 
     private lateinit var cameraViewModel: CameraViewModel
     companion object{
-        private val TAG = "CameraFragment"
+        private const val TAG = "CameraFragment"
 
         // Intent request code to handle updating play services if needed.
-        private val RC_HANDLE_GMS = 9001
+        private const val RC_HANDLE_GMS = 9001
 
         // Permission request codes need to be < 256
-        private val RC_HANDLE_CAMERA_PERM = 2
+        private const val RC_HANDLE_CAMERA_PERM = 2
 
         // Constants used to pass extra data in the intent
-        val AutoFocus = "AutoFocus"
-        val UseFlash = "UseFlash"
-        val TextBlockObject = "String"
+        const val AutoFocus = "AutoFocus"
+        const val UseFlash = "UseFlash"
+        const val TextBlockObject = "String"
     }
 
 
@@ -245,12 +245,12 @@ class CameraFragment : Fragment() {
      * Releases the resources associated with the camera source, the associated detectors, and the
      * rest of the processing pipeline.
      */
-     override fun onDestroy() {
+    /* override fun onDestroy() {
         super.onDestroy()
         if (preview != null) {
             preview!!.release()
         }
-    }
+    }*/
 
 
     /**

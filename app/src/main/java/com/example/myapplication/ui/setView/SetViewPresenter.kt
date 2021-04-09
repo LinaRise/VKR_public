@@ -11,9 +11,8 @@ import com.example.myapplication.entity.Word
 
 class SetViewPresenter(
     view: ISetViewView,
-    dbhelper: DBHelper
+    private var dbhelper: DBHelper
 ) {
-    private var dbhelper = dbhelper
     private var mView: ISetViewView = view
 //    private var words = ArrayList<Word>()
 

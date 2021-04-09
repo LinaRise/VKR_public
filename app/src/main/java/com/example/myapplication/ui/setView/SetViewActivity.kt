@@ -58,6 +58,7 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
     lateinit var dbhelper: DBHelper
     private lateinit var recyclerView: RecyclerView
     private var settId: Long = -1
+    private var receivedCopiedText:String = ""
 
     private lateinit var wordAddButton: Button
     private lateinit var originalText: TextInputEditText
@@ -116,8 +117,13 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         presenter = SetViewPresenter(this, dbhelper)
         val extras = intent.extras
         if (extras != null) {
+            if(intent.getStringExtra("copiedText") != null){
+                receivedCopiedText = extras.getString("copiedText").toString()
+            }
             settId = extras.getLong("settId")
         }
+
+
         LocalBroadcastManager.getInstance(this).registerReceiver(
             mMessageReceiver,
             IntentFilter("sending-list")
@@ -129,6 +135,7 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         recyclerView = findViewById(R.id.recyclerivew_set_create)
         originalText = findViewById(R.id.original_input)
         translatedText = findViewById(R.id.translated_input)
+        originalText.setText(receivedCopiedText)
 
 
     }

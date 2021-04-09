@@ -25,8 +25,8 @@ class ChatHeadService : Service() {
         //Inflate the chat head layout we created
         mChatHeadView = LayoutInflater.from(this).inflate(R.layout.layout_chat_head,null,false)
 
-        Toast.makeText(application, "TOAST", Toast.LENGTH_SHORT)
-            .show()
+       /* Toast.makeText(application, "TOAST", Toast.LENGTH_SHORT)
+            .show()*/
         //Add the view to the window.
         val LAYOUT_FLAG: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY

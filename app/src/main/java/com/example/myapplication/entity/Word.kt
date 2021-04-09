@@ -3,15 +3,15 @@ package com.example.myapplication.entity
 import android.os.Parcel
 import android.os.Parcelable
 
-data class Word (
+data class Word(
 
-    var wordId: Long=0,
-    var originalWord:String="",
-    var translatedWord:String="",
-    var recallPoint:Int=0,
-    var settId:Long = -1,
+    var wordId: Long = 0,
+    var originalWord: String = "",
+    var translatedWord: String = "",
+    var recallPoint: Int = 0,
+    var settId: Long = -1,
 
-    ): Parcelable {
+    ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readLong(),
         parcel.readString().toString(),
@@ -20,6 +20,7 @@ data class Word (
         parcel.readLong()
     ) {
     }
+
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeLong(wordId)

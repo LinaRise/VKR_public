@@ -1,11 +1,13 @@
-package com.example.myapplication.ui.setView
+package com.example.myapplication.ui.chathead
 
 import android.app.Dialog
 import android.content.DialogInterface
-import android.os.*
-import android.util.Log
+import android.content.Intent
+import android.os.Bundle
 import android.view.View
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDialogFragment
 import com.example.myapplication.R
@@ -15,10 +17,10 @@ import com.example.myapplication.database.repo.sett.SettRepo
 import com.example.myapplication.database.repo.word.WordRepo
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
-import com.google.android.material.snackbar.Snackbar
+import com.example.myapplication.ui.setView.SetViewActivity
 
 
-class CopyCardDialog(
+class CopiedTextAddDialog(
     var setsList: List<Sett>?,
     var word: Word?,
     var openedSet: Sett?,
@@ -30,6 +32,8 @@ class CopyCardDialog(
             requireContext()
         )
     }
+
+    private val REQUEST_ACCESS_TYPE = 1
 
     private var hasInternet: Boolean = false
     var mWordRepo: WordRepo = WordRepo(dbhelper)
@@ -45,9 +49,6 @@ class CopyCardDialog(
         val setsTitlesMapCopyTo: LinkedHashMap<Long, String> =
             setsList?.filter { it.settId != openedSet?.settId }
                 ?.map { it.settId to it.settTitle }!!.toMap() as LinkedHashMap<Long, String>
-
-
-
 
         ArrayAdapter(
             requireContext(),
@@ -65,14 +66,13 @@ class CopyCardDialog(
             .setNegativeButton("cancel",
                 DialogInterface.OnClickListener { _, _ -> })
             .setPositiveButton("ok", DialogInterface.OnClickListener { _, _ ->
-                val pickedSetId =
+                 val pickedSetId =
                     ArrayList<Long>(setsTitlesMapCopyTo.keys)[spinner.selectedItemPosition]
-                word!!.settId = pickedSetId
-                mWordRepo.create(word!!)
-                var pickedSet = setsList!!.filter { it.settId == pickedSetId }
-                pickedSet[0].wordsAmount = pickedSet[0].wordsAmount + 1
-                mSettRepo.update( pickedSet[0])
-                Toast.makeText(requireContext(), "Saved", Toast.LENGTH_SHORT).show()
+
+                val intent = Intent(requireContext(), SetViewActivity::class.java)
+                intent.putExtra("copiedText", word?.originalWord)
+                intent.putExtra("settId", pickedSetId)
+                startActivity(intent)
             })
 
 
