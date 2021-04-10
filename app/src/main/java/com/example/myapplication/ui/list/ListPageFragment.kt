@@ -3,6 +3,7 @@ package com.example.myapplication.ui.list
 import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +24,9 @@ import com.example.myapplication.ui.setCreate.SetUpDialog
 import com.example.myapplication.ui.setView.SetViewActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.LinkedHashMap
 
 
 class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
@@ -38,6 +42,8 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
     lateinit var db: SQLiteDatabase
     private lateinit var adapter: SetAdapter
     private var allowRefresh: Boolean = true
+    lateinit var handlerForDeleteSett: Handler
+    private lateinit var deleteSettRunnable: Runnable
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -140,7 +146,7 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean {
-                TODO("Not yet implemented")
+               return false
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -149,7 +155,8 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
                     ItemTouchHelper.LEFT -> {
                         deletedSett = ArrayList<Sett>(setsDisplayed.keys)[position]
                         deletedSettInfo = setsDisplayed[deletedSett]!!
-                        presenter.deleteSett(deletedSett, position)
+                        presenter.deleteSettShow(deletedSett, position)
+
 
                     }
                 }
@@ -183,14 +190,14 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
                 override fun onDismissed(snackbar: Snackbar, event: Int) {
                     when (event) {
                         DISMISS_EVENT_TIMEOUT ->
-                            SetDeleteAsyncTask(dbhelper).execute(deletedSett)
+                            presenter.deleteSettFromDb(deletedSett)
                     }
                 }
 
             }).setAction(
                 "UNDO"
             ) {
-                setsDisplayed.put(deletedSett,deletedSettInfo)
+                setsDisplayed.put(deletedSett, deletedSettInfo)
                 adapter.notifyItemInserted(position)
             }.show()
 

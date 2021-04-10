@@ -2,11 +2,12 @@ package com.example.myapplication.ui.list
 
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.repo.language.LanguageRepo
+import com.example.myapplication.database.repo.sett.SetDeleteAsyncTask
 import com.example.myapplication.database.repo.sett.SettRepo
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
 
-class ListPagePresenter(view: IListPageView, dbhelper: DBHelper) {
+class ListPagePresenter(view: IListPageView, var dbhelper: DBHelper) {
     private var mView: IListPageView = view
     private var set: Sett = Sett()
 
@@ -18,16 +19,16 @@ class ListPagePresenter(view: IListPageView, dbhelper: DBHelper) {
         val setList = mSettRepo.getAll()
 
         if (setList != null) {
-            var languagesList = LinkedHashMap <Sett, List<String>>()
-            for (sett in setList){
+            var languagesList = LinkedHashMap<Sett, List<String>>()
+            for (sett in setList) {
                 val inputLang = mLanguageRepo.get(sett.languageInput_id)
                 val outputLang = mLanguageRepo.get(sett.languageOutput_id)
-                var list  = ArrayList<String>()
-                if (inputLang!=null)
-                     list.add(inputLang.languageTitle)
+                var list = ArrayList<String>()
+                if (inputLang != null)
+                    list.add(inputLang.languageTitle)
                 else
                     list.add("-")
-                if (outputLang!=null)
+                if (outputLang != null)
                     list.add(outputLang.languageTitle)
                 else
                     list.add("-")
@@ -45,11 +46,15 @@ class ListPagePresenter(view: IListPageView, dbhelper: DBHelper) {
         mView.openDialogForSetCreation()
     }
 
-    fun deleteSett(sett: Sett   ,position:Int) {
-        mSettRepo.delete(sett)
-        //здесь будет удаление из бд - пока просто из списка
+    fun deleteSettShow(sett: Sett, position: Int) {
         mView.updateRecyclerViewDeleted(position)
         mView.showUndoDeleteWord(position)
 
     }
+
+    fun deleteSettFromDb(sett:Sett){
+        SetDeleteAsyncTask(dbhelper).execute(sett)
+
+    }
+
 }

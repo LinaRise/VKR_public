@@ -156,7 +156,6 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
             delCount = db.delete(
                 TablesAndColumns.SettEntry.TABLE_NAME, "sett_id = ?",
                 arrayOf(entity.settId.toString())
-
             )
             db.setTransactionSuccessful()
             Log.d("Sett Repo", "deleted rows count = $delCount")
