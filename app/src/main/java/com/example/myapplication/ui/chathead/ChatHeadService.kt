@@ -101,6 +101,7 @@ class ChatHeadService : Service() {
                         ) {
                             val intent = Intent(this@ChatHeadService, ChatActivity::class.java)
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
                             startActivity(intent)
 
                             //close the service and remove the chat heads

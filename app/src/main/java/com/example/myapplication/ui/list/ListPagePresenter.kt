@@ -46,6 +46,7 @@ class ListPagePresenter(view: IListPageView, dbhelper: DBHelper) {
     }
 
     fun deleteSett(sett: Sett   ,position:Int) {
+        mSettRepo.delete(sett)
         //здесь будет удаление из бд - пока просто из списка
         mView.updateRecyclerViewDeleted(position)
         mView.showUndoDeleteWord(position)

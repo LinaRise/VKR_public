@@ -64,7 +64,7 @@ class CopiedTextAddDialog(
         alertDialogBuilder.setView(view)
             .setTitle("Pick up Set")
             .setNegativeButton("cancel",
-                DialogInterface.OnClickListener { _, _ -> })
+                DialogInterface.OnClickListener { _, _ -> dismiss()})
             .setPositiveButton("ok", DialogInterface.OnClickListener { _, _ ->
                  val pickedSetId =
                     ArrayList<Long>(setsTitlesMapCopyTo.keys)[spinner.selectedItemPosition]
@@ -72,6 +72,7 @@ class CopiedTextAddDialog(
                 val intent = Intent(requireContext(), SetViewActivity::class.java)
                 intent.putExtra("copiedText", word?.originalWord)
                 intent.putExtra("settId", pickedSetId)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(intent)
             })
 
