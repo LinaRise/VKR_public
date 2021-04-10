@@ -20,7 +20,16 @@ class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
         cv.put(TablesAndColumns.WordEntry.COL_TRANSLATED_WORD, entity.translatedWord)
         cv.put(TablesAndColumns.WordEntry.COL_SET_ID, entity.settId)
         cv.put(TablesAndColumns.WordEntry.COL_RECALL_POINT, entity.recallPoint)
-        return db.insert(TablesAndColumns.WordEntry.TABLE_NAME, null, cv)
+        var insertId: Long = -1L
+        db.beginTransaction()
+        try {
+            insertId = db.insert(TablesAndColumns.WordEntry.TABLE_NAME, null, cv)
+        } catch (e: java.lang.Error) {
+            Log.d("Word Insert", "Failed")
+        } finally {
+            db.endTransaction()
+            return insertId
+        }
     }
 
     override fun update(entity: Word): Long {
@@ -100,7 +109,7 @@ class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
                         "WHERE s.sett_id = ?",*/
                 "SELECT * FROM  word " +
                         "WHERE sett_id = ?",
-                        arrayOf (settId.toString())
+                arrayOf(settId.toString())
             )
         Log.d("word class", "")
         var word: Word?
