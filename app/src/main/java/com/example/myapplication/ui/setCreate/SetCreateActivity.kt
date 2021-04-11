@@ -258,7 +258,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
     private
     var simpleCallBack =
         object : ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP.or(ItemTouchHelper.DOWN),
+            0.or(0),
             ItemTouchHelper.LEFT.or(ItemTouchHelper.RIGHT)
         ) {
             override fun onMove(

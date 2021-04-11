@@ -13,6 +13,8 @@ import java.lang.Exception
 
 
 class LanguageRepo(val dbhelper: DBHelper) : IRepository<Language> {
+    private val TAG = "LanguageRepo"
+
     lateinit var db: SQLiteDatabase
     override fun create(entity: Language): Long {
         db = dbhelper.writableDatabase
@@ -26,7 +28,7 @@ class LanguageRepo(val dbhelper: DBHelper) : IRepository<Language> {
             id = db.insertOrThrow(TablesAndColumns.LanguageEntry.TABLE_NAME, null, cv)
             db.setTransactionSuccessful()
         } catch (e: Exception) {
-            Log.d("LanguageRepo", "Error while trying to add post to database");
+            Log.d(TAG, "Error while trying to add post to database");
         } finally {
             db.endTransaction()
             return id
@@ -44,7 +46,7 @@ class LanguageRepo(val dbhelper: DBHelper) : IRepository<Language> {
 
     override fun get(id: Long): Language? {
         db = dbhelper.readableDatabase
-
+        db.beginTransaction()
         val cursor: Cursor? =
             db.rawQuery(
                 "SELECT * FROM ${TablesAndColumns.LanguageEntry.TABLE_NAME} WHERE ${TablesAndColumns.LanguageEntry.TABLE_NAME}${BaseColumns._ID} = ?",
@@ -60,6 +62,8 @@ class LanguageRepo(val dbhelper: DBHelper) : IRepository<Language> {
             }
             cursor.close()
         }
+        db.setTransactionSuccessful()
+        db.endTransaction()
 
         db.close()
         return langauge
@@ -67,6 +71,7 @@ class LanguageRepo(val dbhelper: DBHelper) : IRepository<Language> {
 
     fun getByTitle(title: String): Language? {
         db = dbhelper.readableDatabase
+        db.beginTransaction()
         val cursor: Cursor? =
             db.rawQuery(
                 "SELECT * FROM ${TablesAndColumns.LanguageEntry.TABLE_NAME} WHERE ${TablesAndColumns.LanguageEntry.COL_LANGUAGE_TITLE} = '$title'",
@@ -82,6 +87,8 @@ class LanguageRepo(val dbhelper: DBHelper) : IRepository<Language> {
             }
             cursor.close()
         }
+        db.setTransactionSuccessful()
+        db.endTransaction()
 
         db.close()
         return langauge

@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -18,7 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.database.DBHelper
-import com.example.myapplication.database.repo.sett.SetDeleteAsyncTask
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.ui.setCreate.SetUpDialog
 import com.example.myapplication.ui.setView.SetViewActivity
@@ -138,9 +136,10 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
 
     private var simpleCallBack =
         object : ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP.or(ItemTouchHelper.DOWN),
-            ItemTouchHelper.LEFT.or(ItemTouchHelper.RIGHT)
+          0.or(0),
+            ItemTouchHelper.LEFT.or(0)
         ) {
+
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,

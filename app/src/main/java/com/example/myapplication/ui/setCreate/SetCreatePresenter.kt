@@ -13,10 +13,9 @@ import com.google.cloud.translate.Translate
 
 class SetCreatePresenter(
     view: ISetCreateView,
-    dbhelper: DBHelper
+    private var dbhelper: DBHelper
 ) {
     private var mView: ISetCreateView = view
-    private var dbhelper = dbhelper
     var mLanguageRepo: LanguageRepo = LanguageRepo(dbhelper)
     var mWordRepo: WordRepo = WordRepo(dbhelper)
     var mSettRepo: SettRepo = SettRepo(dbhelper)
@@ -74,15 +73,12 @@ class SetCreatePresenter(
 
         val settId = mSettRepo.create(newSet)
 
-        val wordCreateAsyncTask = WordCreateManyAsyncTask(dbhelper = dbhelper)
+//        val wordCreateAsyncTask = WordCreateManyAsyncTask(dbhelper = dbhelper)
         for (word in wordsDisplayed) {
             word.settId = settId
         }
-        wordCreateAsyncTask.execute(wordsDisplayed)
+        WordCreateManyAsyncTask(dbhelper).execute(wordsDisplayed)
 
-//        wordCreateAsyncTask.execute(wordsDisplayed as ArrayList<Word>)
-        /* val wordId = mWordRepo.create(word)
-         mSetWordRepo.create(SetWord(settId = settId, wordId = wordId))*/
 
     }
 

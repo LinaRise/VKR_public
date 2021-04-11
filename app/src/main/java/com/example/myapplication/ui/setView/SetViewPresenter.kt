@@ -37,10 +37,10 @@ class SetViewPresenter(
         //здесь будет удаление из бд - пока просто из списка
 //        val position = words.indexOf(word)
 //        words.removeAt(position)
-    /*    mWordRepo.delete(word)
-        val sett = mSettRepo.get(word.settId)
-        sett!!.wordsAmount = sett.wordsAmount + 1
-        mSettRepo.update(sett)*/
+        /*    mWordRepo.delete(word)
+            val sett = mSettRepo.get(word.settId)
+            sett!!.wordsAmount = sett.wordsAmount + 1
+            mSettRepo.update(sett)*/
         mView.updateRecyclerViewDeleted(position)
         mView.showUndoDeleteWord(position)
 
@@ -97,11 +97,17 @@ class SetViewPresenter(
                 val filtered = wordsOriginal.filter { it!!.wordId == element?.wordId }
                 if (filtered.isNullOrEmpty()) {
                     element!!.settId = settId
-                    WordCreateAsyncTask(dbhelper).execute(element)
+                    Log.d("element", element.toString())
+                    val id = mWordRepo.create(element)
+                    Log.d("createdElement id", id.toString())
+                   /* val id = WordCreateAsyncTask(dbhelper).execute(element)*/
                     wordsLeft.remove(element)
                 } else {
-                    if (element!!.originalWord != (filtered[0]!!.originalWord) || element.originalWord != (filtered[0]!!.originalWord))
-                        WordUpdateAsyncTask(dbhelper).execute(element)
+                    if (element!!.originalWord != (filtered[0]!!.originalWord) || element.originalWord != (filtered[0]!!.originalWord)) {
+                        val id = WordUpdateAsyncTask(dbhelper).execute(element)
+                        Log.d("Word updated = ", id.toString())
+
+                    }
                     wordsLeft.remove(filtered[0])
                 }
             }

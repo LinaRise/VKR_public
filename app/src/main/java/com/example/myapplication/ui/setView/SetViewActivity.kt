@@ -148,7 +148,7 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
 //            wordsEdited = ArrayList(wordsDisplayed)
             for (word in wordsDisplayed)
                 if (word != null) {
-                    wordsOriginal.add(Word(word.wordId, word.originalWord, word.translatedWord))
+                    wordsOriginal.add(Word(word.wordId, word.originalWord, word.translatedWord,settId = word.settId,recallPoint = word.recallPoint))
 //                    wordsEdited.add(Word(word.wordId,word.originalWord,word.translatedWord))
                     //            wordsOriginal = ArrayList(intent.getParcelableArrayListExtra("data"))
                     Log.d("wordsOriginal", wordsOriginal.size.toString())
@@ -421,7 +421,7 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
 
     private var simpleCallBack =
         object : ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP.or(ItemTouchHelper.DOWN),
+            0.or(0),
             ItemTouchHelper.LEFT.or(ItemTouchHelper.RIGHT)
         ) {
             override fun onMove(

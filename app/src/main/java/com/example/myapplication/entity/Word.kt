@@ -5,7 +5,7 @@ import android.os.Parcelable
 
 data class Word(
 
-    var wordId: Long = 0,
+    var wordId: Long = -1,
     var originalWord: String = "",
     var translatedWord: String = "",
     var recallPoint: Int = 0,

@@ -11,21 +11,23 @@ import com.example.myapplication.entity.Word
 
 
 class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
+    private val TAG = "WordRepo"
     lateinit var db: SQLiteDatabase
     override fun create(entity: Word): Long {
         db = dbhelper.writableDatabase
-        val cv = ContentValues()
-        cv.clear();
-        cv.put(TablesAndColumns.WordEntry.COL_ORIGINAL_WORD, entity.originalWord)
-        cv.put(TablesAndColumns.WordEntry.COL_TRANSLATED_WORD, entity.translatedWord)
-        cv.put(TablesAndColumns.WordEntry.COL_SET_ID, entity.settId)
-        cv.put(TablesAndColumns.WordEntry.COL_RECALL_POINT, entity.recallPoint)
         var insertId: Long = -1L
         db.beginTransaction()
         try {
-            insertId = db.insert(TablesAndColumns.WordEntry.TABLE_NAME, null, cv)
+            val cv = ContentValues()
+            cv.clear()
+            cv.put(TablesAndColumns.WordEntry.COL_ORIGINAL_WORD, entity.originalWord)
+            cv.put(TablesAndColumns.WordEntry.COL_TRANSLATED_WORD, entity.translatedWord)
+            cv.put(TablesAndColumns.WordEntry.COL_SET_ID, entity.settId)
+            cv.put(TablesAndColumns.WordEntry.COL_RECALL_POINT, entity.recallPoint)
+            insertId = db.insertOrThrow(TablesAndColumns.WordEntry.TABLE_NAME, null, cv)
+            db.setTransactionSuccessful();
         } catch (e: java.lang.Error) {
-            Log.d("Word Insert", "Failed")
+            Log.d(TAG, "Error while inserting to database")
         } finally {
             db.endTransaction()
             return insertId
@@ -48,13 +50,16 @@ class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
                     entity.wordId.toString()
                 )
             ).toLong()
-            Log.d("Word Repo ", "updated rows count = $updCount")
+            Log.d(TAG, "updated rows count = $updCount")
             db.setTransactionSuccessful()
         } catch (e: java.lang.Error) {
-
+            print(e)
+            Log.d(
+                TAG, "Error while trying to update word at database with id = ${entity.settId}"
+            )
         } finally {
             db.endTransaction()
-            return updCount
+            return entity.settId
         }
 
 
@@ -73,7 +78,10 @@ class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
             db.setTransactionSuccessful()
             Log.d("Word Repo", "deleted rows count = $delCount")
         } catch (e: java.lang.Error) {
-
+            print(e)
+            Log.d(
+                TAG, "Error while trying to delete word at database with id = ${entity.settId}"
+            )
         } finally {
             db.endTransaction()
             return delCount.toLong()
@@ -92,39 +100,28 @@ class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
 
     fun getWordsOfSet(settId: Long): List<Word>? {
         db = dbhelper.readableDatabase
-        val cursor: Cursor? =
-            db.rawQuery(
-                /*"SELECT w.* " +
-                        "FROM  ${TablesAndColumns.WordEntry.TABLE_NAME} w " +
-                        "LEFT OUTER JOIN ${TablesAndColumns.SettWordEntry.TABLE_NAME} sw " +
-                        "ON w.${TablesAndColumns.WordEntry.TABLE_NAME}_id = sw.${TablesAndColumns.WordEntry.TABLE_NAME}_id " +
-                        "LEFT OUTER JOIN ${TablesAndColumns.SettEntry.TABLE_NAME} s " +
-                        "ON sw.sett_word_id = s.sett_id " +
-                        "WHERE s.sett_id = ?",*/
-                /*"SELECT w.* FROM  word w " +
-                        "JOIN sett_word sw " +
-                        "ON w.word_id = sw.word_id " +
-                        "JOIN sett s " +
-                        "ON sw.sett_id = s.sett_id " +
-                        "WHERE s.sett_id = ?",*/
-                "SELECT * FROM  word " +
-                        "WHERE sett_id = ?",
-                arrayOf(settId.toString())
-            )
-        Log.d("word class", "")
-        var word: Word?
+        db.beginTransaction()
         var wordList: ArrayList<Word> = ArrayList()
-        if (cursor != null) {
-            val colOriginalWord =
-                cursor.getColumnIndex(TablesAndColumns.WordEntry.COL_ORIGINAL_WORD)
-            val colTranslatedWord =
-                cursor.getColumnIndex(TablesAndColumns.WordEntry.COL_TRANSLATED_WORD)
-            val colSettId =
-                cursor.getColumnIndex(TablesAndColumns.WordEntry.COL_SET_ID)
-            val colRecallPoints =
-                cursor.getColumnIndex(TablesAndColumns.WordEntry.COL_RECALL_POINT)
-            Log.d("WordsGetAsyncTask", "!!!")
-            try {
+        try {
+            val cursor: Cursor? =
+                db.rawQuery(
+                    "SELECT * FROM  word " +
+                            "WHERE sett_id = ?",
+                    arrayOf(settId.toString())
+                )
+            Log.d("word class", "")
+            var word: Word?
+
+            if (cursor != null) {
+                val colOriginalWord =
+                    cursor.getColumnIndex(TablesAndColumns.WordEntry.COL_ORIGINAL_WORD)
+                val colTranslatedWord =
+                    cursor.getColumnIndex(TablesAndColumns.WordEntry.COL_TRANSLATED_WORD)
+                val colSettId =
+                    cursor.getColumnIndex(TablesAndColumns.WordEntry.COL_SET_ID)
+                val colRecallPoints =
+                    cursor.getColumnIndex(TablesAndColumns.WordEntry.COL_RECALL_POINT)
+                Log.d("WordsGetAsyncTask", "!!!")
                 while (cursor.moveToNext()) {
                     word = Word()
                     word.wordId = cursor.getLong(0)
@@ -136,15 +133,19 @@ class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
                     Log.d("word class", word.originalWord)
 
                 }
-
-            } catch (e: Error) {
-                print(e)
-            } finally {
                 cursor.close()
-                db.close()
-                return wordList
+                db.setTransactionSuccessful()
             }
+        } catch (e: Error) {
+            print(e)
+            print(e)
+            Log.d(
+                TAG, "Error while trying to get wordOfSets at database "
+            )
+        } finally {
+            db.endTransaction()
+            db.close()
+            return wordList
         }
-        return null
     }
 }
