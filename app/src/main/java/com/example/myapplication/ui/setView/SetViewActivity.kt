@@ -21,6 +21,7 @@ import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.examp.CopyCardDialog
 import com.example.myapplication.R
 import com.example.myapplication.connectivity.base.ConnectivityProvider
 import com.example.myapplication.database.DBHelper
@@ -444,7 +445,7 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
                         setViewAdapter.notifyItemChanged(viewHolder.adapterPosition)
                         val sets = presenter.getAllSetsTitles()
                         val copyCardDialog =
-                            CopyCardDialog(sets, wordsDisplayed[position], openedSett!!, dbhelper)
+                            CopyCardDialog(sets!!, wordsDisplayed[position], openedSett!!, dbhelper)
                         copyCardDialog.show(supportFragmentManager, "Copy card dialog")
 
                     }

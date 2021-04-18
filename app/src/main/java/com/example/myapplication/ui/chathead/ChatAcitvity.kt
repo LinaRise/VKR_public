@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.R
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.Word
-import com.example.myapplication.ui.setView.CopyCardDialog
 import com.example.myapplication.ui.setView.SetViewPresenter
 
 

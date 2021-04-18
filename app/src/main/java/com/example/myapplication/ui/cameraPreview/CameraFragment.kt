@@ -15,16 +15,19 @@ import android.speech.tts.TextToSpeech
 import android.speech.tts.TextToSpeech.OnInitListener
 import android.util.Log
 import android.view.*
-import android.view.GestureDetector.SimpleOnGestureListener
-import android.view.ScaleGestureDetector.OnScaleGestureListener
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.R
+import com.example.myapplication.database.DBHelper
+import com.example.myapplication.entity.Word
 import com.example.myapplication.ui.cameraPreview.camera.CameraSource
 import com.example.myapplication.ui.cameraPreview.camera.CameraSourcePreview
 import com.example.myapplication.ui.cameraPreview.camera.GraphicOverlay
+import com.example.myapplication.ui.cameraPreview.camera.ICameraFragmentView
+import com.example.myapplication.ui.chathead.ChatActivityPresenter
+import com.example.myapplication.ui.chathead.CopiedTextAddDialog
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.vision.text.TextBlock
@@ -34,10 +37,11 @@ import java.io.IOException
 import java.util.*
 
 
-class CameraFragment : Fragment() {
+class CameraFragment : Fragment(), ICameraFragmentView {
 
     private lateinit var cameraViewModel: CameraViewModel
-    companion object{
+
+    companion object {
         private const val TAG = "CameraFragment"
 
         // Intent request code to handle updating play services if needed.
@@ -51,6 +55,9 @@ class CameraFragment : Fragment() {
         const val UseFlash = "UseFlash"
         const val TextBlockObject = "String"
     }
+
+    lateinit var dbhelper: DBHelper
+    lateinit var presenter: CameraFragmentPresenter
 
 
     private var cameraSource: CameraSource? = null
@@ -70,20 +77,28 @@ class CameraFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         cameraViewModel =
-                ViewModelProvider(this).get(CameraViewModel::class.java)
+            ViewModelProvider(this).get(CameraViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_camera, container, false)
 //        val textView: TextView = root.findViewById(R.id.text_dashboard)
 //        cameraViewModel.text.observe(viewLifecycleOwner, {
 //            textView.text = it
 //        })
+        dbhelper = DBHelper(requireContext())
+        presenter = CameraFragmentPresenter(this, dbhelper)
+
+        gestureDetector = GestureDetector(requireContext(), CaptureGestureListener())
+        scaleGestureDetector = ScaleGestureDetector(requireContext(), ScaleListener())
         root.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View?, event: MotionEvent): Boolean {
-                if (event.action == MotionEvent.ACTION_MOVE) {
-                    val b = scaleGestureDetector!!.onTouchEvent(event)
-                    val c = gestureDetector!!.onTouchEvent(event)
-                    return b || c
-                }
-                return true
+                /*  if (event.action == MotionEvent.ACTION_MOVE) {
+                      val b = scaleGestureDetector!!.onTouchEvent(event)
+                      val c = gestureDetector!!.onTouchEvent(event)
+                      return b || c
+                  }
+                  return true*/
+                val b = scaleGestureDetector!!.onTouchEvent(event)
+                val c = gestureDetector!!.onTouchEvent(event)
+                return b || c
             }
         })
 //        root.setOnTouchListener { _, event ->
@@ -91,7 +106,7 @@ class CameraFragment : Fragment() {
 //        }
 
         preview = root.findViewById<View>(R.id.preview) as CameraSourcePreview
-        graphicOverlay =  root.findViewById<GraphicOverlay<OcrGraphic>>(R.id.graphicOverlay)
+        graphicOverlay = root.findViewById<GraphicOverlay<OcrGraphic>>(R.id.graphicOverlay)
 
         // Set good defaults for capturing text.
 
@@ -111,8 +126,7 @@ class CameraFragment : Fragment() {
             requestCameraPermission()
         }
 
-        gestureDetector = GestureDetector(requireContext(), CaptureGestureListener())
-        scaleGestureDetector = ScaleGestureDetector(requireContext(), ScaleListener())
+
 
         Snackbar.make(
             requireActivity().findViewById(android.R.id.content)!!,
@@ -207,7 +221,8 @@ class CameraFragment : Fragment() {
             val lowstorageFilter = IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW)
             val hasLowStorage = requireActivity().registerReceiver(null, lowstorageFilter) != null
             if (hasLowStorage) {
-                Toast.makeText(requireContext(), R.string.low_storage_error, Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), R.string.low_storage_error, Toast.LENGTH_LONG)
+                    .show()
                 Log.w(CameraFragment.TAG, getString(R.string.low_storage_error))
             }
         }
@@ -226,7 +241,7 @@ class CameraFragment : Fragment() {
     /**
      * Restarts the camera.
      */
-     override fun onResume() {
+    override fun onResume() {
         super.onResume()
         startCameraSource()
     }
@@ -234,7 +249,7 @@ class CameraFragment : Fragment() {
     /**
      * Stops the camera.
      */
-     override fun onPause() {
+    override fun onPause() {
         super.onPause()
         if (preview != null) {
             preview!!.stop()
@@ -344,7 +359,7 @@ class CameraFragment : Fragment() {
      * @param rawY - the raw position of the tap.
      * @return true if the tap was on a TextBlock
      */
-     fun onTap(rawX: Float, rawY: Float): Boolean {
+    private fun onTap(rawX: Float, rawY: Float): Boolean {
         val graphic = graphicOverlay!!.getGraphicAtLocation(rawX, rawY)
         var text: TextBlock? = null
         if (graphic != null) {
@@ -353,6 +368,15 @@ class CameraFragment : Fragment() {
                 Log.d(CameraFragment.TAG, "text data is being spoken! " + text.value)
                 // Speak the string.
                 tts!!.speak(text.value, TextToSpeech.QUEUE_ADD, null, "DEFAULT")
+                val sets = presenter.getAllSetsTitles()
+                val copiedTextAddDialog =
+                    CopiedTextAddDialog(
+                        sets,
+                        Word(originalWord = text.value, translatedWord = ""),
+                        null,
+                        dbhelper
+                    )
+                copiedTextAddDialog.show(childFragmentManager, "Add copied word")
             } else {
                 Log.d(CameraFragment.TAG, "text data is null")
             }
@@ -362,15 +386,18 @@ class CameraFragment : Fragment() {
         return text != null
     }
 
-   inner class CaptureGestureListener : SimpleOnGestureListener() {
-        override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-            Toast.makeText(context, "TOAST", Toast.LENGTH_SHORT)
-                .show()
-            return this@CameraFragment.onTap(e.rawX, e.rawY) || super.onSingleTapConfirmed(e)
+    inner class CaptureGestureListener : GestureDetector.SimpleOnGestureListener() {
+        override fun onDown(e: MotionEvent?): Boolean {
+            return true
         }
+
+        override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+            return onTap(e.rawX, e.rawY) || super.onSingleTapConfirmed(e)
+        }
+
     }
 
-    inner class ScaleListener : OnScaleGestureListener {
+    inner class ScaleListener : ScaleGestureDetector.OnScaleGestureListener {
         /**
          * Responds to scaling events for a gesture in progress.
          * Reported by pointer motion.

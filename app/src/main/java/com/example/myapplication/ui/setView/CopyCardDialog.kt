@@ -1,11 +1,14 @@
-package com.example.myapplication.ui.setView
+package com.examp
+
 
 import android.app.Dialog
 import android.content.DialogInterface
-import android.os.*
-import android.util.Log
+import android.os.Bundle
 import android.view.View
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDialogFragment
 import com.example.myapplication.R
@@ -15,14 +18,13 @@ import com.example.myapplication.database.repo.sett.SettRepo
 import com.example.myapplication.database.repo.word.WordRepo
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
-import com.google.android.material.snackbar.Snackbar
 
 
 class CopyCardDialog(
-    var setsList: List<Sett>?,
+    var setsList: List<Sett>,
     var word: Word?,
     var openedSet: Sett?,
-    dbhelper: DBHelper
+    var dbhelper: DBHelper
 ) : AppCompatDialogFragment(),
     ConnectivityProvider.ConnectivityStateListener, AdapterView.OnItemSelectedListener {
     private val provider: ConnectivityProvider by lazy {
@@ -43,8 +45,9 @@ class CopyCardDialog(
 
         var spinner = view.findViewById<Spinner>(R.id.sets_titles_spinner)
         val setsTitlesMapCopyTo: LinkedHashMap<Long, String> =
-            setsList?.filter { it.settId != openedSet?.settId }
-                ?.map { it.settId to it.settTitle }!!.toMap() as LinkedHashMap<Long, String>
+            setsList.map { it.settId to it.settTitle }.toMap()
+                .filter { it.key != openedSet?.settId } as LinkedHashMap<Long, String>
+
 
 
 
@@ -71,7 +74,7 @@ class CopyCardDialog(
                 mWordRepo.create(word!!)
                 var pickedSet = setsList!!.filter { it.settId == pickedSetId }
                 pickedSet[0].wordsAmount = pickedSet[0].wordsAmount + 1
-                mSettRepo.update( pickedSet[0])
+                mSettRepo.update(pickedSet[0])
                 Toast.makeText(requireContext(), "Saved", Toast.LENGTH_SHORT).show()
             })
 
