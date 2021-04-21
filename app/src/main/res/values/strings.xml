@@ -18,6 +18,7 @@
     <string name="study_set">Study set</string>
     <string name="edit_set">Edit set</string>
     <string name="save">Save</string>
+    <string name="translate_bubble">Transalte Bubble</string>
     <string-array name="available_translation_languages">
         <item>Russian</item>
         <item>English</item>

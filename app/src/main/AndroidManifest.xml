@@ -42,7 +42,6 @@
         </activity>
         <activity
             android:name=".ui.chathead.ChatActivity"
-            android:label="Chat with Android"
             android:theme="@style/Theme.AppCompat.Light"
             android:excludeFromRecents="true"/>
 

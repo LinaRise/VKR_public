@@ -69,17 +69,16 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.menu_switch_layout, menu)
         val item: MenuItem = menu.findItem(R.id.switchId) as MenuItem
         item.setActionView(R.layout.switch_layout)
-        switchAB = item
-            .actionView.findViewById(R.id.toggle_btn)
+        switchAB = item.actionView.findViewById(R.id.toggle_btn)
         switchAB?.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                Toast.makeText(application, "ON", Toast.LENGTH_SHORT)
+                Toast.makeText(application, "Translate bubble on", Toast.LENGTH_SHORT)
                     .show()
                 startService(Intent(this@MainActivity, ChatHeadService::class.java))
             } else {
                 val myService = Intent(this@MainActivity, ChatHeadService::class.java)
                 stopService(myService)
-                Toast.makeText(application, "OFF", Toast.LENGTH_SHORT)
+                Toast.makeText(application, "Translate bubble off", Toast.LENGTH_SHORT)
                     .show()
             }
         }

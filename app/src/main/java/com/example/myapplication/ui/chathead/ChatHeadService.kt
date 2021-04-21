@@ -9,7 +9,9 @@ import android.view.*
 import android.view.View.OnTouchListener
 import android.widget.ImageView
 import android.widget.Toast
+import com.example.myapplication.MainActivity
 import com.example.myapplication.R
+import kotlin.math.abs
 
 
 class ChatHeadService : Service() {
@@ -58,7 +60,8 @@ class ChatHeadService : Service() {
 
         //Set the close button.
         val closeButton: ImageView = mChatHeadView!!.findViewById<View>(R.id.close_btn) as ImageView
-        closeButton.setOnClickListener { //close the service and remove the chat head from the window
+        closeButton.setOnClickListener {
+            //close the service and remove the chat head from the window
             stopSelf()
         }
 
@@ -95,7 +98,7 @@ class ChatHeadService : Service() {
                         //we have to check if the previous action was ACTION_DOWN
                         //to identify if the user clicked the view or not.
 
-                        if ((Math.abs(initialTouchX - event.rawX) < 5) && (Math.abs(
+                        if ((abs(initialTouchX - event.rawX) < 5) && (Math.abs(
                                 initialTouchY - event.rawY
                             ) < 5)
                         ) {
@@ -105,7 +108,7 @@ class ChatHeadService : Service() {
                             startActivity(intent)
 
                             //close the service and remove the chat heads
-                            stopSelf()
+//                            stopSelf()
                         }
                     else Toast.makeText(
                         applicationContext
