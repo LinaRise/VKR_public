@@ -1,5 +1,9 @@
 package com.example.myapplication
 
+import android.app.AlarmManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -10,6 +14,9 @@ import android.view.MenuItem
 import android.widget.Toast
 import android.widget.ToggleButton
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -17,10 +24,14 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.ui.chathead.ChatHeadService
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
+    private val REQUEST_CODE_NOTIFICATION: Int = 100
+    private val CHANNEL_ID = "CHANNEL_ID"
+    private val NOTIFICATION_ID = 2002
 
-    lateinit var dbhelper:DBHelper
+    lateinit var dbhelper: DBHelper
     private var switchAB: ToggleButton? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,8 +66,61 @@ class MainActivity : AppCompatActivity() {
             )
             startActivityForResult(intent, CODE_DRAW_OVER_OTHER_APP_PERMISSION)
         }
-    }
 
+        createNotificationChannel()
+        var builder = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle("My notification")
+            .setContentText("Much longer text that cannot fit one line...")
+            .setStyle(NotificationCompat.BigTextStyle()
+                .bigText("Much longer text that cannot fit one line..."))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
+        with(NotificationManagerCompat.from(this)) {
+            // notificationId is a unique int for each notification that you must define
+            notify(NOTIFICATION_ID, builder.build())
+        }
+
+      /*  val calendar = Calendar.getInstance()
+        calendar.set(Calendar.HOUR_OF_DAY, 18)
+        calendar.set(Calendar.MINUTE,30)
+//        val intent = Intent(applicationContext, NotificationReceiver::class.java)
+        val intent = Intent(this, NotificationReceiver::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+//        intent.action = "MY_NOTIFICATION_MESSAGE";
+        val pendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            REQUEST_CODE_NOTIFICATION,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+        alarmManager.setRepeating(
+            AlarmManager.RTC_WAKEUP,
+            calendar.timeInMillis,
+            AlarmManager.INTERVAL_DAY,
+            pendingIntent
+        );
+
+*/
+    }
+    private fun createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = resources.getString(R.string.channel_name)
+            val descriptionText = resources.getString(R.string.channel_description)
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            // Register the channel with the system
+            val notificationManager: NotificationManager =
+                ContextCompat.getSystemService(this, NotificationManager::class.java) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
 
 
     /**

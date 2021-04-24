@@ -7,10 +7,12 @@
 
 
     <item
-        android:id="@+id/switchId"
-        android:title="@string/activate_bubble_add"
-        android:actionLayout="@layout/switch_layout"
+        android:id="@+id/backupIcon"
+        android:title="@string/backup"
+        android:icon="@drawable/ic_backup"
+        android:actionLayout="@layout/fragment_profile"
         app:showAsAction="ifRoom" />
+
 
 
 </menu>

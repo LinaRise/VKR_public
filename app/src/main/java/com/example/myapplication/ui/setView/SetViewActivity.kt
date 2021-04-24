@@ -16,6 +16,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -463,6 +464,9 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
                 val languages: List<com.google.cloud.translate.Language> =
                     translate!!.listSupportedLanguages()
                 languageTitleAndCode = languages.map { it.name to it.code }.toMap()
+            }
+            else{
+                    Toast.makeText(this, "Internet is not available", Toast.LENGTH_LONG).show()
             }
         }
     }

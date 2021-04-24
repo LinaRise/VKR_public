@@ -196,7 +196,7 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
             }).setAction(
                 "UNDO"
             ) {
-                setsDisplayed.put(deletedSett, deletedSettInfo)
+                setsDisplayed[deletedSett] = deletedSettInfo
                 adapter.notifyItemInserted(position)
             }.show()
 

@@ -19,6 +19,10 @@
     <string name="edit_set">Edit set</string>
     <string name="save">Save</string>
     <string name="translate_bubble">Transalte Bubble</string>
+    <string name="backup">Backup</string>
+    <string name="activate_bubble_add">Activate bubble add</string>
+    <string name="channel_name">notification_channel</string>
+    <string name="channel_description">it\'s time to study</string>
     <string-array name="available_translation_languages">
         <item>Russian</item>
         <item>English</item>
