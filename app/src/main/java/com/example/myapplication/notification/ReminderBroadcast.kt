@@ -11,22 +11,29 @@ import android.provider.Settings.Secure.getString
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.navigation.NavDeepLinkBuilder
+import com.example.myapplication.MainActivity
 import com.example.myapplication.R
+import com.example.myapplication.ui.list.ListPageFragment
 import com.example.myapplication.ui.setView.SetViewActivity
 
-class NotificationReceiver : BroadcastReceiver() {
+class ReminderBroadcast : BroadcastReceiver() {
     private val REQUEST_CODE = 100
-    private val CHANNEL_ID = "CHANNEL_ID"
-    private val NOTIFICATION_ID = 2002
+    private val CHANNEL_ID = "STUDY_NOTIFY_CHANNEL"
+    private val NOTIFICATION_ID = 200
     override fun onReceive(p0: Context?, p1: Intent?) {
-        val notificationManager = p0?.getSystemService(Context.NOTIFICATION_SERVICE)
 
-        val intent = Intent(p0,SetViewActivity::class.java)
+        val intent = Intent(p0,ListPageFragment::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
 
-       val pendingIntent = PendingIntent.getActivity(p0,REQUEST_CODE,intent,PendingIntent.FLAG_UPDATE_CURRENT)
+//       val pendingIntent = PendingIntent.getActivity(p0,REQUEST_CODE,intent,PendingIntent.FLAG_UPDATE_CURRENT)
+       val pendingIntent = NavDeepLinkBuilder(p0!!)
+           .setComponentName(MainActivity::class.java)
+           .setGraph(R.navigation.mobile_navigation)
+           .setDestination(R.id.navigation_list)
+           .createPendingIntent()
 
-        val builder = NotificationCompat.Builder(p0!!,CHANNEL_ID)
+        val builder = NotificationCompat.Builder(p0,CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("Пора заниматься")
             .setContentText("Время заниматься пришло")
