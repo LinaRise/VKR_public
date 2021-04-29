@@ -13,6 +13,30 @@
         android:actionLayout="@layout/fragment_profile"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/actionTogglePinch"
+        android:title="@string/toggle_pinchzoom"
+        android:actionLayout="@layout/fragment_profile"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/animateX"
+        android:title="Animate X">
+    </item>
+    <item
+        android:id="@+id/animateY"
+        android:title="Animate X">
+    </item>
+    <item
+        android:id="@+id/animateXY"
+        android:title="Animate XY">
+    </item>
+
+    <item
+        android:id="@+id/actionSave"
+        android:title="Savee">
+    </item>
+
 
 
 </menu>

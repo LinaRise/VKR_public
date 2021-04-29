@@ -24,6 +24,7 @@
     <string name="channel_name">notification_channel</string>
     <string name="channel_description">it\'s time to study</string>
     <string name="set_study_reminder">Set study reminder</string>
+    <string name="toggle_pinchzoom">Toggle PinchZoom</string>
     <string-array name="available_translation_languages">
         <item>Russian</item>
         <item>English</item>
