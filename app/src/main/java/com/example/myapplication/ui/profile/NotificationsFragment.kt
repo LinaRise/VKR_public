@@ -3,7 +3,6 @@ package com.example.myapplication.ui.profile
 import android.Manifest
 import android.app.*
 import android.app.TimePickerDialog.OnTimeSetListener
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -22,7 +21,6 @@ import com.example.myapplication.R
 import com.example.myapplication.connectivity.base.ConnectivityProvider
 import com.example.myapplication.notification.ReminderBroadcast
 import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.charts.Chart
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
@@ -37,9 +35,10 @@ import java.util.*
 
 
 class NotificationsFragment : Fragment(),
-    ConnectivityProvider.ConnectivityStateListener, SeekBar.OnSeekBarChangeListener,
+    ConnectivityProvider.ConnectivityStateListener,
+//    SeekBar.OnSeekBarChangeListener,
     OnChartValueSelectedListener,
-    ActivityCompat.OnRequestPermissionsResultCallback{
+    ActivityCompat.OnRequestPermissionsResultCallback {
     private val PERMISSION_STORAGE = 0
     private val REQUEST_CODE_NOTIFICATION: Int = 0
     private val CHANNEL_ID = "STUDY_NOTIFY_CHANNEL"
@@ -54,6 +53,40 @@ class NotificationsFragment : Fragment(),
     private var hasInternet: Boolean = false
     private val TAG = "NotificationsFragment"
 
+    protected var mDays = arrayOf(
+        "Day 1",
+        "Day 2",
+        "Day 3",
+        "Day 4",
+        "Day 5",
+        "Day 6",
+        "Day 7",
+        "Day 8",
+        "Day 9",
+        "Day 10",
+        "Day 11",
+        "Day 12",
+        "Day 13",
+        "Day 14",
+        "Day 15",
+        "Day 16",
+        "Day 17",
+        "Day 18",
+        "Day 19",
+        "Day 20",
+        "Day 21",
+        "Day 22",
+        "Day 23",
+        "Day 24",
+        "Day 25",
+        "Day 26",
+        "Day 27",
+        "Day 28",
+        "Day 29",
+        "Day 30"
+    )
+
+
     private lateinit var notificationsViewModel: NotificationsViewModel
     private val provider: ConnectivityProvider by lazy {
         ConnectivityProvider.createProvider(
@@ -63,7 +96,7 @@ class NotificationsFragment : Fragment(),
 
     private var chart: BarChart? = null
     private var seekBarX: SeekBar? = null
-    private var seekBarY: SeekBar? = null
+//    private var seekBarY: SeekBar? = null
     private var tvX: TextView? = null
     private var tvY: TextView? = null
     override fun onCreateView(
@@ -87,43 +120,58 @@ class NotificationsFragment : Fragment(),
         tvY = root.findViewById(R.id.tvYMax)
 
         seekBarX = root.findViewById(R.id.seekBar1)
-        seekBarX!!.setOnSeekBarChangeListener(this)
+//        seekBarX!!.setOnSeekBarChangeListener(this)
 
-        seekBarY = root.findViewById(R.id.seekBar2)
-        seekBarY!!.setOnSeekBarChangeListener(this)
+//        seekBarY = root.findViewById(R.id.seekBar2)
+//        seekBarY!!.setOnSeekBarChangeListener(this)
 
         chart = root.findViewById(R.id.chart1)
 
-        chart!!.description.isEnabled = false
+        chart?.description?.isEnabled = false
 
-        // if more than 60 entries are displayed in the chart, no values will be
-        // drawn
-
-        // if more than 60 entries are displayed in the chart, no values will be
-        // drawn
-        chart!!.setMaxVisibleValueCount(60)
-
-        // scaling can now only be done on x- and y-axis separately
-
-        // scaling can now only be done on x- and y-axis separately
-        chart!!.setPinchZoom(false)
-
-        chart!!.setDrawBarShadow(false)
-        chart!!.setDrawGridBackground(false)
 
         val xAxis = chart!!.xAxis
         xAxis.position = XAxisPosition.BOTTOM
         xAxis.setDrawGridLines(false)
 
-        chart!!.axisLeft.setDrawGridLines(false)
+        chart?.axisLeft?.setDrawGridLines(true)
+        chart?.axisRight?.isEnabled=false
 
+        val rightYAxis = chart?.axisLeft
+        rightYAxis?.axisMaximum = 100f
+        rightYAxis?.axisMinimum = 0f
         // setting data
+        seekBarX?.progress = 7
 
-        // setting data
-        seekBarX!!.progress = 10
-        seekBarY!!.progress = 100
+//        chart?.moveViewToX(10f);
+//        seekBarY!!.progress = 100
 
-        // add a nice and smooth animation
+        val values: ArrayList<BarEntry> = ArrayList()
+
+        for (i in 0 until 200) {
+//            val multi = (seekBarY!!.progress + 1).toFloat()
+//            val `val` = (Math.random() * multi).toFloat() + multi / 3
+            values.add(BarEntry(i.toFloat(), i.toFloat()))
+        }
+        val set1: BarDataSet
+        set1 = BarDataSet(values, "Data Set")
+        set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
+        set1.setDrawValues(false)
+        val dataSets: ArrayList<IBarDataSet> = ArrayList()
+        dataSets.add(set1)
+        val data = BarData(dataSets)
+        chart?.data = data
+        // if more than 7 entries are displayed in the chart, no values will be
+        // drawn
+        chart?.setVisibleXRangeMinimum(7f)
+        chart?.setVisibleXRangeMaximum(100f)
+        chart?.moveViewToX(1f)
+        chart?.setFitBars(true)
+
+        // scaling can now only be done on x- and y-axis separately
+        chart?.setPinchZoom(false)
+        chart?.setDrawBarShadow(false)
+        chart?.setDrawGridBackground(false)
 
         // add a nice and smooth animation
         chart!!.animateY(1500)
@@ -137,14 +185,14 @@ class NotificationsFragment : Fragment(),
     }
 
 
-    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+  /*  override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
         tvX!!.text = seekBarX!!.progress.toString()
-        tvY!!.text = seekBarY!!.progress.toString()
+//        tvY!!.text = seekBarY!!.progress.toString()
         val values: ArrayList<BarEntry> = ArrayList()
         for (i in 0 until seekBarX!!.progress) {
-            val multi = (seekBarY!!.progress + 1).toFloat()
-            val `val` = (Math.random() * multi).toFloat() + multi / 3
-            values.add(BarEntry(i.toFloat(), `val`))
+//            val multi = (seekBarY!!.progress + 1).toFloat()
+//            val `val` = (Math.random() * multi).toFloat() + multi / 3
+            values.add(BarEntry(i.toFloat(), i.toFloat()))
         }
         val set1: BarDataSet
         if (chart!!.data != null &&
@@ -161,11 +209,14 @@ class NotificationsFragment : Fragment(),
             val dataSets: ArrayList<IBarDataSet> = ArrayList()
             dataSets.add(set1)
             val data = BarData(dataSets)
-            chart!!.data = data
-            chart!!.setFitBars(true)
+            chart?.data = data
+            // if more than 7 entries are displayed in the chart, no values will be
+            // drawn
+            chart?.setMaxVisibleValueCount(7)
+            chart?.setFitBars(true)
         }
         chart!!.invalidate()
-    }
+    }*/
 
 
     override fun onStart() {
@@ -248,7 +299,7 @@ class NotificationsFragment : Fragment(),
             )
         ) {
             Snackbar.make(
-                view!!.findViewById(R.id.relative_layout_chart)!!,
+                requireView().findViewById(R.id.relative_layout_chart)!!,
                 "Write permission is required to save image to gallery",
                 Snackbar.LENGTH_INDEFINITE
             )
@@ -296,9 +347,9 @@ class NotificationsFragment : Fragment(),
     }
 
 
-    override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+   /* override fun onStartTrackingTouch(seekBar: SeekBar?) {}
 
-    override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+    override fun onStopTrackingTouch(seekBar: SeekBar?) {}*/
 
     override fun onValueSelected(e: Entry?, h: Highlight?) {
         val entry = e as BarEntry
@@ -321,7 +372,6 @@ class NotificationsFragment : Fragment(),
         )
             .show()
     }
-
 
 
     override fun onNothingSelected() {}
