@@ -21,6 +21,7 @@ class SetViewPresenter(
     var mSettRepo: SettRepo = SettRepo(dbhelper)
 //    var mSetWordRepo: SetWordRepo = SetWordRepo(dbhelper)
 
+    //добавление нового слова
     fun addNewWord(original: String, translated: String) {
         if (original == "" || translated == "") {
             mView.showWordInputError()
@@ -28,22 +29,16 @@ class SetViewPresenter(
         }
         mView.hideKeyboard()
         val word = Word(0, original.trim(), translated.trim())
-//        words.add(word)
         mView.cleanInputFields()
         mView.updateRecyclerViewInserted(word)
     }
 
+
+
+    //удаление слова из списка
     fun deleteWord(word: Word, position: Int) {
-        //здесь будет удаление из бд - пока просто из списка
-//        val position = words.indexOf(word)
-//        words.removeAt(position)
-        /*    mWordRepo.delete(word)
-            val sett = mSettRepo.get(word.settId)
-            sett!!.wordsAmount = sett.wordsAmount + 1
-            mSettRepo.update(sett)*/
         mView.updateRecyclerViewDeleted(position)
         mView.showUndoDeleteWord(position)
-
     }
 
     fun getAllSetsTitles(): List<Sett>? {

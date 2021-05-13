@@ -88,7 +88,10 @@ dependencies {
         exclude group: 'org.apache.httpcomponents'
         exclude group: 'org.json', module: 'json'
     }
-    annotationProcessor 'com.google.cloud:google-cloud-translate:1.96.0'
-
+    annotationProcessor 'com.google.cloud:google-cloud-translate:1.96.0' +
+            ''
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 }

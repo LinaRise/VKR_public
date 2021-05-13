@@ -50,44 +50,47 @@ import java.io.IOException
 class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.TaskListener,
     ISetInputData, ConnectivityProvider.ConnectivityStateListener {
 
-    private val provider: ConnectivityProvider by lazy { ConnectivityProvider.createProvider(this) }
-
-    private var hasInternet: Boolean = false
-
-    private var receivedTranslation: String = ""
-
     lateinit var presenter: SetViewPresenter
     lateinit var dbhelper: DBHelper
+    private lateinit var setViewAdapter: SetViewAdapter
     private lateinit var recyclerView: RecyclerView
-    private var settId: Long = -1
-    private var receivedCopiedText:String = ""
+    lateinit var adapter: ArrayAdapter<Any>
+
+
+    /**
+     * переменная для отслеживания подключения к интеренету
+     */
+    private val provider: ConnectivityProvider by lazy { ConnectivityProvider.createProvider(this) }
+    private var hasInternet: Boolean = false
 
     private lateinit var wordAddButton: Button
     private lateinit var originalText: TextInputEditText
     private lateinit var translatedText: InstantAutoComplete
 
-    private lateinit var setViewAdapter: SetViewAdapter
     private var openedSett: Sett? = null
     private var inputLanguage: Language = Language()
     private var outputLanguage: Language = Language()
-    var wordsDisplayed = ArrayList<Word?>()
 
-    //    var wordsEdited = ArrayList<Word?>()
+
+    var wordsDisplayed = ArrayList<Word?>()
     var wordsOriginal = ArrayList<Word>()
     private lateinit var deletedWord: Word
 
+    private var settId: Long = -1
+    private var receivedCopiedText: String = ""
     private var setTitle: String? = ""
     private var inputLanguageText: String? = ""
     private var outputLanguageText: String? = ""
-    private var editTextTitle: EditText? = null
     private var hasAutoSuggest = 0
 
     var translate: Translate? = null
-
     var languageTitleAndCode: Map<String, String> = hashMapOf()
-    lateinit var adapter: ArrayAdapter<Any>
+    private var receivedTranslation: String = ""
 
 
+    /**
+     * Инициализация сервиса перевода
+     */
     private val translateService: Unit
         get() {
             val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
@@ -95,11 +98,9 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
             try {
 
                 resources.openRawResource(R.raw.credentials).use { `is` ->
-
-                    //Get credentials:
+                    //получаем реквизиты для входа
                     val myCredentials = GoogleCredentials.fromStream(`is`)
-
-                    //Set credentials and get translate service:
+                    //получаем сервис перевода:
                     val translateOptions =
                         TranslateOptions.newBuilder().setCredentials(myCredentials).build()
                     translate = translateOptions.service
@@ -111,15 +112,16 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("SetViewActivity", "onCreate")
         setContentView(R.layout.activity_set_view)
-
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         dbhelper = DBHelper(this)
         presenter = SetViewPresenter(this, dbhelper)
+        //получаем скопированный текст, если он есть, и id набора слов
         val extras = intent.extras
         if (extras != null) {
-            if(intent.getStringExtra("copiedText") != null){
+            if (intent.getStringExtra("copiedText") != null) {
                 receivedCopiedText = extras.getString("copiedText").toString()
             }
             settId = extras.getLong("settId")
@@ -130,38 +132,36 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
             mMessageReceiver,
             IntentFilter("sending-list")
         )
-        Log.d("SetViewActivity", "onCreate")
+
+       //инициализация элементов
         wordAddButton = findViewById(R.id.word_add_button)
         wordAddButton.setOnClickListener { onAddWordBtnClick() }
-
         recyclerView = findViewById(R.id.recyclerivew_set_create)
         originalText = findViewById(R.id.original_input)
         translatedText = findViewById(R.id.translated_input)
-        originalText.setText(receivedCopiedText)
 
+        originalText.setText(receivedCopiedText)
 
     }
 
     var mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             // Get extra data included in the Intent
-//            wordsOriginal = intent.getParcelableArrayListExtra("data")
             wordsDisplayed = intent.getParcelableArrayListExtra("data")
-//            wordsEdited = ArrayList(wordsDisplayed)
             for (word in wordsDisplayed)
                 if (word != null) {
-                    wordsOriginal.add(Word(word.wordId, word.originalWord, word.translatedWord,settId = word.settId,recallPoint = word.recallPoint))
-//                    wordsEdited.add(Word(word.wordId,word.originalWord,word.translatedWord))
-                    //            wordsOriginal = ArrayList(intent.getParcelableArrayListExtra("data"))
+                    wordsOriginal.add(
+                        Word(
+                            word.wordId,
+                            word.originalWord,
+                            word.translatedWord,
+                            settId = word.settId,
+                            recallPoint = word.recallPoint
+                        )
+                    )
                     Log.d("wordsOriginal", wordsOriginal.size.toString())
-
                 }
             Log.d("wordsOriginal", wordsOriginal.size.toString())
-            /*Toast.makeText(
-                this@SetViewActivity,
-                "words received ${wordsOriginal.size.toString()}",
-                Toast.LENGTH_SHORT
-            ).show()*/
         }
 
 
@@ -464,9 +464,8 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
                 val languages: List<com.google.cloud.translate.Language> =
                     translate!!.listSupportedLanguages()
                 languageTitleAndCode = languages.map { it.name to it.code }.toMap()
-            }
-            else{
-                    Toast.makeText(this, "Internet is not available", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, "Internet is not available", Toast.LENGTH_LONG).show()
             }
         }
     }
