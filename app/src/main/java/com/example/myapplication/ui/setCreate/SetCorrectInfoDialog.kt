@@ -9,6 +9,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.StrictMode
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -40,6 +42,9 @@ class SetCorrectInfoDialog : AppCompatDialogFragment(),
         private var hasAutoSuggest = 0;
     }
 
+    /**
+     * инициализия сервиса перевода для загрузки доступных языков
+     */
     var translate: Translate? = null
     private val translateService: Unit
         get() {
@@ -107,6 +112,29 @@ class SetCorrectInfoDialog : AppCompatDialogFragment(),
                 }
             }
 
+        editTextTitle!!.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable) {
+                // TODO Auto-generated method stub
+            }
+
+            override fun beforeTextChanged(
+                s: CharSequence,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                //включаем кнопку "Ок", если названия сета не пустое
+                val dialog = dialog as AlertDialog?
+                dialog!!.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
+                    editTextTitle!!.text.trim().isNotEmpty()
+
+            }
+        })
+
         alertDialogBuilder.setView(view)
             .setTitle("Edit Set")
             .setNegativeButton("cancel",
@@ -149,6 +177,8 @@ class SetCorrectInfoDialog : AppCompatDialogFragment(),
     override fun onStart() {
         super.onStart()
         provider.addListener(this)
+
+        //загрузка доступных языков
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
         executor.execute {

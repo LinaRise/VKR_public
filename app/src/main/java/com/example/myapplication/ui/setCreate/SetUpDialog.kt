@@ -103,8 +103,11 @@ class SetUpDialog : AppCompatDialogFragment(), ConnectivityProvider.Connectivity
             }
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                val dialog = dialog as AlertDialog?
-                dialog!!.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = true
+                //включаем кнопку "Ок", если названия сета не пустое
+                if (editTextTitle!!.text.trim().isNotEmpty()) {
+                    val dialog = dialog as AlertDialog?
+                    dialog!!.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = true
+                }
 
             }
         })
@@ -140,7 +143,7 @@ class SetUpDialog : AppCompatDialogFragment(), ConnectivityProvider.Connectivity
         dialog!!.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
     }
 
-
+    //загрузка доступных языков
     override fun onStart() {
         super.onStart()
         provider.addListener(this)
