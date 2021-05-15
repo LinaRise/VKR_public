@@ -26,7 +26,6 @@ import com.example.myapplication.ui.cameraPreview.camera.CameraSource
 import com.example.myapplication.ui.cameraPreview.camera.CameraSourcePreview
 import com.example.myapplication.ui.cameraPreview.camera.GraphicOverlay
 import com.example.myapplication.ui.cameraPreview.camera.ICameraFragmentView
-import com.example.myapplication.ui.chathead.ChatActivityPresenter
 import com.example.myapplication.ui.chathead.CopiedTextAddDialog
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -53,7 +52,6 @@ class CameraFragment : Fragment(), ICameraFragmentView {
         // Constants used to pass extra data in the intent
         const val AutoFocus = "AutoFocus"
         const val UseFlash = "UseFlash"
-        const val TextBlockObject = "String"
     }
 
     lateinit var dbhelper: DBHelper
@@ -68,7 +66,7 @@ class CameraFragment : Fragment(), ICameraFragmentView {
     private var scaleGestureDetector: ScaleGestureDetector? = null
     private var gestureDetector: GestureDetector? = null
 
-    // A TextToSpeech engine for speaking a String value.
+    // A TextToSpeech engine для озвучки a String value.
     private var tts: TextToSpeech? = null
 
     override fun onCreateView(
@@ -79,46 +77,28 @@ class CameraFragment : Fragment(), ICameraFragmentView {
         cameraViewModel =
             ViewModelProvider(this).get(CameraViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_camera, container, false)
-//        val textView: TextView = root.findViewById(R.id.text_dashboard)
-//        cameraViewModel.text.observe(viewLifecycleOwner, {
-//            textView.text = it
-//        })
+//
         dbhelper = DBHelper(requireContext())
-        presenter = CameraFragmentPresenter(this, dbhelper)
+        presenter = CameraFragmentPresenter(dbhelper)
 
         gestureDetector = GestureDetector(requireContext(), CaptureGestureListener())
         scaleGestureDetector = ScaleGestureDetector(requireContext(), ScaleListener())
         root.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View?, event: MotionEvent): Boolean {
-                /*  if (event.action == MotionEvent.ACTION_MOVE) {
-                      val b = scaleGestureDetector!!.onTouchEvent(event)
-                      val c = gestureDetector!!.onTouchEvent(event)
-                      return b || c
-                  }
-                  return true*/
                 val b = scaleGestureDetector!!.onTouchEvent(event)
                 val c = gestureDetector!!.onTouchEvent(event)
                 return b || c
             }
         })
-//        root.setOnTouchListener { _, event ->
-//
-//        }
-
         preview = root.findViewById<View>(R.id.preview) as CameraSourcePreview
         graphicOverlay = root.findViewById<GraphicOverlay<OcrGraphic>>(R.id.graphicOverlay)
-
-        // Set good defaults for capturing text.
 
         // Set good defaults for capturing text.
         val autoFocus = true
         val useFlash = false
 
-        // Check for the camera permission before accessing the camera.  If the
-        // permission is not granted yet, request permission.
-
-        // Check for the camera permission before accessing the camera.  If the
-        // permission is not granted yet, request permission.
+        // проверка разрешений для доступа к камере.
+        // Если разрешения нет, то запрос.
         val rc = ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
         if (rc == PackageManager.PERMISSION_GRANTED) {
             createCameraSource(autoFocus, useFlash)
@@ -126,17 +106,13 @@ class CameraFragment : Fragment(), ICameraFragmentView {
             requestCameraPermission()
         }
 
-
-
         Snackbar.make(
             requireActivity().findViewById(android.R.id.content)!!,
-            "Tap to Speak. Pinch/Stretch to zoom",
+            getString(R.string.tap_speak_pinch_zoom),
             Snackbar.LENGTH_LONG
         ).show()
 
-        // Set up the Text To Speech engine.
-
-        // Set up the Text To Speech engine.
+        // настройка Text To Speech engine.
         val listener = OnInitListener { status ->
             if (status == TextToSpeech.SUCCESS) {
                 Log.d("OnInitListener", "Text to speech engine started successfully.")
@@ -150,7 +126,7 @@ class CameraFragment : Fragment(), ICameraFragmentView {
     }
 
     private fun requestCameraPermission() {
-        Log.w(CameraFragment.TAG, "Camera permission is not granted. Requesting permission")
+        Log.w(TAG, "Camera permission is not granted. Requesting permission")
         val permissions = arrayOf(Manifest.permission.CAMERA)
         if (!ActivityCompat.shouldShowRequestPermissionRationale(
                 requireActivity(),
@@ -160,7 +136,7 @@ class CameraFragment : Fragment(), ICameraFragmentView {
             ActivityCompat.requestPermissions(
                 requireActivity(),
                 permissions,
-                CameraFragment.RC_HANDLE_CAMERA_PERM
+                RC_HANDLE_CAMERA_PERM
             )
             return
         }
@@ -168,7 +144,7 @@ class CameraFragment : Fragment(), ICameraFragmentView {
         val listener = View.OnClickListener {
             ActivityCompat.requestPermissions(
                 thisActivity, permissions,
-                CameraFragment.RC_HANDLE_CAMERA_PERM
+                RC_HANDLE_CAMERA_PERM
             )
         }
         Snackbar.make(
@@ -179,12 +155,6 @@ class CameraFragment : Fragment(), ICameraFragmentView {
             .show()
     }
 
-
-//  override  fun onTouchEvent(e: MotionEvent?): Boolean {
-//        val b = scaleGestureDetector!!.onTouchEvent(e)
-//        val c = gestureDetector!!.onTouchEvent(e)
-//        return b || c || super.onTouchEvent(e)
-//    }
 
     /**
      * Creates and starts the camera.  Note that this uses a higher resolution in comparison
@@ -214,7 +184,7 @@ class CameraFragment : Fragment(), ICameraFragmentView {
             // isOperational() can be used to check if the required native libraries are currently
             // available.  The detectors will automatically become operational once the library
             // downloads complete on device.
-            Log.w(CameraFragment.TAG, "Detector dependencies are not yet available.")
+            Log.w(TAG, "Detector dependencies are not yet available.")
 
             // Check for low storage.  If there is low storage, the native library will not be
             // downloaded, so detection will not become operational.
@@ -223,7 +193,7 @@ class CameraFragment : Fragment(), ICameraFragmentView {
             if (hasLowStorage) {
                 Toast.makeText(requireContext(), R.string.low_storage_error, Toast.LENGTH_LONG)
                     .show()
-                Log.w(CameraFragment.TAG, getString(R.string.low_storage_error))
+                Log.w(TAG, getString(R.string.low_storage_error))
             }
         }
 
@@ -290,14 +260,14 @@ class CameraFragment : Fragment(), ICameraFragmentView {
         permissions: Array<String?>,
         grantResults: IntArray
     ) {
-        if (requestCode != CameraFragment.RC_HANDLE_CAMERA_PERM) {
-            Log.d(CameraFragment.TAG, "Got unexpected permission result: $requestCode")
+        if (requestCode != RC_HANDLE_CAMERA_PERM) {
+            Log.d(TAG, "Got unexpected permission result: $requestCode")
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
             return
         }
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.d(
-                CameraFragment.TAG,
+                TAG,
                 "Camera permission granted - initialize the camera source"
             )
             // we have permission, so create the camerasource
@@ -313,7 +283,7 @@ class CameraFragment : Fragment(), ICameraFragmentView {
             return
         }
         Log.e(
-            CameraFragment.TAG, "Permission not granted: results len = " + grantResults.size +
+            TAG, "Permission not granted: results len = " + grantResults.size +
                     " Result code = " + if (grantResults.isNotEmpty()) grantResults[0] else "(empty)"
         )
         val listener =
@@ -345,7 +315,7 @@ class CameraFragment : Fragment(), ICameraFragmentView {
             try {
                 preview!!.start(cameraSource, graphicOverlay)
             } catch (e: IOException) {
-                Log.e(CameraFragment.TAG, "Unable to start camera source.", e)
+                Log.e(TAG, "Unable to start camera source.", e)
                 cameraSource!!.release()
                 cameraSource = null
             }
@@ -365,7 +335,7 @@ class CameraFragment : Fragment(), ICameraFragmentView {
         if (graphic != null) {
             text = graphic.textBlock
             if (text != null) {
-                Log.d(CameraFragment.TAG, "text data is being spoken! " + text.value)
+                Log.d(TAG, "text data is being spoken! " + text.value)
                 // Speak the string.
                 tts!!.speak(text.value, TextToSpeech.QUEUE_ADD, null, "DEFAULT")
                 val sets = presenter.getAllSetsTitles()
@@ -378,10 +348,10 @@ class CameraFragment : Fragment(), ICameraFragmentView {
                     )
                 copiedTextAddDialog.show(childFragmentManager, "Add copied word")
             } else {
-                Log.d(CameraFragment.TAG, "text data is null")
+                Log.d(TAG, "text data is null")
             }
         } else {
-            Log.d(CameraFragment.TAG, "no text detected")
+            Log.d(TAG, "no text detected")
         }
         return text != null
     }
