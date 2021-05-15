@@ -8,6 +8,8 @@ import com.example.myapplication.database.repo.word.*
 import com.example.myapplication.entity.Language
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
+import com.example.myapplication.translation.TranslationUtils
+import com.google.cloud.translate.Translate
 
 class SetViewPresenter(
     view: ISetViewView,
@@ -31,6 +33,15 @@ class SetViewPresenter(
         val word = Word(0, original.trim(), translated.trim())
         mView.cleanInputFields()
         mView.updateRecyclerViewInserted(word)
+    }
+
+    fun translate(translate: Translate,
+                  languageTitleAndCode: Map<String, String>,
+                  originalText: String,
+                  sourceLanguage: String,
+                  targetLanguage: String): String {
+      return  TranslationUtils.translate(translate,languageTitleAndCode,originalText,sourceLanguage,targetLanguage)
+
     }
 
 

@@ -13,16 +13,12 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.examp.CopyCardDialog
 import com.example.myapplication.R
 import com.example.myapplication.connectivity.base.ConnectivityProvider
 import com.example.myapplication.database.DBHelper
@@ -32,11 +28,9 @@ import com.example.myapplication.database.repo.word.WordsGetAsyncTask
 import com.example.myapplication.entity.Language
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
-import com.example.myapplication.translation.TranslationUtils
 import com.example.myapplication.ui.setCreate.ISetInputData
 import com.example.myapplication.ui.setCreate.InstantAutoComplete
 import com.example.myapplication.ui.setCreate.SetCorrectInfoDialog
-import com.example.myapplication.ui.setCreate.SetUpDialog
 import com.example.myapplication.ui.study.StudyActivity
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
@@ -133,7 +127,7 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
             IntentFilter("sending-list")
         )
 
-       //инициализация элементов
+        //инициализация элементов
         wordAddButton = findViewById(R.id.word_add_button)
         wordAddButton.setOnClickListener { onAddWordBtnClick() }
         recyclerView = findViewById(R.id.recyclerivew_set_create)
@@ -169,19 +163,17 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
 
     override fun onStart() {
         super.onStart()
+        Log.d("SetViewActivity", "onStart")
         provider.addListener(this)
 
         SettGetAsyncTask(dbhelper, this).execute(settId)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
-
         setViewAdapter = SetViewAdapter(this)
         recyclerView.adapter = setViewAdapter
+
         val itemTouchHelper = ItemTouchHelper(simpleCallBack)
         itemTouchHelper.attachToRecyclerView(recyclerView)
-
-
-
 
         adapter =
             ArrayAdapter(
@@ -190,58 +182,46 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
                 emptyArray()
             )
 
+        translatedText.onFocusChangeListener = View.OnFocusChangeListener { p0, p1 ->
+            if (p1) {
+                if (hasAutoSuggest == 1) {
+                    if (hasInternet) {
 
-
-        translatedText.onFocusChangeListener = object : View.OnFocusChangeListener {
-            override fun onFocusChange(p0: View?, p1: Boolean) {
-                if (p1) {
-                    if (hasAutoSuggest == 1) {
-                        if (hasInternet) {
-
-                            receivedTranslation =
-                                TranslationUtils.translate(
-                                    translate!!,
-                                    languageTitleAndCode,
-                                    originalText.text.toString(),
-                                    inputLanguageText!!.trim(),
-                                    outputLanguageText!!.trim()
-                                )
-                            Log.d("receivedTranslation", receivedTranslation)
-
-                            val array = arrayOf(
-                                receivedTranslation
+                        if (translate != null) {
+                            receivedTranslation = presenter.translate(
+                                translate!!,
+                                languageTitleAndCode,
+                                originalText.text.toString(),
+                                inputLanguageText!!.trim(),
+                                outputLanguageText!!.trim()
                             )
-/*
+                        } else {
                             Toast.makeText(
                                 this@SetViewActivity,
-                                "HERE $inputLanguage, $outputLanguage",
-                                Toast.LENGTH_LONG
-                            ).show()*/
-
-                            adapter =
-                                ArrayAdapter(
-                                    this@SetViewActivity,
-                                    android.R.layout.simple_list_item_1,
-                                    array
-                                )
-                            adapter.notifyDataSetChanged()
-
-                            translatedText.setAdapter(adapter)
-                            translatedText.showDropDown();
-
+                                "Problems with translation server initialization",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
-                        /*  Toast.makeText(
-                              this@SetViewActivity,
-                              "HERE 2 $receivedTranslation",
-                              Toast.LENGTH_LONG
-                          ).show()
-  */
+                        Log.d("receivedTranslation", receivedTranslation)
+
+                        val array = arrayOf(
+                            receivedTranslation
+                        )
+
+                        adapter =
+                            ArrayAdapter(
+                                this@SetViewActivity,
+                                android.R.layout.simple_list_item_1,
+                                array
+                            )
+                        adapter.notifyDataSetChanged()
+
+                        translatedText.setAdapter(adapter)
+                        translatedText.showDropDown();
+
                     }
                 }
-
             }
-
-
         }
 
     }
@@ -273,20 +253,16 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle item selection
         return when (item.itemId) {
             R.id.home -> {
+                Log.d("SetViewActivity", "home clicked")
+
                 finish()
                 return true
             }
             R.id.check_icon -> {
-//               Log.d("wordsDisplayed", wordsDisplayed[0].toString())
-//               Log.d("wordsOriginal", wordsOriginal[0].toString())
-//               Log.d("wordsEdited", wordsEdited[0].toString())
-//                wordsDisplayed.forEach { print(it) }
-//                wordsOriginal.forEach { print(it) }
-//                wordsEdited.forEach { print(it) }
-//                Toast.makeText(this, "wordsEdited size = ${wordsEdited.size}", Toast.LENGTH_SHORT).show()
+                Log.d("SetViewActivity", "check_icon clicked")
+
                 presenter.onDoneButtonWasClicked(
                     wordsDisplayed,
                     wordsOriginal,
@@ -296,24 +272,19 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
                     hasAutoSuggest
                 )
 
-//                Toast.makeText(this, "added successfully", Toast.LENGTH_SHORT).show()
                 finish()
                 return true
             }
             R.id.ic_settings -> {
+                Log.d("SetViewActivity", "ic_settings clicked")
+
                 Toast.makeText(this, outputLanguageText, Toast.LENGTH_SHORT).show()
-                val setCorrectInfoDialog = SetCorrectInfoDialog()
-                val args = Bundle()
-                args.putString("settTitle", setTitle)
-                args.putString("inputLanguage", inputLanguageText)
-                args.putString("outputLanguage", outputLanguageText)
-                args.putInt("hasAutoSuggest", hasAutoSuggest)
-                setCorrectInfoDialog.arguments = args
-                val manager = supportFragmentManager
-                setCorrectInfoDialog.show(manager, "Set Up Dialog")
+                showSetCorrectInfoDialog()
                 return true
             }
             R.id.ic_study -> {
+                Log.d("SetViewActivity", "ic_study clicked")
+
                 if (wordsDisplayed.size < 5) {
                     Snackbar.make(
                         recyclerView,
@@ -352,15 +323,22 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         }
     }
 
-//    override fun setData(words: List<Word>) {
-//        wordsDisplayed.addAll(words)
-//        wordsEdited.addAll(wordsDisplayed)
-//    }
+
+    private fun showSetCorrectInfoDialog() {
+        val setCorrectInfoDialog = SetCorrectInfoDialog()
+        val args = Bundle()
+        args.putString("settTitle", setTitle)
+        args.putString("inputLanguage", inputLanguageText)
+        args.putString("outputLanguage", outputLanguageText)
+        args.putInt("hasAutoSuggest", hasAutoSuggest)
+        setCorrectInfoDialog.arguments = args
+        val manager = supportFragmentManager
+        setCorrectInfoDialog.show(manager, "Set Up Dialog")
+    }
+
 
     override fun updateRecyclerViewInserted(word: Word) {
         wordsDisplayed.add(word)
-//        wordsEdited.add(word)
-//        Toast.makeText(this, "wordsEdited size = ${wordsEdited.size}", Toast.LENGTH_SHORT).show()
         setViewAdapter.notifyItemInserted(wordsDisplayed.size - 1)
 
 
@@ -368,7 +346,6 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
 
 
     override fun updateRecyclerViewDeleted(position: Int) {
-//        wordsEdited[position] = null
         setViewAdapter.notifyItemRemoved(position)
         wordsDisplayed.removeAt(position)
 
@@ -382,6 +359,9 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         ).show()
     }
 
+    /**
+     * показ кнопки отмены удаления слова
+     */
     override fun showUndoDeleteWord(position: Int) {
         Snackbar.make(
             recyclerView,
@@ -392,10 +372,12 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         ) {
             wordsDisplayed.add(position, deletedWord)
             setViewAdapter.notifyItemInserted(position)
-//            wordsEdited.add(position, deletedWord)
         }.show()
     }
 
+    /**
+     * функция скрытия клавиатуры
+     */
     override fun hideKeyboard() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(
@@ -404,11 +386,17 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         )
     }
 
+    /**
+     * функция очистки полей
+     */
     override fun cleanInputFields() {
         originalText.setText("")
         translatedText.setText("")
     }
 
+    /**
+     * функция присваивания данных
+     */
     override fun onInputedData(list: ArrayList<Any>) {
         setTitle = (list[0] as String).trim()
         inputLanguageText = (list[1] as String).trim()
@@ -420,7 +408,9 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         outputLanguage.languageTitle = outputLanguageText as String
     }
 
-
+    /**
+     * функция подключения жестов для карточек
+     */
     private var simpleCallBack =
         object : ItemTouchHelper.SimpleCallback(
             0.or(0),
@@ -437,17 +427,17 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
                 when (direction) {
+                    //свайп влево -> удаление
                     ItemTouchHelper.LEFT -> {
                         deletedWord = wordsDisplayed[position]!!
                         presenter.deleteWord(deletedWord, position)
 
                     }
+                    //свайп впрао -> копирование
                     ItemTouchHelper.RIGHT -> {
                         setViewAdapter.notifyItemChanged(viewHolder.adapterPosition)
                         val sets = presenter.getAllSetsTitles()
-                        val copyCardDialog =
-                            CopyCardDialog(sets!!, wordsDisplayed[position], openedSett!!, dbhelper)
-                        copyCardDialog.show(supportFragmentManager, "Copy card dialog")
+                        showCopyCardDialog(sets, position)
 
                     }
                 }
@@ -455,18 +445,29 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
 
         }
 
+    /**
+     * вызов диалога для копирования слова
+     */
+    private fun showCopyCardDialog(sets: List<Sett>?, position: Int) {
+        val copyCardDialog =
+            CopyCardDialog(sets!!, wordsDisplayed[position], openedSett!!, dbhelper)
+        copyCardDialog.show(supportFragmentManager, "Copy card dialog")
+    }
 
+    /**
+     * функция проверки состояния подключения к интернету
+     */
     override fun onStateChange(state: ConnectivityProvider.NetworkState) {
         hasInternet = state.hasInternet()
         if (hasInternet) {
             translateService
-            if (translate != null) {
+           /* if (translate != null) {
                 val languages: List<com.google.cloud.translate.Language> =
                     translate!!.listSupportedLanguages()
                 languageTitleAndCode = languages.map { it.name to it.code }.toMap()
             } else {
                 Toast.makeText(this, "Internet is not available", Toast.LENGTH_LONG).show()
-            }
+            }*/
         }
     }
 

@@ -6,13 +6,62 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.StrictMode
 import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDialogFragment
 import com.example.myapplication.R
+import com.example.myapplication.connectivity.base.ConnectivityProvider
+import com.google.auth.oauth2.GoogleCredentials
+import com.google.cloud.translate.Language
+import com.google.cloud.translate.Translate
+import com.google.cloud.translate.TranslateOptions
+import java.io.IOException
+import java.util.concurrent.Executors
 
-class SetCorrectInfoDialog : AppCompatDialogFragment() {
+class SetCorrectInfoDialog : AppCompatDialogFragment(),
+    ConnectivityProvider.ConnectivityStateListener {
+
+    private val provider: ConnectivityProvider by lazy {
+        ConnectivityProvider.createProvider(
+            requireContext()
+        )
+    }
+    var languageTitleAndCode: Map<String, String> = hashMapOf()
+
+
+    private var hasInternet: Boolean = false
+
+    companion object {
+
+        private var hasAutoSuggest = 0;
+    }
+
+    var translate: Translate? = null
+    private val translateService: Unit
+        get() {
+            val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+            StrictMode.setThreadPolicy(policy)
+            try {
+
+                resources.openRawResource(R.raw.credentials).use { `is` ->
+
+                    //Get credentials:
+                    val myCredentials = GoogleCredentials.fromStream(`is`)
+
+                    //Set credentials and get translate service:
+                    val translateOptions =
+                        TranslateOptions.newBuilder().setCredentials(myCredentials).build()
+                    translate = translateOptions.service
+                }
+            } catch (ioe: IOException) {
+                ioe.printStackTrace()
+            }
+        }
+
     private var mCallback: ISetInputData? = null
 
 
@@ -20,6 +69,9 @@ class SetCorrectInfoDialog : AppCompatDialogFragment() {
     private var editTextInputLang: AutoCompleteTextView? = null
     private var editTextOutputLang: AutoCompleteTextView? = null
     private var hasAutoSuggest = 0
+
+    var languagesSourceNames: Array<String> = arrayOf()
+
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         var alertDialogBuilder = AlertDialog.Builder(requireActivity())
@@ -35,9 +87,9 @@ class SetCorrectInfoDialog : AppCompatDialogFragment() {
         val inputLangReceived = requireArguments().getString("inputLanguage")
         val outputLangReceived = requireArguments().getString("outputLanguage")
         val hasAutoSuggestReceived = requireArguments().getInt("hasAutoSuggest")
+
         hasAutoSuggest = hasAutoSuggestReceived
         checkBox.isChecked = hasAutoSuggestReceived == 1
-
 
 
         editTextTitle?.setText(setTitleReceived)
@@ -45,7 +97,7 @@ class SetCorrectInfoDialog : AppCompatDialogFragment() {
         editTextOutputLang?.setText(outputLangReceived, TextView.BufferType.EDITABLE)
 
         checkBox
-            .setOnCheckedChangeListener { buttonView, isChecked ->
+            .setOnCheckedChangeListener { _, isChecked ->
                 hasAutoSuggest = if (isChecked) {
                     Toast.makeText(requireContext(), "Checked", Toast.LENGTH_SHORT).show()
                     1
@@ -68,23 +120,11 @@ class SetCorrectInfoDialog : AppCompatDialogFragment() {
                 list.add(inputLang)
                 list.add(outputLang)
                 list.add(hasAutoSuggest)
-                Toast.makeText(requireContext(),hasAutoSuggest.toString(),Toast.LENGTH_SHORT).show()
-//                listener.applyTexts(setTitle, inputLang,outputLang);
-                /* targetFragment!!.onActivityResult(
-                     targetRequestCode,
-                     Activity.RESULT_OK,
-                     requireActivity().intent
-                 )*/
+                Toast.makeText(requireContext(), hasAutoSuggest.toString(), Toast.LENGTH_SHORT)
+                    .show()
                 mCallback?.onInputedData(list)
             })
 
-        val adapter = ArrayAdapter.createFromResource(
-            requireContext(),
-            R.array.available_translation_languages,
-            android.R.layout.simple_list_item_1
-        )
-        editTextInputLang!!.setAdapter(adapter)
-        editTextOutputLang!!.setAdapter(adapter)
         return alertDialogBuilder.create()
 
 
@@ -104,5 +144,87 @@ class SetCorrectInfoDialog : AppCompatDialogFragment() {
                 );
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        provider.addListener(this)
+        val executor = Executors.newSingleThreadExecutor()
+        val handler = Handler(Looper.getMainLooper())
+        executor.execute {
+            if (hasInternet) {
+                if (languagesSourceNames.isEmpty()) {
+                    loadAvailableLanguagesForTranslation()
+                }
+            }
+            handler.post {
+                if (languagesSourceNames.isNotEmpty()) {
+                    /*val languagesTarget =
+                        translate!!.listSupportedLanguages(
+                            Translate.LanguageListOption.targetLanguage(
+                                languageTitleAndCode[editTextInputLang!!.text.toString()]
+                            )
+                        )*/
+
+//                    val languagesTargetNames = languagesTarget.map { it.name }.toTypedArray()
+
+
+                    val adapterSource = ArrayAdapter(
+                        requireContext(),
+                        android.R.layout.simple_list_item_1,
+                        languagesSourceNames
+
+                    )
+                    val adapterTarget = ArrayAdapter(
+                        requireContext(),
+                        android.R.layout.simple_list_item_1,
+                        languagesSourceNames
+
+                    )
+                    editTextInputLang!!.setAdapter(adapterSource)
+                    editTextOutputLang!!.setAdapter(adapterTarget)
+
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Can't load available languages for translation! No internet connection!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        provider.removeListener(this)
+    }
+
+
+    private fun loadAvailableLanguagesForTranslation() {
+        translateService
+        var languages: List<Language> = listOf()
+        if (translate != null) {
+            languages = translate!!.listSupportedLanguages()
+            languagesSourceNames = languages.map { it.name }.toTypedArray()
+            languageTitleAndCode = languages.map { it.name to it.code }.toMap()
+        }
+
+    }
+
+
+    override fun onStateChange(state: ConnectivityProvider.NetworkState) {
+        hasInternet = state.hasInternet()
+        if (!hasInternet)
+            Toast.makeText(
+                requireContext(),
+                "No internet connection!",
+                Toast.LENGTH_SHORT
+            ).show()
+
+    }
+
+    private fun ConnectivityProvider.NetworkState.hasInternet(): Boolean {
+        return (this as? ConnectivityProvider.NetworkState.ConnectedState)?.hasInternet == true
     }
 }

@@ -1,5 +1,4 @@
-package com.examp
-
+package com.example.myapplication.ui.setView
 
 import android.app.Dialog
 import android.content.DialogInterface
