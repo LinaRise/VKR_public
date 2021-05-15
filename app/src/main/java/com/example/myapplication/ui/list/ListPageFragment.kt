@@ -28,20 +28,19 @@ import kotlin.collections.LinkedHashMap
 
 
 class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
+
     private lateinit var presenter: ListPagePresenter
     private lateinit var homeViewModel: HomeViewModel
+
     private lateinit var addSetButton: FloatingActionButton
     private var setsDisplayed: LinkedHashMap<Sett, List<String>> = LinkedHashMap()
     private lateinit var emptyTextView: TextView
     private lateinit var recyclerView: RecyclerView
     private lateinit var deletedSett: Sett
     private lateinit var deletedSettInfo: List<String>
+
     lateinit var dbhelper: DBHelper
-    lateinit var db: SQLiteDatabase
     private lateinit var adapter: SetAdapter
-    private var allowRefresh: Boolean = true
-    lateinit var handlerForDeleteSett: Handler
-    private lateinit var deleteSettRunnable: Runnable
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,15 +53,12 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
         val root = inflater.inflate(R.layout.fragment_list, container, false)
         recyclerView = root.findViewById(R.id.set_list)
         emptyTextView = root.findViewById(R.id.empty_view) as TextView
+        addSetButton = root.findViewById(R.id.fab)
+
         dbhelper = DBHelper(requireContext())
 
         presenter = ListPagePresenter(this, dbhelper)
 
-//       val textView: TextView = root.findViewById(R.id.text_home)
-//        homeViewModel.text.observe(viewLifecycleOwner, Observer {
-//            textView.text = it
-//        })
-        addSetButton = root.findViewById(R.id.fab)
         addSetButton.setOnClickListener { clickOnAddSetButton() }
 
         return root
@@ -79,14 +75,6 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
         val itemTouchHelper = ItemTouchHelper(simpleCallBack)
         itemTouchHelper.attachToRecyclerView(recyclerView)
     }
-
-//    override fun onResume() {
-//        super.onResume()
-////        setsDisplayed.clear() //clear array
-//         // notify adapter
-//        getSetsList() // getdatas from service
-//        adapter.notifyDataSetChanged()
-//    }
 
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -154,7 +142,7 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
                     ItemTouchHelper.LEFT -> {
                         deletedSett = ArrayList<Sett>(setsDisplayed.keys)[position]
                         deletedSettInfo = setsDisplayed[deletedSett]!!
-                        presenter.deleteSettShow(deletedSett, position)
+                        presenter.deleteSettShow(position)
 
 
                     }
@@ -170,21 +158,7 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
     }
 
     override fun showUndoDeleteWord(position: Int) {
-        /*Snackbar.make(
-            recyclerView,
-            "${deletedSett.settTitle} is deleted",
-            Snackbar.LENGTH_LONG
-        ).setAction(
-            "UNDO"
-        ) {
-            setsDisplayed.put(deletedSett)
-            adapter.notifyItemInserted(position)
-        }.addCallback(Snackbar.Callback() {
-
-        })
-            .show()*/
-
-        Snackbar.make(recyclerView, "${deletedSett.settTitle} is deleted", Snackbar.LENGTH_LONG)
+               Snackbar.make(recyclerView, "${deletedSett.settTitle} is deleted", Snackbar.LENGTH_LONG)
             .addCallback(object : Snackbar.Callback() {
                 override fun onDismissed(snackbar: Snackbar, event: Int) {
                     when (event) {

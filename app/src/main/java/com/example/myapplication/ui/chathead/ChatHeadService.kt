@@ -25,10 +25,8 @@ class ChatHeadService : Service() {
     override fun onCreate() {
         super.onCreate()
         //Inflate the chat head layout we created
-        mChatHeadView = LayoutInflater.from(this).inflate(R.layout.layout_chat_head,null,false)
+        mChatHeadView = LayoutInflater.from(this).inflate(R.layout.layout_chat_head, null, false)
 
-       /* Toast.makeText(application, "TOAST", Toast.LENGTH_SHORT)
-            .show()*/
         //Add the view to the window.
         val LAYOUT_FLAG: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
@@ -54,10 +52,6 @@ class ChatHeadService : Service() {
         mWindowManager = getSystemService(WINDOW_SERVICE) as WindowManager?
         mWindowManager!!.addView(mChatHeadView, params)
 
-//….
-//….
-        //Set the close button.
-
         //Set the close button.
         val closeButton: ImageView = mChatHeadView!!.findViewById<View>(R.id.close_btn) as ImageView
         closeButton.setOnClickListener {
@@ -66,12 +60,8 @@ class ChatHeadService : Service() {
         }
 
 //Drag and move chat head using user's touch action.
-
-//Drag and move chat head using user's touch action.
         val chatHeadImage: ImageView =
             mChatHeadView!!.findViewById<View>(R.id.chat_head_profile_iv) as ImageView
-
-
 
         chatHeadImage.setOnTouchListener(object : OnTouchListener {
             private var lastAction = 0
@@ -109,38 +99,36 @@ class ChatHeadService : Service() {
 
                             //close the service and remove the chat heads
 //                            stopSelf()
-                        }
-                    else Toast.makeText(
-                        applicationContext
-                        , "It's not a click !",
-                    Toast.LENGTH_LONG
+                        } else Toast.makeText(
+                            applicationContext, "It's not a click !",
+                            Toast.LENGTH_LONG
                         )
-                        .show()
-                    lastAction = event.action
+                            .show()
+                        lastAction = event.action
                         return true
 
 
-                }
-                MotionEvent.ACTION_MOVE -> {
-                    //Calculate the X and Y coordinates of the view.
-                    params.x = initialX + (event.rawX - initialTouchX).toInt()
-                    params.y = initialY + (event.rawY - initialTouchY).toInt()
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+                        //Calculate the X and Y coordinates of the view.
+                        params.x = initialX + (event.rawX - initialTouchX).toInt()
+                        params.y = initialY + (event.rawY - initialTouchY).toInt()
 
-                    //Update the layout with new X & Y coordinate
-                    mWindowManager!!.updateViewLayout(mChatHeadView, params)
-                    lastAction = event.action
-                    return true
+                        //Update the layout with new X & Y coordinate
+                        mWindowManager!!.updateViewLayout(mChatHeadView, params)
+                        lastAction = event.action
+                        return true
+                    }
                 }
+                return false
             }
-            return false
-        }
-    })
+        })
 
 
-}
+    }
 
-override fun onDestroy() {
-    super.onDestroy()
-    if (mChatHeadView != null) mWindowManager!!.removeView(mChatHeadView)
-}
+    override fun onDestroy() {
+        super.onDestroy()
+        if (mChatHeadView != null) mWindowManager!!.removeView(mChatHeadView)
+    }
 }

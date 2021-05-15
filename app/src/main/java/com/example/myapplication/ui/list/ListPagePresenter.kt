@@ -14,6 +14,10 @@ class ListPagePresenter(view: IListPageView, var dbhelper: DBHelper) {
     private var sets = ArrayList<Sett>()
     var mSettRepo: SettRepo = SettRepo(dbhelper)
     var mLanguageRepo: LanguageRepo = LanguageRepo(dbhelper)
+
+    /**
+     * получение данных из бд
+     */
     fun loadData() {
         //обращение к бд
         val setList = mSettRepo.getAll()
@@ -42,16 +46,24 @@ class ListPagePresenter(view: IListPageView, var dbhelper: DBHelper) {
         }
     }
 
+    /**
+     * открытие диалога создания сет слов
+     */
     fun openSet() {
         mView.openDialogForSetCreation()
     }
 
-    fun deleteSettShow(sett: Sett, position: Int) {
+    /**
+     * удалени набора слов из списка
+     */
+    fun deleteSettShow(position: Int) {
         mView.updateRecyclerViewDeleted(position)
         mView.showUndoDeleteWord(position)
 
     }
-
+    /**
+     * удаление набора слов из БД
+     */
     fun deleteSettFromDb(sett:Sett){
         SetDeleteAsyncTask(dbhelper).execute(sett)
 

@@ -227,6 +227,7 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
     }
 
 
+
     private fun onAddWordBtnClick() {
         val original: String = originalText.text.toString().trim()
         val translated: String = translatedText.text.toString().trim()

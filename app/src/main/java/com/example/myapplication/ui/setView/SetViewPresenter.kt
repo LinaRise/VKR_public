@@ -74,6 +74,7 @@ class SetViewPresenter(
         return mSettRepo.getAll()
     }
 
+
     /**
      * Сохранение набора слов
      * @param wordsDisplayed - текущий спсиок слов в наборе

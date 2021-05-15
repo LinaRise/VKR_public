@@ -33,11 +33,8 @@ class CopiedTextAddDialog(
         )
     }
 
-    private val REQUEST_ACCESS_TYPE = 1
-
     private var hasInternet: Boolean = false
     var mWordRepo: WordRepo = WordRepo(dbhelper)
-    var mSettRepo: SettRepo = SettRepo(dbhelper)
 
     //    private var listener: ExampleDialogListener? = null
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -45,7 +42,7 @@ class CopiedTextAddDialog(
         val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.set_pick_up, null)
 
-        var spinner = view.findViewById<Spinner>(R.id.sets_titles_spinner)
+        val spinner = view.findViewById<Spinner>(R.id.sets_titles_spinner)
         val setsTitlesMapCopyTo: LinkedHashMap<Long, String> =
             setsList?.filter { it.settId != openedSet?.settId }
                 ?.map { it.settId to it.settTitle }!!.toMap() as LinkedHashMap<Long, String>
