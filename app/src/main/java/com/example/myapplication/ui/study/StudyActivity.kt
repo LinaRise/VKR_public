@@ -58,6 +58,7 @@ class StudyActivity : AppCompatActivity() {
     )
     var currentQuestion = 0
     var rightAnswer: Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_study)
@@ -77,8 +78,6 @@ class StudyActivity : AppCompatActivity() {
 
         val (newOrForgotten, others) = listToSelectFrom.partition { it.recallPoint < 4 }
         val (average, wellKnown) = others.partition { it.recallPoint < 8 }
-
-
 
         if (wordsDisplayed.isNotEmpty()) {
             linearLayout = findViewById<View>(R.id.progress_icons_lines) as LinearLayout
@@ -117,9 +116,6 @@ class StudyActivity : AppCompatActivity() {
                     )
                 )
                 (newList as ArrayList<Word>).shuffle()
-                Log.d("newlist", newList[5].toString())
-                Log.d("newlist", newList[4].toString())
-                Log.d("newlist", newList[3].toString())
                 val optionsTaken = ArrayList<Word>()
                 rightAnswer = (1..4).random()
                 Log.d("rightAnswer = ", rightAnswer.toString())
@@ -428,7 +424,6 @@ class StudyActivity : AppCompatActivity() {
                 val wrongAnswers = asked.count { !it }
                 args.putInt("rightAnswers", rightAnswers)
                 args.putInt("wrongAnswers", wrongAnswers)
-//            args.putParcelableArrayList("newList", newList as ArrayList)
                 setStudyEnd.arguments = args
                 val manager = supportFragmentManager
                 setStudyEnd.show(manager, "Set study")

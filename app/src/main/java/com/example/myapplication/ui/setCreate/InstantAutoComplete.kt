@@ -5,7 +5,9 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.widget.AutoCompleteTextView
 
-
+/**
+ * Кастомный класс
+ */
 class InstantAutoComplete : androidx.appcompat.widget.AppCompatAutoCompleteTextView{
     constructor(context: Context?) : super(context!!) {}
     constructor(arg0: Context?, arg1: AttributeSet?) : super(arg0!!, arg1) {}

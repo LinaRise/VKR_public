@@ -22,21 +22,33 @@ class SetCreatePresenter(
     private var word: Word = Word()
     private var set: Sett = Sett()
 
-    //    private var words = ArrayList<Word>()
 
+    /**
+     * Перевод слова
+     * @param translate - переменная сервиса перевода
+     * @param languageTitleAndCode - код и название языков
+     * @param originalText - текст для перевода
+     * @param sourceLanguage - язык с которого нужен перевод
+     * @param targetLanguage - язык на который нужно перевести
+     * @return String перевод
+     */
+    fun translate(translate: Translate,
+                  languageTitleAndCode: Map<String, String>,
+                  originalText: String,
+                  sourceLanguage: String,
+                  targetLanguage: String): String {
+        return  TranslationUtils.translate(translate,languageTitleAndCode,originalText,sourceLanguage,targetLanguage)
 
-//    fun loadData() {
-//        //пока просто список - будет обращение к бд
-//
-//        var languageInputInfo = db.rawQuery(
-//            "SELECT * FROM ${TablesAndColumns.LanguageEntry.TABLE_NAME} " +
-//                    "WHERE ${TablesAndColumns.LanguageEntry.COL_LANGUAGE_TITLE} = $inputLanguage",
-//            null
-//        );
-//
-//    }
-
-    fun onDoneButtonWasClicked(
+    }
+    /**
+     * Сохранение набора слов
+     * @param wordsDisplayed - текущий спсиок слов в наборе
+     * @param setTitle - навзание для перевода
+     * @param inputLanguage - язык с которого нужен перевод
+     * @param outputLanguage - язык на который нужно перевести
+     * @param hasAutoSuggest - переменная наличия авто-перевода
+     */
+    fun saveSet(
         wordsDisplayed: List<Word>, setTitle: String, inputLanguage: String,
         outputLanguage: String, hasAutoSuggest: Int
     ) {
@@ -73,7 +85,6 @@ class SetCreatePresenter(
 
         val settId = mSettRepo.create(newSet)
 
-//        val wordCreateAsyncTask = WordCreateManyAsyncTask(dbhelper = dbhelper)
         for (word in wordsDisplayed) {
             word.settId = settId
         }
@@ -82,6 +93,9 @@ class SetCreatePresenter(
 
     }
 
+    /**
+     * добавление слова
+     */
     fun addNewWord(original: String, translated: String) {
         if (original == "" || translated == "") {
             mView.showWordInputError()
@@ -91,14 +105,13 @@ class SetCreatePresenter(
         val word =
             Word(0, original.trim(), translated.trim())
 
-//        words.add(word)
         mView.cleanInputFields()
         mView.updateRecyclerViewInserted(word)
     }
-
-    fun deleteWord(word: Word, position: Int) {
-        //здесь будет удаление из бд - пока просто из списка
-//        words.removeAt(position)
+    /**
+     * удаление слова
+     */
+    fun deleteWord( position: Int) {
         mView.updateRecyclerViewDeleted(position)
         mView.showUndoDeleteWord(position)
 

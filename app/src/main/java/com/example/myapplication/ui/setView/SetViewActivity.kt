@@ -277,8 +277,6 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
             }
             R.id.ic_settings -> {
                 Log.d("SetViewActivity", "ic_settings clicked")
-
-                Toast.makeText(this, outputLanguageText, Toast.LENGTH_SHORT).show()
                 showSetCorrectInfoDialog()
                 return true
             }
@@ -461,13 +459,19 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         hasInternet = state.hasInternet()
         if (hasInternet) {
             translateService
-           /* if (translate != null) {
-                val languages: List<com.google.cloud.translate.Language> =
-                    translate!!.listSupportedLanguages()
-                languageTitleAndCode = languages.map { it.name to it.code }.toMap()
-            } else {
-                Toast.makeText(this, "Internet is not available", Toast.LENGTH_LONG).show()
-            }*/
+            if (translate != null) {
+                if (languageTitleAndCode.isEmpty()) {
+                    val languages: List<com.google.cloud.translate.Language> =
+                        translate!!.listSupportedLanguages()
+                    languageTitleAndCode = languages.map { it.name to it.code }.toMap()
+                }
+            }
+        } else {
+            Toast.makeText(
+                this,
+                "Can't load available languages for translation! Check internet connection!",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 

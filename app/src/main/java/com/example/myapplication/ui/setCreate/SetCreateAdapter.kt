@@ -12,10 +12,10 @@ import com.example.myapplication.entity.Word
 import com.google.android.material.textfield.TextInputEditText
 
 
-class SetCreateAdapter(setCreateActivity: SetCreateActivity) : RecyclerView.Adapter<SetCreateAdapter.SetCreateHolder>() {
+class SetCreateAdapter : RecyclerView.Adapter<SetCreateAdapter.SetCreateHolder>() {
     lateinit var context:Context
 
-    var words:List<Word?> = ArrayList<Word?>()
+    var words:List<Word?> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SetCreateHolder {
        val view = LayoutInflater.from(parent.context).inflate(

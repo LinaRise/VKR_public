@@ -1,7 +1,6 @@
 package com.example.myapplication.ui.setCreate
 
 import android.content.Context
-import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.os.StrictMode
 import android.util.Log
@@ -18,7 +17,6 @@ import com.example.myapplication.R
 import com.example.myapplication.connectivity.base.ConnectivityProvider
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.Word
-import com.example.myapplication.translation.TranslationUtils
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.auth.oauth2.GoogleCredentials
@@ -31,11 +29,10 @@ import java.io.IOException
 
 class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
     ConnectivityProvider.ConnectivityStateListener {
-    private var connected = false
+
     var translate: Translate? = null
 
     private val provider: ConnectivityProvider by lazy { ConnectivityProvider.createProvider(this) }
-
     private var hasInternet: Boolean = false;
 
     private lateinit var deletedWord: Word
@@ -44,24 +41,23 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
     private lateinit var wordAddButton: Button
     private lateinit var originalText: TextInputEditText
     private lateinit var translatedText: InstantAutoComplete
+
     lateinit var presenter: SetCreatePresenter
     lateinit var dbhelper: DBHelper
-    lateinit var db: SQLiteDatabase
 
     private lateinit var setTitle: String
     private lateinit var inputLanguage: String
     private lateinit var outputLanguage: String
-
-    private var editTextTitle: EditText? = null
-    private var hasAutoSuggest = 0
-    private var editTextInputLang: AutoCompleteTextView? = null
-    private var editTextOutputLang: AutoCompleteTextView? = null
-
     private var receivedTranslation: String = ""
+
+    private var hasAutoSuggest = 0
 
     lateinit var adapter: ArrayAdapter<Any>
 
     var languageTitleAndCode: Map<String, String> = hashMapOf()
+
+    // которые отображаются на экране
+    var wordsDisplayed = ArrayList<Word>()
 
     private val translateService: Unit
         get() {
@@ -70,11 +66,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
             try {
 
                 resources.openRawResource(R.raw.credentials).use { `is` ->
-
-                    //Get credentials:
                     val myCredentials = GoogleCredentials.fromStream(`is`)
-
-                    //Set credentials and get translate service:
                     val translateOptions =
                         TranslateOptions.newBuilder().setCredentials(myCredentials).build()
                     translate = translateOptions.service
@@ -85,11 +77,9 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
         }
 
 
-    // которые отображаются на экране
-    var wordsDisplayed = ArrayList<Word>()
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
+
         dbhelper = DBHelper(this)
         presenter = SetCreatePresenter(this, dbhelper)
         setContentView(R.layout.activity_set_create)
@@ -102,8 +92,6 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
             hasAutoSuggest = extras.getInt("hasAutoSuggest")
         }
 
-//        db = dbhelper.writableDatabase
-        // showing the back button in action bar
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         recyclerView = findViewById(R.id.recyclerivew_set_create)
@@ -112,10 +100,10 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
         translatedText = findViewById(R.id.translated_input)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        setCreateAdapter = SetCreateAdapter(this)
+        setCreateAdapter = SetCreateAdapter()
         recyclerView.adapter = setCreateAdapter
-
         setCreateAdapter.setData(wordsDisplayed)
+
         val itemTouchHelper = ItemTouchHelper(simpleCallBack)
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
@@ -128,52 +116,36 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
                 emptyArray()
             )
 
-        translatedText.onFocusChangeListener = object : View.OnFocusChangeListener {
-            override fun onFocusChange(p0: View?, p1: Boolean) {
-                if (p1) {
-                    if (hasAutoSuggest == 1) {
-                        if (hasInternet) {
-
-                            receivedTranslation =
-                                TranslationUtils.translate(
-                                    translate!!,
-                                    languageTitleAndCode,
-                                    originalText.text.toString(),
-                                    inputLanguage.trim(),
-                                    outputLanguage.trim()
-                                )
-                            Log.d("receivedTranslation", receivedTranslation)
-
-                            val array = arrayOf(
-                                receivedTranslation
+        translatedText.onFocusChangeListener = View.OnFocusChangeListener { p0, p1 ->
+            if (p1) {
+                if (hasAutoSuggest == 1) {
+                    if (hasInternet) {
+                        receivedTranslation =
+                            presenter.translate(
+                                translate!!,
+                                languageTitleAndCode,
+                                originalText.text.toString(),
+                                inputLanguage.trim(),
+                                outputLanguage.trim()
                             )
+                        Log.d("receivedTranslation", receivedTranslation)
+                        val array = arrayOf(
+                            receivedTranslation
+                        )
+                        adapter =
+                            ArrayAdapter(
+                                this@SetCreateActivity,
+                                android.R.layout.simple_list_item_1,
+                                array
+                            )
+                        adapter.notifyDataSetChanged()
 
-                            /*  Toast.makeText(
-                                  this@SetCreateActivity,
-                                  "HERE $inputLanguage, $outputLanguage",
-                                  Toast.LENGTH_LONG
-                              ).show()*/
-
-                            adapter =
-                                ArrayAdapter(
-                                    this@SetCreateActivity,
-                                    android.R.layout.simple_list_item_1,
-                                    array
-                                )
-                            adapter.notifyDataSetChanged()
-
-                            translatedText.setAdapter(adapter)
-                            translatedText.showDropDown();
-
-                        }
-
+                        translatedText.setAdapter(adapter)
+                        translatedText.showDropDown();
 
                     }
                 }
-
             }
-
-
         }
     }
 
@@ -200,34 +172,24 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle item selection
         return when (item.itemId) {
             R.id.home -> {
                 finish()
                 return true
             }
             R.id.check_icon -> {
-                presenter.onDoneButtonWasClicked(
+                presenter.saveSet(
                     wordsDisplayed,
                     setTitle,
                     inputLanguage,
                     outputLanguage,
                     hasAutoSuggest
                 )
-                Toast.makeText(this, "added successfully", Toast.LENGTH_SHORT).show()
                 finish()
                 return true
             }
             R.id.ic_settings -> {
-                val setCorrectInfoDialog = SetCorrectInfoDialog()
-                val args = Bundle()
-                args.putString("settTitle", setTitle)
-                args.putString("inputLanguage", inputLanguage)
-                args.putString("outputLanguage", outputLanguage)
-                args.putInt("hasAutoSuggest", hasAutoSuggest)
-                setCorrectInfoDialog.arguments = args
-                val manager = supportFragmentManager
-                setCorrectInfoDialog.show(manager, "Set Up Dialog")
+                showSetCorrectInfoDialog()
                 return true
             }
             else -> false
@@ -235,12 +197,17 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
     }
 
 
-//    private fun onDoneButtonWasClicked() {
-//        presenter.addAllToDatabase(wordsDisplayed, setTitle, inputLanguage, outputLanguage, db )
-//        Toast.makeText(this, "added successfully", Toast.LENGTH_SHORT).show()
-//        finish()
-//    }
-
+    private fun showSetCorrectInfoDialog() {
+        val setCorrectInfoDialog = SetCorrectInfoDialog()
+        val args = Bundle()
+        args.putString("settTitle", setTitle)
+        args.putString("inputLanguage", inputLanguage)
+        args.putString("outputLanguage", outputLanguage)
+        args.putInt("hasAutoSuggest", hasAutoSuggest)
+        setCorrectInfoDialog.arguments = args
+        val manager = supportFragmentManager
+        setCorrectInfoDialog.show(manager, "Set Up Dialog")
+    }
 
     private fun onAddWordBtnClick() {
         val original: String = originalText.text.toString().trim()
@@ -250,13 +217,8 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
         presenter.addNewWord(original, translated)
     }
 
-    private fun getWordList() {
-//        вызов загрузки
-//        presenter.loadData()
-    }
 
-    private
-    var simpleCallBack =
+    private var simpleCallBack =
         object : ItemTouchHelper.SimpleCallback(
             0.or(0),
             ItemTouchHelper.LEFT.or(ItemTouchHelper.RIGHT)
@@ -277,36 +239,33 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
                 when (direction) {
                     ItemTouchHelper.LEFT -> {
                         deletedWord = wordsDisplayed[position]
-                        presenter.deleteWord(deletedWord, position)
-
+                        presenter.deleteWord(position)
                     }
                 }
             }
 
         }
 
-
-//    override fun onDestroy() {
-//        super.onDestroy()
-//        dbhelper.close()
-//
-//    }
-
-//    override fun setData(words: List<Word>) {
-//        wordsDisplayed.addAll(words)
-//    }
-
+    /**
+     * обновление списка после вставки
+     */
     override fun updateRecyclerViewInserted(word: Word) {
         wordsDisplayed.add(word)
         setCreateAdapter.notifyDataSetChanged()
     }
 
+    /**
+     * обновление списка после удаления
+     */
     override fun updateRecyclerViewDeleted(position: Int) {
         wordsDisplayed.removeAt(position)
         setCreateAdapter.notifyItemRemoved(position)
 
     }
 
+    /**
+     * показ ошибки ввода
+     */
     override fun showWordInputError() {
         Snackbar.make(
             recyclerView,
@@ -315,6 +274,9 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
         ).show()
     }
 
+    /**
+     * показать отмену удаления
+     */
     override fun showUndoDeleteWord(position: Int) {
         Snackbar.make(
             recyclerView,
@@ -328,6 +290,9 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
         }.show()
     }
 
+    /**
+     * спрятать клавиатуру
+     */
     override fun hideKeyboard() {
         val imm =
             getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -337,30 +302,42 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
         )
     }
 
+    /**
+     * очистка полей
+     */
     override fun cleanInputFields() {
         originalText.setText("")
         translatedText.setText("")
-
-
     }
 
+    /**
+     * спрятать клвиатуру
+     */
     override fun onInputedData(list: ArrayList<Any>) {
         setTitle = (list[0] as String).trim()
         inputLanguage = (list[1] as String).trim()
         outputLanguage = (list[2] as String).trim()
         hasAutoSuggest = list[3] as Int
-
     }
+
 
     override fun onStateChange(state: ConnectivityProvider.NetworkState) {
         hasInternet = state.hasInternet()
         if (hasInternet) {
             translateService
             if (translate != null) {
-                val languages: List<com.google.cloud.translate.Language> =
-                    translate!!.listSupportedLanguages()
-                languageTitleAndCode = languages.map { it.name to it.code }.toMap()
+                if (languageTitleAndCode.isEmpty()) {
+                    val languages: List<Language> =
+                        translate!!.listSupportedLanguages()
+                    languageTitleAndCode = languages.map { it.name to it.code }.toMap()
+                }
             }
+        } else {
+            Toast.makeText(
+                this,
+                "Can't load available languages for translation! Check internet connection!",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 

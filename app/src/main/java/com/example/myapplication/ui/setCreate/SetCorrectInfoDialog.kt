@@ -233,9 +233,8 @@ class SetCorrectInfoDialog : AppCompatDialogFragment(),
 
     private fun loadAvailableLanguagesForTranslation() {
         translateService
-        var languages: List<Language> = listOf()
         if (translate != null) {
-            languages = translate!!.listSupportedLanguages()
+            val languages = translate!!.listSupportedLanguages()
             languagesSourceNames = languages.map { it.name }.toTypedArray()
             languageTitleAndCode = languages.map { it.name to it.code }.toMap()
         }

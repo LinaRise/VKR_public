@@ -36,20 +36,15 @@ class CopyCardDialog(
     var mWordRepo: WordRepo = WordRepo(dbhelper)
     var mSettRepo: SettRepo = SettRepo(dbhelper)
 
-    //    private var listener: ExampleDialogListener? = null
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val alertDialogBuilder = AlertDialog.Builder(requireActivity())
         val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.set_pick_up, null)
 
-        var spinner = view.findViewById<Spinner>(R.id.sets_titles_spinner)
+        val spinner = view.findViewById<Spinner>(R.id.sets_titles_spinner)
         val setsTitlesMapCopyTo: LinkedHashMap<Long, String> =
             setsList.map { it.settId to it.settTitle }.toMap()
                 .filter { it.key != openedSet?.settId } as LinkedHashMap<Long, String>
-
-
-
-
 
         ArrayAdapter(
             requireContext(),
@@ -71,14 +66,11 @@ class CopyCardDialog(
                     ArrayList<Long>(setsTitlesMapCopyTo.keys)[spinner.selectedItemPosition]
                 word!!.settId = pickedSetId
                 mWordRepo.create(word!!)
-                var pickedSet = setsList!!.filter { it.settId == pickedSetId }
+                val pickedSet = setsList.filter { it.settId == pickedSetId }
                 pickedSet[0].wordsAmount = pickedSet[0].wordsAmount + 1
                 mSettRepo.update(pickedSet[0])
                 Toast.makeText(requireContext(), "Saved", Toast.LENGTH_SHORT).show()
             })
-
-
-
 
         return alertDialogBuilder.create()
 
@@ -106,7 +98,6 @@ class CopyCardDialog(
     }
 
     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-
 
     }
 
