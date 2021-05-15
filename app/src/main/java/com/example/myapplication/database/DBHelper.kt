@@ -7,35 +7,20 @@ import android.provider.BaseColumns
 import com.example.myapplication.database.TablesAndColumns.LanguageEntry
 import com.example.myapplication.database.TablesAndColumns.SettEntry
 import com.example.myapplication.database.TablesAndColumns.WordEntry
+import com.example.myapplication.database.TablesAndColumns.StudyProgress
 
 
 class DBHelper(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     companion object {
         const val DATABASE_NAME = "wordsAndProgressDB.db"
-        const val DATABASE_VERSION = 1
-        private const val COL_ID = "id"
+        const val DATABASE_VERSION = 2
 
-/*        private const val TABLE_WORD = "word"
-        private const val COL_ORIGINAL_WORD = "original_word"
-        private const val COL_TRANSLATED_WORD = "translated_word"
-
-        private const val TABLE_SET = "sett"
-        private const val COL_SET_TITLE = "set_title"
-        private const val COL_LANGUAGE_INPUT_ID = "languageInput_id"
-        private const val COL_LANGUAGE_OUTPUT_ID = "languageOutput_id"
-        private const val COL_WORDS_AMOUNT = "words_amount"
-
-        private const val TABLE_SET_WORD = "set_word"
-        private const val COL_SET_ID = "SET_ID"
-        private const val COL_WORD_ID = "WORD_ID"
-
-        private const val TABLE_LANGUAGE = "language"
-        private const val COL_LANGUAGE_TITLE = "language_title"
-        private const val COL_SUPPORTS_TRANSLATION = "supports_translation"*/
 
         private const val CREATE_TABLE_LANGUAGE =
             "CREATE TABLE ${LanguageEntry.TABLE_NAME} (${LanguageEntry.TABLE_NAME}${BaseColumns._ID} INTEGER PRIMARY KEY autoincrement, ${LanguageEntry.COL_LANGUAGE_TITLE} TEXT not null UNIQUE, ${LanguageEntry.COL_SUPPORTS_TRANSLATION} INTEGER DEFAULT 0);"
+        private const val CREATE_TABLE_STUDY_PROGRESS =
+            "CREATE TABLE ${StudyProgress.TABLE_NAME} (${StudyProgress.COL_DATE}${BaseColumns._ID} TEXT PRIMARY KEY, ${StudyProgress.COL_RIGHT_ANSWERS} INTEGER DEFAULT 0, ${StudyProgress.COL_WRONG_ANSWERS} INTEGER DEFAULT 0);"
 
         private const val CREATE_TABLE_WORD =
             "CREATE TABLE ${WordEntry.TABLE_NAME}  (${WordEntry.TABLE_NAME}${BaseColumns._ID} INTEGER PRIMARY KEY autoincrement, ${WordEntry.COL_ORIGINAL_WORD} text not null, ${WordEntry.COL_TRANSLATED_WORD} TEXT, " +
@@ -56,13 +41,13 @@ class DBHelper(context: Context) :
                     "FOREIGN KEY (${SettWordEntry.COL_SET_ID}) REFERENCES ${SettEntry.TABLE_NAME} (${SettEntry.TABLE_NAME}${BaseColumns._ID}) ON DELETE CASCADE, " +
                     "FOREIGN KEY (${SettWordEntry.COL_WORD_ID}) REFERENCES ${WordEntry.TABLE_NAME} (${WordEntry.TABLE_NAME}${BaseColumns._ID}) ON DELETE CASCADE );"
 */
-        private const val INSERT_DEFAULT_LANGUAGES =
+       /* private const val INSERT_DEFAULT_LANGUAGES =
             "INSERT INTO ${LanguageEntry.TABLE_NAME} (${LanguageEntry.COL_LANGUAGE_TITLE},${LanguageEntry.COL_SUPPORTS_TRANSLATION}) VALUES ('English', 1), " +
                     "('Russian', 1), " +
                     "('French', 1), " +
                     "('Czech', 1), " +
                     "('German', 1);"
-       /* val values = ContentValues().apply {
+       *//* val values = ContentValues().apply {
             put(LanguageEntry.COL_LANGUAGE_TITLE, "English")
             put(LanguageEntry.COL_SUPPORTS_TRANSLATION, 1)
             put(LanguageEntry.COL_LANGUAGE_TITLE, "Russian")
@@ -80,8 +65,9 @@ class DBHelper(context: Context) :
         db.execSQL(CREATE_TABLE_LANGUAGE)
         db.execSQL(CREATE_TABLE_WORD)
         db.execSQL(CREATE_TABLE_SET)
+        db.execSQL(CREATE_TABLE_STUDY_PROGRESS)
 //        db.execSQL(CREATE_TABLE_SET_WORD)
-        db.execSQL(INSERT_DEFAULT_LANGUAGES)
+//        db.execSQL(INSERT_DEFAULT_LANGUAGES)
     }
     override fun onOpen(db: SQLiteDatabase) {
         super.onOpen(db)
@@ -93,6 +79,7 @@ class DBHelper(context: Context) :
         database.execSQL("DROP TABLE IF EXISTS ${SettEntry.TABLE_NAME}")
         database.execSQL("DROP TABLE IF EXISTS ${WordEntry.TABLE_NAME};")
         database.execSQL("DROP TABLE IF EXISTS ${LanguageEntry.TABLE_NAME};")
+        database.execSQL("DROP TABLE IF EXISTS ${StudyProgress.TABLE_NAME};")
         onCreate(database)
     }
 

@@ -10,4 +10,5 @@ interface ISetViewView {
     fun showUndoDeleteWord(position:Int)
     fun hideKeyboard()
     fun cleanInputFields()
+    fun setData(result: List<Word>?)
 }

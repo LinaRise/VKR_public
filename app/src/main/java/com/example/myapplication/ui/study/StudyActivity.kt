@@ -1,23 +1,22 @@
 package com.example.myapplication.ui.study
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.MotionEvent
 import android.view.View
 import android.widget.*
-import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
+import com.example.myapplication.MainActivity
 import com.example.myapplication.R
 import com.example.myapplication.database.DBHelper
-import com.example.myapplication.database.repo.word.WordUpdateAsyncTask
-import com.example.myapplication.database.repo.word.WordUpdateManyAsyncTask
 import com.example.myapplication.entity.Word
-import com.example.myapplication.ui.setCreate.SetCorrectInfoDialog
+import com.example.myapplication.ui.list.ListPageFragment
 import kotlinx.android.synthetic.main.activity_study.*
-import kotlin.collections.ArrayList
 
 
-class StudyActivity : AppCompatActivity() {
+class StudyActivity : AppCompatActivity(), ISetStudyView {
+    lateinit var presenter: SetStudyPresenter
+
     var wordsDisplayed = ArrayList<Word>()
     lateinit var listToSelectFrom: List<Word>
     lateinit var newList: List<Word>
@@ -52,7 +51,7 @@ class StudyActivity : AppCompatActivity() {
     )
 
     //для отображения правильного и неправильного ответа (зеленый/красный)
-    var rightWrong = booleanArrayOf(
+    private var rightWrong = booleanArrayOf(
         false, false, false, false, false, false, false, false, false, false, false, false,
         false, false, false, false, false, false, false, false
     )
@@ -63,6 +62,8 @@ class StudyActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_study)
         dbhelper = DBHelper(this)
+        presenter = SetStudyPresenter(this, dbhelper)
+
 
         questionTV = findViewById<TextView>(R.id.question_textview)
         option1B = findViewById<Button>(R.id.option1)
@@ -320,6 +321,13 @@ class StudyActivity : AppCompatActivity() {
         return wordsList.subList(0, randomSeriesLength)
     }
 
+    override fun onBackPressed() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        finish()
+        startActivity(intent)
+    }
+
     fun setOnClickOnEachButton(buttonNumber: Int) {
         if (currentQuestion > newList.size - 1) {
 
@@ -438,7 +446,9 @@ class StudyActivity : AppCompatActivity() {
 
                     }
                 }
-                WordUpdateManyAsyncTask(dbhelper).execute(newList)
+
+
+                presenter.updateWordsPoints(newList)
 
 
             }

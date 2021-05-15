@@ -1,5 +1,8 @@
 package com.example.myapplication.ui.setCreate
 
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.repo.language.LanguageRepo
 import com.example.myapplication.database.repo.sett.SettRepo
@@ -10,6 +13,7 @@ import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
 import com.example.myapplication.translation.TranslationUtils
 import com.google.cloud.translate.Translate
+import java.util.concurrent.Executors
 
 class SetCreatePresenter(
     view: ISetCreateView,
@@ -88,8 +92,18 @@ class SetCreatePresenter(
         for (word in wordsDisplayed) {
             word.settId = settId
         }
-        WordCreateManyAsyncTask(dbhelper).execute(wordsDisplayed)
 
+        val executor = Executors.newSingleThreadExecutor()
+        val handler = Handler(Looper.getMainLooper())
+        executor.execute {
+            for (word in wordsDisplayed) {
+                val wordId = mWordRepo.create(word)
+            }
+
+            handler.post {
+                mView.showToastMessage("Saved")
+            }
+        }
 
     }
 

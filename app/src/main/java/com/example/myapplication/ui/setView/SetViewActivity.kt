@@ -312,10 +312,15 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
             openedSett = sett
             inputLanguage = LanguageRepo(dbhelper).get(sett.languageInput_id)!!
             outputLanguage = LanguageRepo(dbhelper).get(sett.languageOutput_id)!!
-            inputLanguageText = inputLanguage?.languageTitle
-            outputLanguageText = outputLanguage?.languageTitle
+            inputLanguageText = inputLanguage.languageTitle
+            outputLanguageText = outputLanguage.languageTitle
             hasAutoSuggest = sett.hasAutoSuggest
-            WordsGetAsyncTask(dbhelper, setViewAdapter).execute(sett.settId)
+
+
+            presenter.getSetWords(sett.settId)
+
+
+//            WordsGetAsyncTask(dbhelper, setViewAdapter).execute(sett.settId)
 
         } else {
             supportActionBar?.title = "Set"
@@ -391,6 +396,11 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
     override fun cleanInputFields() {
         originalText.setText("")
         translatedText.setText("")
+    }
+
+    override fun setData(result: List<Word>?) {
+        setViewAdapter.setData(result)
+        setViewAdapter.notifyDataSetChanged()
     }
 
     /**

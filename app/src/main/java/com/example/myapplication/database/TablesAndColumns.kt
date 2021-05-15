@@ -26,10 +26,12 @@ object TablesAndColumns {
         const val COL_WORDS_AMOUNT = "words_amount"
         const val COL_AUTO_SUGGEST = "has_auto_suggest"
     }
-    /*object SettWordEntry : BaseColumns {
-         const val TABLE_NAME  = "sett_word"
-         const val COL_SET_ID = "sett_id"
-         const val COL_WORD_ID = "word_id"
 
-    }*/
+    object StudyProgress : BaseColumns {
+        const val TABLE_NAME = "study_progress"
+        const val COL_DATE = "study_progress_date"
+        const val COL_RIGHT_ANSWERS = "right_answers"
+        const val COL_WRONG_ANSWERS = "wrong_answers"
+    }
+
 }

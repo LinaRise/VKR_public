@@ -14,7 +14,6 @@ class WordDeleteAsyncTask(dbhelper: DBHelper) : AsyncTask<Word, Unit, Unit>() {
 
     override fun onPostExecute(result: Unit?) {
         super.onPostExecute(result)
-//        Log.d("DEBUG_TAG", "Language inserted with id $result")
 
     }
 
@@ -22,7 +21,6 @@ class WordDeleteAsyncTask(dbhelper: DBHelper) : AsyncTask<Word, Unit, Unit>() {
     override fun doInBackground(vararg p0: Word?) {
         val word = p0[0] as Word
         val wordId = mWordRepo.delete(word)
-//        mSetWordRepo.delete(SetWord(settId = settId, wordId = wordId))
     }
 }
 

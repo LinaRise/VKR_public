@@ -311,6 +311,13 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
     }
 
     /**
+     * показать ссообщение
+     */
+    override fun showToastMessage(line: String) {
+        Toast.makeText(this, line, Toast.LENGTH_SHORT).show()
+    }
+
+    /**
      * спрятать клвиатуру
      */
     override fun onInputedData(list: ArrayList<Any>) {

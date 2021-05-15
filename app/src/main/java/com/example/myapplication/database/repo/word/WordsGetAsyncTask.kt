@@ -17,10 +17,8 @@ class WordsGetAsyncTask (dbhelper: DBHelper, adapter: SetViewAdapter) : AsyncTas
 
     override fun onPostExecute(result: List<Word>?) {
         super.onPostExecute(result)
-//        Log.d("DEBUG_TAG", "Language inserted with id $result")
         mAdapter.setData(result)
         mAdapter.notifyDataSetChanged()
-
 
     }
 

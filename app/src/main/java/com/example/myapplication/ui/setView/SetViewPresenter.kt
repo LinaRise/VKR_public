@@ -1,5 +1,7 @@
 package com.example.myapplication.ui.setView
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.repo.language.LanguageRepo
@@ -10,13 +12,13 @@ import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
 import com.example.myapplication.translation.TranslationUtils
 import com.google.cloud.translate.Translate
+import java.util.concurrent.Executors
 
 class SetViewPresenter(
     view: ISetViewView,
-    private var dbhelper: DBHelper
+    dbhelper: DBHelper
 ) {
     private var mView: ISetViewView = view
-
     var mLanguageRepo: LanguageRepo = LanguageRepo(dbhelper)
     var mWordRepo: WordRepo = WordRepo(dbhelper)
     var mSettRepo: SettRepo = SettRepo(dbhelper)
@@ -46,15 +48,22 @@ class SetViewPresenter(
      * @param targetLanguage - язык на который нужно перевести
      * @return String перевод
      */
-    fun translate(translate: Translate,
-                  languageTitleAndCode: Map<String, String>,
-                  originalText: String,
-                  sourceLanguage: String,
-                  targetLanguage: String): String {
-      return  TranslationUtils.translate(translate,languageTitleAndCode,originalText,sourceLanguage,targetLanguage)
+    fun translate(
+        translate: Translate,
+        languageTitleAndCode: Map<String, String>,
+        originalText: String,
+        sourceLanguage: String,
+        targetLanguage: String
+    ): String {
+        return TranslationUtils.translate(
+            translate,
+            languageTitleAndCode,
+            originalText,
+            sourceLanguage,
+            targetLanguage
+        )
 
     }
-
 
 
     /**
@@ -127,47 +136,64 @@ class SetViewPresenter(
 
             val settId = mSettRepo.update(sett)
             var wordsLeft = ArrayList(wordsOriginal)
-            wordsDisplayed.forEachIndexed { index, element ->
-                val filtered = wordsOriginal.filter { it!!.wordId == element?.wordId }
-                if (filtered.isNullOrEmpty()) {
-                    element!!.settId = settId
-                    Log.d("element", element.toString())
-                    val id = mWordRepo.create(element)
-                    Log.d("createdElement id", id.toString())
-                   /* val id = WordCreateAsyncTask(dbhelper).execute(element)*/
-                    wordsLeft.remove(element)
-                } else {
-                    if (element!!.originalWord != (filtered[0]!!.originalWord) || element.originalWord != (filtered[0]!!.originalWord)) {
-                        val id = WordUpdateAsyncTask(dbhelper).execute(element)
-                        Log.d("Word updated = ", id.toString())
 
+            val executor = Executors.newSingleThreadExecutor()
+            val handler = Handler(Looper.getMainLooper())
+
+
+            executor.execute {
+                wordsDisplayed.forEachIndexed { index, word ->
+                    val filtered = wordsOriginal.filter { it!!.wordId == word?.wordId }
+                    if (filtered.isNullOrEmpty()) {
+                        word!!.settId = settId
+                        Log.d("element", word.toString())
+                        val id = mWordRepo.create(word)
+                        Log.d("createdElement id", id.toString())
+                        wordsLeft.remove(word)
+                    } else {
+                        if (word!!.originalWord != (filtered[0]!!.originalWord) || word.originalWord != (filtered[0]!!.originalWord)) {
+                            val id = mWordRepo.update(word)
+                            Log.d("Word updated = ", id.toString())
+
+                        }
+                        wordsLeft.remove(filtered[0])
                     }
-                    wordsLeft.remove(filtered[0])
+                }
+
+                handler.post {
                 }
             }
 
-            if (wordsLeft.isNotEmpty()) {
-                wordsLeft.forEachIndexed { index, element ->
-                    WordDeleteAsyncTask(dbhelper).execute(element)
-                }
 
-/*
-            if (element !in wordsOriginal) {
-                if (element?.wordId != null) {
-                    val filtered = wordsOriginal.filter { it!!.wordId == element.wordId }
-                    if (filtered.isNotEmpty()) {
-                        WordUpdateAsyncTask(dbhelper).execute(filtered[0])
-                    } else {
-                        WordDeleteAsyncTask(dbhelper).execute(element)
+            executor.execute {
+                if (wordsLeft.isNotEmpty()) {
+                    wordsLeft.forEachIndexed { index, word ->
+                        val wordId = mWordRepo.delete(word!!)
                     }
-                } else {
-                    WordCreateAsyncTask(dbhelper).execute(element)
+
                 }
-            }*/
+                handler.post {
+
+                }
+            }
+
+        }
+    }
+
+    fun getSetWords(setId: Long) {
+        val executor = Executors.newSingleThreadExecutor()
+        val handler = Handler(Looper.getMainLooper())
+        var result: List<Word>?
+        executor.execute {
+            result = mWordRepo.getWordsOfSet(settId = setId)
+            handler.post {
+                mView.setData(result)
             }
         }
     }
 }
+
+
 /*        wordsOriginal.forEachIndexed { index, element ->
             if (wordsEdited[index] != null) {
                 Log.d("wordsEdited[$index]", wordsEdited[index].toString())

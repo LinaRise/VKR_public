@@ -18,7 +18,6 @@ import com.example.myapplication.ui.list.ListPageFragment
 import com.example.myapplication.ui.setView.SetViewActivity
 
 class ReminderBroadcast : BroadcastReceiver() {
-    private val REQUEST_CODE = 100
     private val CHANNEL_ID = "STUDY_NOTIFY_CHANNEL"
     private val NOTIFICATION_ID = 200
     override fun onReceive(p0: Context?, p1: Intent?) {
@@ -26,7 +25,6 @@ class ReminderBroadcast : BroadcastReceiver() {
         val intent = Intent(p0,ListPageFragment::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
 
-//       val pendingIntent = PendingIntent.getActivity(p0,REQUEST_CODE,intent,PendingIntent.FLAG_UPDATE_CURRENT)
        val pendingIntent = NavDeepLinkBuilder(p0!!)
            .setComponentName(MainActivity::class.java)
            .setGraph(R.navigation.mobile_navigation)

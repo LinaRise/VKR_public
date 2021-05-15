@@ -7,14 +7,6 @@ class TranslationUtils {
 
     companion object {
 
-        /*   private val languagesAccordance = hashMapOf(
-               "English" to "en",
-               "Russian" to "ru",
-               "French" to "fr",
-               "Czech" to "cs",
-               "German" to "de"
-           )
-   */
         /**
          * Метод для перевода текста
          * @param translate переменная библиотеки класса перевода

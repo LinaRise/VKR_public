@@ -101,7 +101,7 @@ class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
     fun getWordsOfSet(settId: Long): List<Word>? {
         db = dbhelper.readableDatabase
         db.beginTransaction()
-        var wordList: ArrayList<Word> = ArrayList()
+        val wordList: ArrayList<Word> = ArrayList()
         try {
             val cursor: Cursor? =
                 db.rawQuery(

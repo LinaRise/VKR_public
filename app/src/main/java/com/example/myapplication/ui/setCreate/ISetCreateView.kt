@@ -9,4 +9,5 @@ interface ISetCreateView {
     fun showUndoDeleteWord(position:Int)
     fun hideKeyboard()
     fun cleanInputFields()
+    fun showToastMessage(line:String)
 }
