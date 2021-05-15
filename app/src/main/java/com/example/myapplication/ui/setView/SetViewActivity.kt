@@ -263,7 +263,7 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
             R.id.check_icon -> {
                 Log.d("SetViewActivity", "check_icon clicked")
 
-                presenter.onDoneButtonWasClicked(
+                presenter.saveSet(
                     wordsDisplayed,
                     wordsOriginal,
                     openedSett,
@@ -430,7 +430,7 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
                     //свайп влево -> удаление
                     ItemTouchHelper.LEFT -> {
                         deletedWord = wordsDisplayed[position]!!
-                        presenter.deleteWord(deletedWord, position)
+                        presenter.deleteWord(position)
 
                     }
                     //свайп впрао -> копирование

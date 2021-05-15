@@ -16,14 +16,16 @@ class SetViewPresenter(
     private var dbhelper: DBHelper
 ) {
     private var mView: ISetViewView = view
-//    private var words = ArrayList<Word>()
 
     var mLanguageRepo: LanguageRepo = LanguageRepo(dbhelper)
     var mWordRepo: WordRepo = WordRepo(dbhelper)
     var mSettRepo: SettRepo = SettRepo(dbhelper)
-//    var mSetWordRepo: SetWordRepo = SetWordRepo(dbhelper)
 
-    //добавление нового слова
+    /**
+     * Добавление нового слова в список
+     * @param original - текст для перевода
+     * @param translated -переведенный тектс
+     */
     fun addNewWord(original: String, translated: String) {
         if (original == "" || translated == "") {
             mView.showWordInputError()
@@ -35,6 +37,15 @@ class SetViewPresenter(
         mView.updateRecyclerViewInserted(word)
     }
 
+    /**
+     * Перевод слова
+     * @param translate - переменная сервиса перевода
+     * @param languageTitleAndCode - код и название языков
+     * @param originalText - текст для перевода
+     * @param sourceLanguage - язык с которого нужен перевод
+     * @param targetLanguage - язык на который нужно перевести
+     * @return String перевод
+     */
     fun translate(translate: Translate,
                   languageTitleAndCode: Map<String, String>,
                   originalText: String,
@@ -46,17 +57,33 @@ class SetViewPresenter(
 
 
 
-    //удаление слова из списка
-    fun deleteWord(word: Word, position: Int) {
+    /**
+     * Удаление слова из спсика
+     * @param position - позиция слова в списке на экране
+     */
+    fun deleteWord(position: Int) {
         mView.updateRecyclerViewDeleted(position)
         mView.showUndoDeleteWord(position)
     }
 
+    /**
+     * Получаем все названия наборов слов
+     * @return List<Sett>? список сетов
+     */
     fun getAllSetsTitles(): List<Sett>? {
         return mSettRepo.getAll()
     }
 
-    fun onDoneButtonWasClicked(
+    /**
+     * Сохранение набора слов
+     * @param wordsDisplayed - текущий спсиок слов в наборе
+     * @param wordsOriginal - изначальный список слов в наборе
+     * @param sett - текущий набор слов (инфа)
+     * @param inputLanguage - язык с которого нужен перевод
+     * @param outputLanguage - язык на который нужно перевести
+     * @param hasAutoSuggest - переменная наличия авто-перевода
+     */
+    fun saveSet(
         wordsDisplayed: List<Word?>,
         wordsOriginal: List<Word?>,
         sett: Sett?,
