@@ -79,8 +79,6 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
                     "SELECT * FROM ${TablesAndColumns.SettEntry.TABLE_NAME} WHERE ${TablesAndColumns.SettEntry.TABLE_NAME}${BaseColumns._ID} = ?",
                     arrayOf(id.toString())
                 )
-
-
             if (cursor != null) {
                 val colSetTitle = cursor.getColumnIndex(TablesAndColumns.SettEntry.COL_SET_TITLE)
                 val colLangInputId =
@@ -103,6 +101,7 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
                 }
                 cursor.close()
             }
+            db.setTransactionSuccessful()
         } catch (e: Exception) {
             Log.d(
                 TAG,

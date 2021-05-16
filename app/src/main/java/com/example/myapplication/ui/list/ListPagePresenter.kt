@@ -1,11 +1,12 @@
 package com.example.myapplication.ui.list
 
+import android.os.Handler
+import android.os.Looper
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.repo.language.LanguageRepo
-import com.example.myapplication.database.repo.sett.SetDeleteAsyncTask
 import com.example.myapplication.database.repo.sett.SettRepo
 import com.example.myapplication.entity.Sett
-import com.example.myapplication.entity.Word
+import java.util.concurrent.Executors
 
 class ListPagePresenter(view: IListPageView, var dbhelper: DBHelper) {
     private var mView: IListPageView = view
@@ -65,8 +66,11 @@ class ListPagePresenter(view: IListPageView, var dbhelper: DBHelper) {
      * удаление набора слов из БД
      */
     fun deleteSettFromDb(sett:Sett){
-        SetDeleteAsyncTask(dbhelper).execute(sett)
-
+        val executor = Executors.newSingleThreadExecutor()
+        val handler = Handler(Looper.getMainLooper())
+        executor.execute {
+            val wordId = mSettRepo.delete(sett)
+        }
     }
 
 }

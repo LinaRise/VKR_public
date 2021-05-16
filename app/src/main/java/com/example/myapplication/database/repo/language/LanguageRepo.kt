@@ -64,8 +64,6 @@ class LanguageRepo(val dbhelper: DBHelper) : IRepository<Language> {
         }
         db.setTransactionSuccessful()
         db.endTransaction()
-
-        db.close()
         return langauge
     }
 
@@ -89,8 +87,6 @@ class LanguageRepo(val dbhelper: DBHelper) : IRepository<Language> {
         }
         db.setTransactionSuccessful()
         db.endTransaction()
-
-        db.close()
         return langauge
     }
 

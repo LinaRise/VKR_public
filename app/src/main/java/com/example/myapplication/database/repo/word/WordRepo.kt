@@ -144,7 +144,6 @@ class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
             )
         } finally {
             db.endTransaction()
-            db.close()
             return wordList
         }
     }

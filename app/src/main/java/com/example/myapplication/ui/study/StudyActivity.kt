@@ -9,12 +9,18 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.MainActivity
 import com.example.myapplication.R
 import com.example.myapplication.database.DBHelper
+import com.example.myapplication.entity.StudyProgress
 import com.example.myapplication.entity.Word
-import com.example.myapplication.ui.list.ListPageFragment
 import kotlinx.android.synthetic.main.activity_study.*
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class StudyActivity : AppCompatActivity(), ISetStudyView {
+    private var wrongAnswers: Int = 0
+    private var rightAnswers: Int = 0
+    private lateinit var asked: List<Boolean>
     lateinit var presenter: SetStudyPresenter
 
     var wordsDisplayed = ArrayList<Word>()
@@ -285,34 +291,10 @@ class StudyActivity : AppCompatActivity(), ISetStudyView {
 
         }
 
-        option1B.setOnClickListener(object : View.OnClickListener {
-
-            override fun onClick(p0: View?) {
-                setOnClickOnEachButton(1)
-
-            }
-        })
-        option2B.setOnClickListener(object : View.OnClickListener {
-
-            override fun onClick(p0: View?) {
-                setOnClickOnEachButton(2)
-
-            }
-        })
-        option3B.setOnClickListener(object : View.OnClickListener {
-
-            override fun onClick(p0: View?) {
-                setOnClickOnEachButton(3)
-
-            }
-        })
-        option4B.setOnClickListener(object : View.OnClickListener {
-
-            override fun onClick(p0: View?) {
-                setOnClickOnEachButton(4)
-
-            }
-        })
+        option1B.setOnClickListener { setOnClickOnEachButton(1) }
+        option2B.setOnClickListener { setOnClickOnEachButton(2) }
+        option3B.setOnClickListener { setOnClickOnEachButton(3) }
+        option4B.setOnClickListener { setOnClickOnEachButton(4) }
     }
 
 
@@ -328,7 +310,7 @@ class StudyActivity : AppCompatActivity(), ISetStudyView {
         startActivity(intent)
     }
 
-    fun setOnClickOnEachButton(buttonNumber: Int) {
+    private fun setOnClickOnEachButton(buttonNumber: Int) {
         if (currentQuestion > newList.size - 1) {
 
         } else {
@@ -425,17 +407,17 @@ class StudyActivity : AppCompatActivity(), ISetStudyView {
             currentQuestion++
             if (currentQuestion == newList.size) {
                 Log.d("here", "here")
-                val setStudyEnd = SetStudyEnd()
-                val args = Bundle()
-                val asked = rightWrong.take(currentQuestion)
-                val rightAnswers = asked.count { it }
-                val wrongAnswers = asked.count { !it }
-                args.putInt("rightAnswers", rightAnswers)
-                args.putInt("wrongAnswers", wrongAnswers)
-                setStudyEnd.arguments = args
-                val manager = supportFragmentManager
-                setStudyEnd.show(manager, "Set study")
+                Log.d("StudyActivity", Date().toString())
 
+                showSetStudyEnd()
+
+                presenter.updateStudyProgress(
+                    StudyProgress(
+                        java.time.LocalDate.now(),
+                        rightAnswer,
+                        wrongAnswers
+                    )
+                )
                 for ((index, word) in newList.withIndex()) {
                     println("The element at $index is $word")
                     if (asked[index])
@@ -446,15 +428,25 @@ class StudyActivity : AppCompatActivity(), ISetStudyView {
 
                     }
                 }
-
-
                 presenter.updateWordsPoints(newList)
-
 
             }
 
 
         }
+    }
+
+    private fun showSetStudyEnd() {
+        val setStudyEnd = SetStudyEnd()
+        val args = Bundle()
+        asked = rightWrong.take(currentQuestion)
+        rightAnswers = asked.count { it }
+        wrongAnswers = asked.count { !it }
+        args.putInt("rightAnswers", rightAnswers)
+        args.putInt("wrongAnswers", wrongAnswers)
+        setStudyEnd.arguments = args
+        val manager = supportFragmentManager
+        setStudyEnd.show(manager, "Set study")
     }
 
 }
