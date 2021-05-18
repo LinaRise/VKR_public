@@ -23,6 +23,7 @@ import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.StudyProgress
 import com.example.myapplication.notification.ReminderBroadcast
 import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
@@ -44,6 +45,7 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
     OnChartValueSelectedListener,
     ActivityCompat.OnRequestPermissionsResultCallback {
 
+    private var xAxis: XAxis? = null
     lateinit var presenter: ProfilePresenter
     lateinit var dbhelper: DBHelper
 
@@ -112,9 +114,9 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
         chart?.description?.isEnabled = false
 
 
-        val xAxis = chart!!.xAxis
-        xAxis.position = XAxisPosition.BOTTOM
-        xAxis.setDrawGridLines(false)
+        xAxis = chart?.xAxis
+        xAxis?.position = XAxisPosition.BOTTOM
+        xAxis?.setDrawGridLines(false)
 
         chart?.axisLeft?.setDrawGridLines(true)
         chart?.axisRight?.isEnabled = false
@@ -416,21 +418,30 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
         chart?.xAxis?.valueFormatter = IndexAxisValueFormatter(list.map { it.date.toString() })
 
         val values: ArrayList<BarEntry> = ArrayList()
-        for (i in list.indices)
+        val labels: ArrayList<String> = ArrayList()
+        for (i in list.indices) {
             values.add(
                 BarEntry(
-                    i.toFloat(),
-                    ((list[i].rightAnswers / 100)*(list[i].rightAnswers + list[i].wrongAnswers)).toFloat()
+                    i.toFloat() + 1,
+                    ((list[i].rightAnswers.toFloat() * 100) / (list[i].rightAnswers.toFloat() + list[i].wrongAnswers.toFloat()))
+
                 )
             )
-        Log.d("valuesData",values[1].toString())
+            labels.add(list[i].date.toString())
+        }
+        Log.d(
+            "valuesData",
+            (((list[0].rightAnswers.toFloat() * 100) / (list[0].rightAnswers.toFloat() + list[0].wrongAnswers.toFloat())).toString())
+        )
+
+        Log.d("valuesData", values[1].toString())
         set1 = BarDataSet(values, "Progress")
         set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
         set1.setDrawValues(false)
         val dataSets: ArrayList<IBarDataSet> = ArrayList()
         dataSets.add(set1)
         val data = BarData(dataSets)
-        chart!!.data = data
+        chart?.data = data
 
         chart?.setVisibleXRangeMinimum(7f)
         chart?.setVisibleXRangeMaximum(100f)
@@ -442,10 +453,12 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
         chart?.setDrawBarShadow(false)
         chart?.setDrawGridBackground(false)
 
+        Log.d("labelss", labels.toString())
+        xAxis!!.valueFormatter =  IndexAxisValueFormatter(labels)
         // add a nice and smooth animation
-        chart!!.animateY(1500)
+        chart?.animateY(1500)
 
-        chart!!.legend.isEnabled = false
+        chart?.legend?.isEnabled = false
 
     }
 
