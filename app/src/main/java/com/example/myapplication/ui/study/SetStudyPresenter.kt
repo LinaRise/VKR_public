@@ -32,10 +32,14 @@ class SetStudyPresenter(
 
     fun updateStudyProgress(studyProgress: StudyProgress) {
         val executor = Executors.newSingleThreadExecutor()
-        Log.d("updateStudyProgress", studyProgress.date.toString())
+        Log.d("updateStudyProgress", studyProgress.wrongAnswers.toString())
+        Log.d("updateStudyProgress2", studyProgress.rightAnswers.toString())
         executor.execute {
             val currentDateProgress = mStudyProgressRepo.get(studyProgress.date)
             if ( currentDateProgress.date != LocalDate.parse("2018-12-12")) {
+                Log.d("currentDateProgress", currentDateProgress.rightAnswers.toString())
+                Log.d("currentDateProgress2", currentDateProgress.wrongAnswers.toString())
+
                 studyProgress.rightAnswers =
                     studyProgress.rightAnswers + currentDateProgress.rightAnswers
                 studyProgress.wrongAnswers =

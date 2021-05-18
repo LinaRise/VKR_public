@@ -133,20 +133,7 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
 
         // if more than 7 entries are displayed in the chart, no values will be
         // drawn
-        chart?.setVisibleXRangeMinimum(7f)
-        chart?.setVisibleXRangeMaximum(100f)
-        chart?.moveViewToX(1f)
-        chart?.setFitBars(true)
 
-        // scaling can now only be done on x- and y-axis separately
-        chart?.setPinchZoom(false)
-        chart?.setDrawBarShadow(false)
-        chart?.setDrawGridBackground(false)
-
-        // add a nice and smooth animation
-        chart!!.animateY(1500)
-
-        chart!!.legend.isEnabled = false
 
 
         setHasOptionsMenu(true)
@@ -433,16 +420,32 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
             values.add(
                 BarEntry(
                     i.toFloat(),
-                    ((list[i].rightAnswers / (list[i].rightAnswers + list[i].wrongAnswers))*100).toFloat()
+                    ((list[i].rightAnswers / 100)*(list[i].rightAnswers + list[i].wrongAnswers)).toFloat()
                 )
             )
-        set1 = BarDataSet(values, "Data Set")
+        Log.d("valuesData",values[1].toString())
+        set1 = BarDataSet(values, "Progress")
         set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
         set1.setDrawValues(false)
         val dataSets: ArrayList<IBarDataSet> = ArrayList()
         dataSets.add(set1)
         val data = BarData(dataSets)
-        chart?.data = data
+        chart!!.data = data
+
+        chart?.setVisibleXRangeMinimum(7f)
+        chart?.setVisibleXRangeMaximum(100f)
+        chart?.moveViewToX(1f)
+        chart?.setFitBars(true)
+
+        // scaling can now only be done on x- and y-axis separately
+        chart?.setPinchZoom(false)
+        chart?.setDrawBarShadow(false)
+        chart?.setDrawGridBackground(false)
+
+        // add a nice and smooth animation
+        chart!!.animateY(1500)
+
+        chart!!.legend.isEnabled = false
 
     }
 

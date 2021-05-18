@@ -120,7 +120,6 @@ class StudyProgressRepo(val dbhelper: DBHelper) : IRepository<StudyProgress> {
                     "SELECT * FROM ${TablesAndColumns.StudyProgress.TABLE_NAME}",
                     null
                 )
-            val studyProgress = StudyProgress()
             if (cursor != null) {
                 val colDate = cursor.getColumnIndex(TablesAndColumns.StudyProgress.COL_DATE)
                 val colRightAnswers =
@@ -128,6 +127,7 @@ class StudyProgressRepo(val dbhelper: DBHelper) : IRepository<StudyProgress> {
                 val colWrongAnswers =
                     cursor.getColumnIndex(TablesAndColumns.StudyProgress.COL_WRONG_ANSWERS)
                 while (cursor.moveToNext()) {
+                    val studyProgress = StudyProgress()
                     studyProgress.date = LocalDate.parse(cursor.getString(colDate))
                     studyProgress.rightAnswers = cursor.getInt(colRightAnswers)
                     studyProgress.wrongAnswers = cursor.getInt(colWrongAnswers)

@@ -1,5 +1,7 @@
 package com.example.myapplication.ui.study
 
+import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -12,21 +14,26 @@ import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.StudyProgress
 import com.example.myapplication.entity.Word
 import kotlinx.android.synthetic.main.activity_study.*
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
 
 class StudyActivity : AppCompatActivity(), ISetStudyView {
-    private var wrongAnswers: Int = 0
-    private var rightAnswers: Int = 0
+    private var wrongAnswersCount: Int = 0
+
+    private var rightAnswersCount: Int = 0
     private lateinit var asked: List<Boolean>
     lateinit var presenter: SetStudyPresenter
+
+    lateinit var frontAnim: AnimatorSet
+    lateinit var backAnim: AnimatorSet
+    var isFront = true
 
     var wordsDisplayed = ArrayList<Word>()
     lateinit var listToSelectFrom: List<Word>
     lateinit var newList: List<Word>
     lateinit var questionTV: TextView
+    lateinit var answerTV: TextView
     lateinit var option1B: Button
     lateinit var option2B: Button
     lateinit var option3B: Button
@@ -71,14 +78,27 @@ class StudyActivity : AppCompatActivity(), ISetStudyView {
         presenter = SetStudyPresenter(this, dbhelper)
 
 
-        questionTV = findViewById<TextView>(R.id.question_textview)
+        questionTV = findViewById<TextView>(R.id.question_textView)
+        answerTV = findViewById<TextView>(R.id.answer_textView)
         option1B = findViewById<Button>(R.id.option1)
         option2B = findViewById<Button>(R.id.option2)
         option3B = findViewById<Button>(R.id.option3)
         option4B = findViewById<Button>(R.id.option4)
 
 
-        val scale: Float = baseContext.resources.displayMetrics.density
+        val scale = applicationContext.resources.displayMetrics.density
+        questionTV.cameraDistance = 8000 * scale;
+        answerTV.cameraDistance = 8000 * scale;
+
+        frontAnim = AnimatorInflater.loadAnimator(
+            applicationContext,
+            R.animator.front_animator
+        ) as AnimatorSet
+        backAnim = AnimatorInflater.loadAnimator(
+            applicationContext,
+            R.animator.back_animator
+        ) as AnimatorSet
+
         wordsDisplayed = intent.getParcelableArrayListExtra("wordsDisplayed")
         listToSelectFrom = ArrayList<Word>(wordsDisplayed)
         (listToSelectFrom as ArrayList<Word>).sortBy { it.recallPoint }
@@ -91,10 +111,11 @@ class StudyActivity : AppCompatActivity(), ISetStudyView {
             if (wordsDisplayed.size < 20) {
 
                 //количество проверяемых слов
-                val newSize: Int =
-                    newOrForgotten.size + (average.size / 3).toInt() + (wellKnown.size / 4).toInt()
+                /* val newSize: Int =
+                     newOrForgotten.size + (average.size / 3).toInt() + (wellKnown.size / 4).toInt()*/
 
-                for (i in 0 until newSize) {
+                         //textView для отображения верных и неверных ответов
+                for (i in 0 until wordsDisplayed.size) {
                     val textView = TextView(this)
                     textView.layoutParams = TableLayout.LayoutParams(
                         TableRow.LayoutParams.WRAP_CONTENT,
@@ -127,6 +148,7 @@ class StudyActivity : AppCompatActivity(), ISetStudyView {
                 rightAnswer = (1..4).random()
                 Log.d("rightAnswer = ", rightAnswer.toString())
                 questionTV.text = newList[0].originalWord
+                answerTV.text = newList[0].translatedWord
                 var option: Word
                 while (true) {
                     if (rightAnswer != 1) {
@@ -228,6 +250,7 @@ class StudyActivity : AppCompatActivity(), ISetStudyView {
                     rightAnswer = (1..4).random()
                     Log.d("rightAnswer = ", rightAnswer.toString())
                     questionTV.text = newList[0].originalWord
+                    answerTV.text = newList[0].translatedWord
                     var option: Word
                     while (true) {
                         if (rightAnswer != 1) {
@@ -311,6 +334,16 @@ class StudyActivity : AppCompatActivity(), ISetStudyView {
     }
 
     private fun setOnClickOnEachButton(buttonNumber: Int) {
+        frontAnim.setTarget(questionTV)
+        backAnim.setTarget(answerTV)
+        frontAnim.start()
+        backAnim.start()
+
+        frontAnim.setTarget(answerTV)
+        backAnim.setTarget(questionTV)
+        backAnim.start()
+        frontAnim.start()
+
         if (currentQuestion > newList.size - 1) {
 
         } else {
@@ -318,11 +351,11 @@ class StudyActivity : AppCompatActivity(), ISetStudyView {
                 rightWrong[currentQuestion] = true
             }
             for (i in 0 until listToSelectFrom.size) {
-                var tv = linearLayout.findViewById<TextView>(progressBarIds[i])
+                val tv = linearLayout.findViewById<TextView>(progressBarIds[i])
                 tv.setBackgroundResource(R.drawable.style_points)
             }
             for (i in 0..currentQuestion) {
-                var tv = linearLayout.findViewById<TextView>(progressBarIds[i])
+                val tv = linearLayout.findViewById<TextView>(progressBarIds[i])
                 if (rightWrong[i])
                     tv.setBackgroundResource(R.drawable.style_points_green)
                 else
@@ -414,8 +447,8 @@ class StudyActivity : AppCompatActivity(), ISetStudyView {
                 presenter.updateStudyProgress(
                     StudyProgress(
                         java.time.LocalDate.now(),
-                        rightAnswer,
-                        wrongAnswers
+                        rightAnswersCount,
+                        wrongAnswersCount
                     )
                 )
                 for ((index, word) in newList.withIndex()) {
@@ -440,10 +473,12 @@ class StudyActivity : AppCompatActivity(), ISetStudyView {
         val setStudyEnd = SetStudyEnd()
         val args = Bundle()
         asked = rightWrong.take(currentQuestion)
-        rightAnswers = asked.count { it }
-        wrongAnswers = asked.count { !it }
-        args.putInt("rightAnswers", rightAnswers)
-        args.putInt("wrongAnswers", wrongAnswers)
+        rightAnswersCount = asked.count { it }
+        Log.d("rightAnswers", rightAnswersCount.toString())
+        wrongAnswersCount = asked.count { !it }
+        Log.d("wrongAnswers", wrongAnswersCount.toString())
+        args.putInt("rightAnswers", rightAnswersCount)
+        args.putInt("wrongAnswers", wrongAnswersCount)
         setStudyEnd.arguments = args
         val manager = supportFragmentManager
         setStudyEnd.show(manager, "Set study")
