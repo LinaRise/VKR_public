@@ -434,7 +434,7 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
             (((list[0].rightAnswers.toFloat() * 100) / (list[0].rightAnswers.toFloat() + list[0].wrongAnswers.toFloat())).toString())
         )
 
-        Log.d("valuesData", values[1].toString())
+//        Log.d("valuesData", values[1].toString())
         set1 = BarDataSet(values, "Progress")
         set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
         set1.setDrawValues(false)

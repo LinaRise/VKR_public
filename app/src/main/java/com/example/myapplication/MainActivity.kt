@@ -29,8 +29,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
-
-
     lateinit var dbhelper: DBHelper
     private var switchAB: ToggleButton? = null
     override fun onCreate(savedInstanceState: Bundle?) {

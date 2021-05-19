@@ -4,11 +4,15 @@ package com.example.myapplication.ui.chathead
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.R
 import com.example.myapplication.database.DBHelper
+import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
+import java.util.concurrent.Executors
 
 
 class ChatActivity : AppCompatActivity(), IChatActivityView {
@@ -49,11 +53,26 @@ class ChatActivity : AppCompatActivity(), IChatActivityView {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
-            val sets = presenter.getAllSetsTitles()
-            Log.d("Sets", sets!!.size.toString())
-            val copiedTextAddDialog =
-                CopiedTextAddDialog(sets, Word(originalWord = getCopy(), translatedWord = ""), null, dbhelper)
-            copiedTextAddDialog.show(supportFragmentManager, "Add copied word")
+            val executor = Executors.newSingleThreadExecutor()
+            val handler = Handler(Looper.getMainLooper())
+            var sets: List<Sett>?
+            executor.execute {
+                sets = presenter.getAllSetsTitles()
+                handler.post {
+                    Log.d("Sets got", sets!!.size.toString())
+                    val copiedTextAddDialog =
+                        CopiedTextAddDialog(
+                            sets,
+                            Word(originalWord = getCopy(), translatedWord = ""),
+                            null,
+                            dbhelper
+                        )
+                    copiedTextAddDialog.show(supportFragmentManager, "Add copied word")
+                }
+            }
+
+
+
         }
     }
 }

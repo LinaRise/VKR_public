@@ -114,7 +114,7 @@ class StudyActivity : AppCompatActivity(), ISetStudyView {
                 /* val newSize: Int =
                      newOrForgotten.size + (average.size / 3).toInt() + (wellKnown.size / 4).toInt()*/
 
-                         //textView для отображения верных и неверных ответов
+                //textView для отображения верных и неверных ответов
                 for (i in 0 until wordsDisplayed.size) {
                     val textView = TextView(this)
                     textView.layoutParams = TableLayout.LayoutParams(
@@ -363,6 +363,7 @@ class StudyActivity : AppCompatActivity(), ISetStudyView {
             }
             // присваиваем значение в тексовое поле вопроса
             questionTV.text = newList[currentQuestion].originalWord
+            answerTV.text = newList[currentQuestion].translatedWord
             var option: Word
             //выбираем рандомно какой ответ будет праильным
             rightAnswer = (1..4).random()

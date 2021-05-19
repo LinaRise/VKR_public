@@ -43,9 +43,16 @@ class CopiedTextAddDialog(
         val view = inflater.inflate(R.layout.set_pick_up, null)
 
         val spinner = view.findViewById<Spinner>(R.id.sets_titles_spinner)
-        val setsTitlesMapCopyTo: LinkedHashMap<Long, String> =
-            setsList?.filter { it.settId != openedSet?.settId }
-                ?.map { it.settId to it.settTitle }!!.toMap() as LinkedHashMap<Long, String>
+
+        val setsFiltered: List<Sett>? = setsList?.filter { it.settId != openedSet?.settId }
+        val setsTitlesMapCopyTo: LinkedHashMap<Long, String> =  LinkedHashMap()
+
+        for (i in setsFiltered?.indices!!){
+            setsTitlesMapCopyTo[setsFiltered[i].settId] = setsFiltered[i].settTitle
+        }
+           /* setsList?.filter { it.settId != openedSet?.settId }
+                ?.map { it.settId to it.settTitle }!!.toMap() as LinkedHashMap<Long, String>*/
+
 
         ArrayAdapter(
             requireContext(),
