@@ -7,7 +7,6 @@ object TablesAndColumns {
     object LanguageEntry : BaseColumns {
         const val TABLE_NAME = "language"
         const val COL_LANGUAGE_TITLE = "language_title"
-        const val COL_SUPPORTS_TRANSLATION = "supports_translation"
     }
 
     object WordEntry : BaseColumns {
@@ -27,11 +26,11 @@ object TablesAndColumns {
         const val COL_AUTO_SUGGEST = "has_auto_suggest"
     }
 
-    object StudyProgress : BaseColumns {
+    object StudyProgressEntry : BaseColumns {
         const val TABLE_NAME = "study_progress"
         const val COL_DATE = "study_progress_date"
-        const val COL_RIGHT_ANSWERS = "right_answers"
-        const val COL_WRONG_ANSWERS = "wrong_answers"
+        const val COL_RIGHT_ANSWERS = "right_answers_count"
+        const val COL_WRONG_ANSWERS = "wrong_answers_count"
     }
 
 }

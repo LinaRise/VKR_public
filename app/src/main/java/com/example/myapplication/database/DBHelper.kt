@@ -7,20 +7,20 @@ import android.provider.BaseColumns
 import com.example.myapplication.database.TablesAndColumns.LanguageEntry
 import com.example.myapplication.database.TablesAndColumns.SettEntry
 import com.example.myapplication.database.TablesAndColumns.WordEntry
-import com.example.myapplication.database.TablesAndColumns.StudyProgress
+import com.example.myapplication.database.TablesAndColumns.StudyProgressEntry
 
 
 class DBHelper(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     companion object {
         const val DATABASE_NAME = "wordsAndProgressDB.db"
-        const val DATABASE_VERSION = 3
+        const val DATABASE_VERSION = 5
 
 
         private const val CREATE_TABLE_LANGUAGE =
-            "CREATE TABLE ${LanguageEntry.TABLE_NAME} (${LanguageEntry.TABLE_NAME}${BaseColumns._ID} INTEGER PRIMARY KEY autoincrement, ${LanguageEntry.COL_LANGUAGE_TITLE} TEXT not null UNIQUE, ${LanguageEntry.COL_SUPPORTS_TRANSLATION} INTEGER DEFAULT 0);"
+            "CREATE TABLE ${LanguageEntry.TABLE_NAME} (${LanguageEntry.TABLE_NAME}${BaseColumns._ID} INTEGER PRIMARY KEY autoincrement, ${LanguageEntry.COL_LANGUAGE_TITLE} TEXT not null UNIQUE);"
         private const val CREATE_TABLE_STUDY_PROGRESS =
-            "CREATE TABLE ${StudyProgress.TABLE_NAME} (${StudyProgress.COL_DATE} TEXT PRIMARY KEY, ${StudyProgress.COL_RIGHT_ANSWERS} INTEGER DEFAULT 0, ${StudyProgress.COL_WRONG_ANSWERS} INTEGER DEFAULT 0);"
+            "CREATE TABLE ${StudyProgressEntry.TABLE_NAME} (${StudyProgressEntry.COL_DATE} TEXT PRIMARY KEY, ${StudyProgressEntry.COL_RIGHT_ANSWERS} INTEGER DEFAULT 0, ${StudyProgressEntry.COL_WRONG_ANSWERS} INTEGER DEFAULT 0);"
 
         private const val CREATE_TABLE_WORD =
             "CREATE TABLE ${WordEntry.TABLE_NAME}  (${WordEntry.TABLE_NAME}${BaseColumns._ID} INTEGER PRIMARY KEY autoincrement, ${WordEntry.COL_ORIGINAL_WORD} text not null, ${WordEntry.COL_TRANSLATED_WORD} TEXT, " +
@@ -79,7 +79,7 @@ class DBHelper(context: Context) :
         database.execSQL("DROP TABLE IF EXISTS ${SettEntry.TABLE_NAME}")
         database.execSQL("DROP TABLE IF EXISTS ${WordEntry.TABLE_NAME};")
         database.execSQL("DROP TABLE IF EXISTS ${LanguageEntry.TABLE_NAME};")
-        database.execSQL("DROP TABLE IF EXISTS ${StudyProgress.TABLE_NAME};")
+        database.execSQL("DROP TABLE IF EXISTS ${StudyProgressEntry.TABLE_NAME};")
         onCreate(database)
     }
 

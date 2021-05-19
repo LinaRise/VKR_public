@@ -24,7 +24,6 @@ class LanguageRepo(val dbhelper: DBHelper) : IRepository<Language> {
             val cv = ContentValues()
             cv.clear();
             cv.put(TablesAndColumns.LanguageEntry.COL_LANGUAGE_TITLE, entity.languageTitle)
-            cv.put(TablesAndColumns.LanguageEntry.COL_SUPPORTS_TRANSLATION, 0)
             id = db.insertOrThrow(TablesAndColumns.LanguageEntry.TABLE_NAME, null, cv)
             db.setTransactionSuccessful()
         } catch (e: Exception) {
@@ -58,7 +57,6 @@ class LanguageRepo(val dbhelper: DBHelper) : IRepository<Language> {
             if (cursor.moveToFirst()) {
                 langauge.languageId = cursor.getLong(0)
                 langauge.languageTitle = cursor.getString(1)
-                langauge.supports_translation = cursor.getLong(2)
             }
             cursor.close()
         }
@@ -81,7 +79,6 @@ class LanguageRepo(val dbhelper: DBHelper) : IRepository<Language> {
             if (cursor.moveToFirst()) {
                 langauge.languageId = cursor.getLong(0)
                 langauge.languageTitle = cursor.getString(1)
-                langauge.supports_translation = cursor.getLong(2)
             }
             cursor.close()
         }

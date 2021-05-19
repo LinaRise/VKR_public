@@ -13,7 +13,7 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginTop="8dp"
-        android:src="@drawable/ic_android_circle"
+        android:src="@drawable/ic_bubble_round"
         tools:ignore="ContentDescription"/>
 
     <!--Close button-->

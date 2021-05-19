@@ -4,14 +4,12 @@ package com.example.myapplication.database.repo.studyProgress
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import android.provider.BaseColumns
 import android.util.Log
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.TablesAndColumns
 import com.example.myapplication.database.repo.IRepository
 import com.example.myapplication.entity.StudyProgress
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import kotlin.collections.ArrayList
 
 
@@ -26,10 +24,10 @@ class StudyProgressRepo(val dbhelper: DBHelper) : IRepository<StudyProgress> {
         try {
             val cv = ContentValues()
             cv.clear()
-            cv.put(TablesAndColumns.StudyProgress.COL_DATE, entity.date.toString())
-            cv.put(TablesAndColumns.StudyProgress.COL_RIGHT_ANSWERS, entity.rightAnswers)
-            cv.put(TablesAndColumns.StudyProgress.COL_WRONG_ANSWERS, entity.wrongAnswers)
-            id = db.insertOrThrow(TablesAndColumns.StudyProgress.TABLE_NAME, null, cv)
+            cv.put(TablesAndColumns.StudyProgressEntry.COL_DATE, entity.date.toString())
+            cv.put(TablesAndColumns.StudyProgressEntry.COL_RIGHT_ANSWERS, entity.rightAnswers)
+            cv.put(TablesAndColumns.StudyProgressEntry.COL_WRONG_ANSWERS, entity.wrongAnswers)
+            id = db.insertOrThrow(TablesAndColumns.StudyProgressEntry.TABLE_NAME, null, cv)
             db.setTransactionSuccessful();
         } catch (e: Exception) {
             Log.e(TAG, "Error while inserting to database");
@@ -46,12 +44,12 @@ class StudyProgressRepo(val dbhelper: DBHelper) : IRepository<StudyProgress> {
         try {
             val cv = ContentValues()
             cv.clear()
-            cv.put(TablesAndColumns.StudyProgress.COL_DATE, entity.date.toString())
-            cv.put(TablesAndColumns.StudyProgress.COL_RIGHT_ANSWERS, entity.rightAnswers)
-            cv.put(TablesAndColumns.StudyProgress.COL_WRONG_ANSWERS, entity.wrongAnswers)
+            cv.put(TablesAndColumns.StudyProgressEntry.COL_DATE, entity.date.toString())
+            cv.put(TablesAndColumns.StudyProgressEntry.COL_RIGHT_ANSWERS, entity.rightAnswers)
+            cv.put(TablesAndColumns.StudyProgressEntry.COL_WRONG_ANSWERS, entity.wrongAnswers)
             // обновляем по id
             updCount = db.update(
-                TablesAndColumns.StudyProgress.TABLE_NAME, cv, "study_progress_date = ?",
+                TablesAndColumns.StudyProgressEntry.TABLE_NAME, cv, "study_progress_date = ?",
                 arrayOf(entity.date.toString())
             ).toLong()
             db.setTransactionSuccessful()
@@ -78,15 +76,15 @@ class StudyProgressRepo(val dbhelper: DBHelper) : IRepository<StudyProgress> {
         try {
             val cursor: Cursor? =
                 db.rawQuery(
-                    "SELECT * FROM ${TablesAndColumns.StudyProgress.TABLE_NAME} WHERE ${TablesAndColumns.StudyProgress.COL_DATE} = ?",
+                    "SELECT * FROM ${TablesAndColumns.StudyProgressEntry.TABLE_NAME} WHERE ${TablesAndColumns.StudyProgressEntry.COL_DATE} = ?",
                     arrayOf(date.toString())
                 )
 
             if (cursor != null) {
                 val colRightAnswers =
-                    cursor.getColumnIndex(TablesAndColumns.StudyProgress.COL_RIGHT_ANSWERS)
+                    cursor.getColumnIndex(TablesAndColumns.StudyProgressEntry.COL_RIGHT_ANSWERS)
                 val colWrongAnswers =
-                    cursor.getColumnIndex(TablesAndColumns.StudyProgress.COL_WRONG_ANSWERS)
+                    cursor.getColumnIndex(TablesAndColumns.StudyProgressEntry.COL_WRONG_ANSWERS)
                 if (cursor.moveToFirst()) {
                    /* studyProgress.date =LocalDate.parse(cursor.getString(0))
                     studyProgress.rightAnswers = cursor.getInt(1)
@@ -117,15 +115,15 @@ class StudyProgressRepo(val dbhelper: DBHelper) : IRepository<StudyProgress> {
         try {
             val cursor: Cursor? =
                 db.rawQuery(
-                    "SELECT * FROM ${TablesAndColumns.StudyProgress.TABLE_NAME}",
+                    "SELECT * FROM ${TablesAndColumns.StudyProgressEntry.TABLE_NAME}",
                     null
                 )
             if (cursor != null) {
-                val colDate = cursor.getColumnIndex(TablesAndColumns.StudyProgress.COL_DATE)
+                val colDate = cursor.getColumnIndex(TablesAndColumns.StudyProgressEntry.COL_DATE)
                 val colRightAnswers =
-                    cursor.getColumnIndex(TablesAndColumns.StudyProgress.COL_RIGHT_ANSWERS)
+                    cursor.getColumnIndex(TablesAndColumns.StudyProgressEntry.COL_RIGHT_ANSWERS)
                 val colWrongAnswers =
-                    cursor.getColumnIndex(TablesAndColumns.StudyProgress.COL_WRONG_ANSWERS)
+                    cursor.getColumnIndex(TablesAndColumns.StudyProgressEntry.COL_WRONG_ANSWERS)
                 while (cursor.moveToNext()) {
                     val studyProgress = StudyProgress()
                     studyProgress.date = LocalDate.parse(cursor.getString(colDate))
@@ -156,7 +154,7 @@ class StudyProgressRepo(val dbhelper: DBHelper) : IRepository<StudyProgress> {
         var delCount: Int = 0
         try {
             delCount = db.delete(
-                TablesAndColumns.StudyProgress.TABLE_NAME, "study_progress_date = ?",
+                TablesAndColumns.StudyProgressEntry.TABLE_NAME, "study_progress_date = ?",
                 arrayOf(entity.date.toString())
             )
             db.setTransactionSuccessful()
