@@ -3,10 +3,12 @@ package com.example.myapplication.database.repo.word
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import android.provider.BaseColumns
 import android.util.Log
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.TablesAndColumns
 import com.example.myapplication.database.repo.IRepository
+import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
 
 
@@ -89,8 +91,49 @@ class WordRepo(val dbhelper: DBHelper) : IRepository<Word> {
 
     }
 
-    override fun get(id: Long): Word {
-        TODO("Not yet implemented")
+    override fun get(id: Long): Word? {
+        db = dbhelper.readableDatabase
+
+        db.beginTransaction()
+        var word: Word? = null
+        try {
+
+            val cursor: Cursor? =
+                db.rawQuery(
+                    "SELECT * FROM ${TablesAndColumns.WordEntry.TABLE_NAME} WHERE ${TablesAndColumns.WordEntry.TABLE_NAME}${BaseColumns._ID} = ?",
+                    arrayOf(id.toString())
+                )
+            if (cursor != null) {
+                val colOriginalWord =
+                    cursor.getColumnIndex(TablesAndColumns.WordEntry.COL_ORIGINAL_WORD)
+                val colTranslatedWord =
+                    cursor.getColumnIndex(TablesAndColumns.WordEntry.COL_TRANSLATED_WORD)
+                val colSettId =
+                    cursor.getColumnIndex(TablesAndColumns.WordEntry.COL_SET_ID)
+                val colRecallPoints =
+                    cursor.getColumnIndex(TablesAndColumns.WordEntry.COL_RECALL_POINT)
+                word = Word()
+                if (cursor.moveToFirst()) {
+                    word.wordId = cursor.getLong(0)
+                    word.originalWord = cursor.getString(colOriginalWord)
+                    word.translatedWord = cursor.getString(colTranslatedWord)
+                    word.recallPoint = cursor.getInt(colRecallPoints)
+                    word.settId = cursor.getLong(colSettId)
+
+                }
+                cursor.close()
+            }
+            db.setTransactionSuccessful()
+        } catch (e: Exception) {
+            Log.d(
+                TAG,
+                "Error while trying to get sett from database with id = ${word?.settId}"
+            )
+        } finally {
+            db.endTransaction()
+            db.close()
+            return word
+        }
     }
 
 

@@ -50,8 +50,7 @@ class CopiedTextAddDialog(
         for (i in setsFiltered?.indices!!){
             setsTitlesMapCopyTo[setsFiltered[i].settId] = setsFiltered[i].settTitle
         }
-           /* setsList?.filter { it.settId != openedSet?.settId }
-                ?.map { it.settId to it.settTitle }!!.toMap() as LinkedHashMap<Long, String>*/
+
 
 
         ArrayAdapter(

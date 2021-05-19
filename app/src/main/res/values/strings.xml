@@ -26,6 +26,10 @@
     <string name="set_study_reminder">Set study reminder</string>
     <string name="toggle_pinchzoom">Toggle PinchZoom</string>
     <string name="tap_speak_pinch_zoom">Tap to Speak. Pinch/Stretch to zoom</string>
+    <string name="study_progress">Study progress</string>
+    <string name="animate_x">Animate X</string>
+    <string name="animate_y">Animate Y</string>
+    <string name="animate_xy">Animate XY</string>
     <string-array name="available_translation_languages">
         <item>Russian</item>
         <item>English</item>

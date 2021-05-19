@@ -86,4 +86,17 @@ class DBHelper(context: Context) :
     override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         onUpgrade(db, oldVersion, newVersion)
     }
+
+    fun clearDbAndRecreate() {
+        clearDb()
+        onCreate(writableDatabase)
+    }
+
+    fun clearDb() {
+        writableDatabase.execSQL("DROP TABLE IF EXISTS ${SettEntry.TABLE_NAME}")
+        writableDatabase.execSQL("DROP TABLE IF EXISTS ${WordEntry.TABLE_NAME};")
+        writableDatabase.execSQL("DROP TABLE IF EXISTS ${LanguageEntry.TABLE_NAME};")
+        writableDatabase.execSQL("DROP TABLE IF EXISTS ${StudyProgressEntry.TABLE_NAME};")
+    }
+
 }

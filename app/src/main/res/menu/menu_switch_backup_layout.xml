@@ -21,20 +21,20 @@
 
     <item
         android:id="@+id/animateX"
-        android:title="Animate X">
+        android:title="@string/animate_x">
     </item>
     <item
         android:id="@+id/animateY"
-        android:title="Animate X">
+        android:title="@string/animate_y">
     </item>
     <item
         android:id="@+id/animateXY"
-        android:title="Animate XY">
+        android:title="@string/animate_xy">
     </item>
 
     <item
         android:id="@+id/actionSave"
-        android:title="Savee">
+        android:title="@string/save">
     </item>
 
 

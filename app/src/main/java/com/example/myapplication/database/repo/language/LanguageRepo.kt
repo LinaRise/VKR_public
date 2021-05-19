@@ -36,11 +36,49 @@ class LanguageRepo(val dbhelper: DBHelper) : IRepository<Language> {
     }
 
     override fun update(entity: Language): Long {
-        TODO("Not yet implemented")
+        db = dbhelper.writableDatabase
+        var updCount: Long = -1L
+        val cv = ContentValues()
+        cv.put(TablesAndColumns.LanguageEntry.COL_LANGUAGE_TITLE, entity.languageTitle)
+        // обновляем по id
+        db.beginTransaction()
+        try {
+            updCount = db.update(
+                TablesAndColumns.LanguageEntry.TABLE_NAME, cv, "language_id = ?", arrayOf<String>(
+                    entity.languageId.toString()
+                )
+            ).toLong()
+            Log.d(TAG, "updated rows count = $updCount")
+            db.setTransactionSuccessful()
+        } catch (e: java.lang.Error) {
+            print(e)
+            Log.d(
+                TAG, "Error while trying to update language at database with id = ${entity.languageId}"
+            )
+        } finally {
+            db.endTransaction()
+            return entity.languageId
+        }
     }
 
     override fun delete(entity: Language): Long {
-        TODO("Not yet implemented")
+        db = dbhelper.writableDatabase
+        db.beginTransaction()
+        var delCount: Int = 0
+        try {
+            delCount = db.delete(
+                TablesAndColumns.LanguageEntry.TABLE_NAME, "language_id = ?",
+                arrayOf(entity.languageId.toString())
+            )
+            db.setTransactionSuccessful()
+            Log.d(TAG, "deleted rows count = $delCount")
+        } catch (e: java.lang.Error) {
+            print(e)
+            Log.d(TAG, "Error while trying to delete language from database with id = ${entity.languageId}")
+        } finally {
+            db.endTransaction()
+            return delCount.toLong()
+        }
     }
 
     override fun get(id: Long): Language? {
