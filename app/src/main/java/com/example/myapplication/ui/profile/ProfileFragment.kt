@@ -418,23 +418,28 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
         chart?.xAxis?.valueFormatter = IndexAxisValueFormatter(list.map { it.date.toString() })
 
         val values: ArrayList<BarEntry> = ArrayList()
-        val labels: ArrayList<String> = ArrayList()
+        var labels: ArrayList<String> = ArrayList()
         for (i in list.indices) {
             values.add(
                 BarEntry(
-                    i.toFloat() + 1,
+                    (list.size-i-1).toFloat() ,
                     ((list[i].rightAnswers.toFloat() * 100) / (list[i].rightAnswers.toFloat() + list[i].wrongAnswers.toFloat()))
-
                 )
             )
-            labels.add(list[i].date.toString())
+            labels.add(list[i].date.toString().split("-",limit = 2)[1])
         }
+
+        labels = labels.reversed() as ArrayList<String>
         Log.d(
             "valuesData",
             (((list[0].rightAnswers.toFloat() * 100) / (list[0].rightAnswers.toFloat() + list[0].wrongAnswers.toFloat())).toString())
         )
 
-//        Log.d("valuesData", values[1].toString())
+        Log.d(
+            "labells",
+            labels.toString()
+        )
+
         set1 = BarDataSet(values, "Progress")
         set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
         set1.setDrawValues(false)
@@ -454,6 +459,7 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
         chart?.setDrawGridBackground(false)
 
         Log.d("labelss", labels.toString())
+        xAxis?.labelCount = values.size
         xAxis!!.valueFormatter =  IndexAxisValueFormatter(labels)
         // add a nice and smooth animation
         chart?.animateY(1500)
