@@ -11,32 +11,34 @@ import com.example.myapplication.entity.Language
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
 import com.example.myapplication.translation.TranslationUtils
+import com.example.myapplication.ui.DependencyInjector
 import com.google.cloud.translate.Translate
 import java.util.concurrent.Executors
 
 class SetViewPresenter(
-    view: ISetViewView,
-    dbhelper: DBHelper
-) {
-    private var mView: ISetViewView = view
-    var mLanguageRepo: LanguageRepo = LanguageRepo(dbhelper)
-    var mWordRepo: WordRepo = WordRepo(dbhelper)
-    var mSettRepo: SettRepo = SettRepo(dbhelper)
+    view: SetViewContract.View,
+    dependencyInjector: DependencyInjector
+) : SetViewContract.Presenter {
+    private var mView: SetViewContract.View? = view
+    private val mSettRepo: SettRepo = dependencyInjector.settRepository()
+    private val mLanguageRepo: LanguageRepo = dependencyInjector.languageRepository()
+    private val mWordRepo: WordRepo = dependencyInjector.wordRepository()
+
 
     /**
      * Добавление нового слова в список
      * @param original - текст для перевода
      * @param translated -переведенный тектс
      */
-    fun addNewWord(original: String, translated: String) {
+    override fun onAddWordClicked(original: String, translated: String) {
         if (original == "" || translated == "") {
-            mView.showWordInputError()
+            mView?.showWordInputError()
             return
         }
-        mView.hideKeyboard()
+        mView?.hideKeyboard()
         val word = Word(0, original.trim(), translated.trim())
-        mView.cleanInputFields()
-        mView.updateRecyclerViewInserted(word)
+        mView?.cleanInputFields()
+        mView?.updateRecyclerViewInserted(word)
     }
 
     /**
@@ -48,7 +50,7 @@ class SetViewPresenter(
      * @param targetLanguage - язык на который нужно перевести
      * @return String перевод
      */
-    fun translate(
+    override fun onTranslate(
         translate: Translate,
         languageTitleAndCode: Map<String, String>,
         originalText: String,
@@ -70,16 +72,16 @@ class SetViewPresenter(
      * Удаление слова из спсика
      * @param position - позиция слова в списке на экране
      */
-    fun deleteWord(position: Int) {
-        mView.updateRecyclerViewDeleted(position)
-        mView.showUndoDeleteWord(position)
+    override fun onLeftSwipe(position: Int) {
+        mView?.updateRecyclerViewDeleted(position)
+        mView?.showUndoDeleteWord(position)
     }
 
     /**
      * Получаем все названия наборов слов
      * @return List<Sett>? список сетов
      */
-    fun getAllSetsTitles(): List<Sett>? {
+    override fun onRightSwipe(): List<Sett>? {
         return mSettRepo.getAll()
     }
 
@@ -93,7 +95,7 @@ class SetViewPresenter(
      * @param outputLanguage - язык на который нужно перевести
      * @param hasAutoSuggest - переменная наличия авто-перевода
      */
-    fun saveSet(
+    override fun onSaveClicked(
         wordsDisplayed: List<Word?>,
         wordsOriginal: List<Word?>,
         sett: Sett?,
@@ -135,7 +137,7 @@ class SetViewPresenter(
             }
 
             val settId = mSettRepo.update(sett)
-            var wordsLeft = ArrayList(wordsOriginal)
+            val wordsLeft = ArrayList(wordsOriginal)
 
             val executor = Executors.newSingleThreadExecutor()
             val handler = Handler(Looper.getMainLooper())
@@ -180,16 +182,42 @@ class SetViewPresenter(
         }
     }
 
-    fun getSetWords(setId: Long) {
+
+    override fun onViewCreated(settId: Long) {
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
         var result: List<Word>?
+        var resultSet: Sett?
         executor.execute {
-            result = mWordRepo.getWordsOfSet(settId = setId)
+            result = mWordRepo.getWordsOfSet(settId = settId)
+            resultSet = mSettRepo.get(settId)
             handler.post {
-                mView.setData(result)
+                if (resultSet!=null) {
+                    mView?.setSettData(resultSet!!)
+                }
+                mView?.setData(result)
             }
         }
+    }
+
+    override fun loadLanguagesData(sett: Sett) {
+        val executor = Executors.newSingleThreadExecutor()
+        val handler = Handler(Looper.getMainLooper())
+        var inputLanguage: Language?
+        var outputLanguage: Language?
+        executor.execute {
+            inputLanguage = mLanguageRepo.get(sett.languageInput_id)
+            outputLanguage = mLanguageRepo.get(sett.languageOutput_id)
+            handler.post {
+                if (inputLanguage!=null && outputLanguage!=null) {
+                    mView?.setLanguageData(inputLanguage!!, outputLanguage!!)
+                }
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        this.mView = null
     }
 }
 

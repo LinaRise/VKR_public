@@ -1,9 +1,7 @@
 package com.example.myapplication.ui.setView
 
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.os.StrictMode
 import android.util.Log
@@ -15,19 +13,16 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.connectivity.base.ConnectivityProvider
 import com.example.myapplication.database.DBHelper
-import com.example.myapplication.database.repo.language.LanguageRepo
-import com.example.myapplication.database.repo.sett.SettGetAsyncTask
-import com.example.myapplication.database.repo.word.WordsGetAsyncTask
 import com.example.myapplication.entity.Language
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
+import com.example.myapplication.ui.DependencyInjectorImpl
 import com.example.myapplication.ui.setCreate.ISetInputData
 import com.example.myapplication.ui.setCreate.InstantAutoComplete
 import com.example.myapplication.ui.setCreate.SetCorrectInfoDialog
@@ -41,15 +36,14 @@ import kotlinx.android.synthetic.main.activity_set_create.*
 import java.io.IOException
 
 
-class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.TaskListener,
+class SetViewActivity : AppCompatActivity(), SetViewContract.View,
     ISetInputData, ConnectivityProvider.ConnectivityStateListener {
 
-    lateinit var presenter: SetViewPresenter
+    private lateinit var presenter: SetViewContract.Presenter
     lateinit var dbhelper: DBHelper
     private lateinit var setViewAdapter: SetViewAdapter
     private lateinit var recyclerView: RecyclerView
     lateinit var adapter: ArrayAdapter<Any>
-
 
     /**
      * переменная для отслеживания подключения к интеренету
@@ -111,7 +105,8 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         dbhelper = DBHelper(this)
-        presenter = SetViewPresenter(this, dbhelper)
+        setPresenter(SetViewPresenter(this, DependencyInjectorImpl(dbhelper)))
+
         //получаем скопированный текст, если он есть, и id набора слов
         val extras = intent.extras
         if (extras != null) {
@@ -122,10 +117,10 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         }
 
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(
+        /*LocalBroadcastManager.getInstance(this).registerReceiver(
             mMessageReceiver,
             IntentFilter("sending-list")
-        )
+        )*/
 
         //инициализация элементов
         wordAddButton = findViewById(R.id.word_add_button)
@@ -133,12 +128,11 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         recyclerView = findViewById(R.id.recyclerivew_set_create)
         originalText = findViewById(R.id.original_input)
         translatedText = findViewById(R.id.translated_input)
-
         originalText.setText(receivedCopiedText)
 
     }
 
-    var mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+    /*var mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             // Get extra data included in the Intent
             wordsDisplayed = intent.getParcelableArrayListExtra("data")
@@ -159,14 +153,15 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
         }
 
 
-    }
+    }*/
 
     override fun onStart() {
         super.onStart()
         Log.d("SetViewActivity", "onStart")
         provider.addListener(this)
 
-        SettGetAsyncTask(dbhelper, this).execute(settId)
+        presenter.onViewCreated(settId)
+//        SettGetAsyncTask(dbhelper, this).execute(settId)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         setViewAdapter = SetViewAdapter(this)
@@ -186,9 +181,8 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
             if (p1) {
                 if (hasAutoSuggest == 1) {
                     if (hasInternet) {
-
                         if (translate != null) {
-                            receivedTranslation = presenter.translate(
+                            receivedTranslation = presenter.onTranslate(
                                 translate!!,
                                 languageTitleAndCode,
                                 originalText.text.toString(),
@@ -196,18 +190,13 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
                                 outputLanguageText!!.trim()
                             )
                         } else {
-                            Toast.makeText(
-                                this@SetViewActivity,
-                                "Problems with translation server initialization",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            showToast("Problems with translation server initialization")
                         }
                         Log.d("receivedTranslation", receivedTranslation)
 
                         val array = arrayOf(
                             receivedTranslation
                         )
-
                         adapter =
                             ArrayAdapter(
                                 this@SetViewActivity,
@@ -215,9 +204,8 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
                                 array
                             )
                         adapter.notifyDataSetChanged()
-
                         translatedText.setAdapter(adapter)
-                        translatedText.showDropDown();
+                        translatedText.showDropDown()
 
                     }
                 }
@@ -227,15 +215,21 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
     }
 
 
-
     private fun onAddWordBtnClick() {
         val original: String = originalText.text.toString().trim()
         val translated: String = translatedText.text.toString().trim()
         adapter.clear()
         adapter.notifyDataSetChanged()
-        presenter.addNewWord(original, translated)
+        presenter.onAddWordClicked(original, translated)
     }
 
+
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
+        dbhelper.close()
+
+    }
 
     override fun onStop() {
         super.onStop()
@@ -264,7 +258,7 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
             R.id.check_icon -> {
                 Log.d("SetViewActivity", "check_icon clicked")
 
-                presenter.saveSet(
+                presenter.onSaveClicked(
                     wordsDisplayed,
                     wordsOriginal,
                     openedSett,
@@ -304,28 +298,23 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
     }
 
 
-    override fun onSettReceived(sett: Sett?) {
-        Log.d("SetViewActivity", "onSettReceived")
-        if (sett != null) {
-            supportActionBar?.title = sett.settTitle
-            setTitle = sett.settTitle
-            openedSett = sett
-            inputLanguage = LanguageRepo(dbhelper).get(sett.languageInput_id)!!
-            outputLanguage = LanguageRepo(dbhelper).get(sett.languageOutput_id)!!
-            inputLanguageText = inputLanguage.languageTitle
-            outputLanguageText = outputLanguage.languageTitle
-            hasAutoSuggest = sett.hasAutoSuggest
-
-
-            presenter.getSetWords(sett.settId)
-
-
-//            WordsGetAsyncTask(dbhelper, setViewAdapter).execute(sett.settId)
-
-        } else {
-            supportActionBar?.title = "Set"
-        }
-    }
+    /* override fun onSettReceived(sett: Sett?) {
+         Log.d("SetViewActivity", "onSettReceived")
+         if (sett != null) {
+             supportActionBar?.title = sett.settTitle
+             setTitle = sett.settTitle
+             openedSett = sett
+             inputLanguage = LanguageRepo(dbhelper).get(sett.languageInput_id)!!
+             outputLanguage = LanguageRepo(dbhelper).get(sett.languageOutput_id)!!
+             inputLanguageText = inputLanguage.languageTitle
+             outputLanguageText = outputLanguage.languageTitle
+             hasAutoSuggest = sett.hasAutoSuggest
+             presenter.getSetWords(sett.settId)
+ //            WordsGetAsyncTask(dbhelper, setViewAdapter).execute(sett.settId)
+         } else {
+             supportActionBar?.title = "Set"
+         }
+     }*/
 
 
     private fun showSetCorrectInfoDialog() {
@@ -401,7 +390,38 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
     override fun setData(result: List<Word>?) {
         setViewAdapter.setData(result)
         setViewAdapter.notifyDataSetChanged()
+        wordsDisplayed = result as ArrayList<Word?>
+        for (word in wordsDisplayed)
+            if (word != null) {
+                wordsOriginal.add(
+                    Word(
+                        word.wordId,
+                        word.originalWord,
+                        word.translatedWord,
+                        settId = word.settId,
+                        recallPoint = word.recallPoint
+                    )
+                )
+                Log.d("wordsOriginal", wordsOriginal.size.toString())
+            }
+        Log.d("wordsOriginal", wordsOriginal.size.toString())
+
+
     }
+
+
+    override fun showToast(message: String) {
+        Toast.makeText(
+            this@SetViewActivity,
+            message,
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    override fun setPresenter(presenter: SetViewContract.Presenter) {
+        this.presenter = presenter
+    }
+
 
     /**
      * функция присваивания данных
@@ -439,14 +459,14 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
                     //свайп влево -> удаление
                     ItemTouchHelper.LEFT -> {
                         deletedWord = wordsDisplayed[position]!!
-                        presenter.deleteWord(position)
+                        presenter.onLeftSwipe(position)
 
                     }
                     //свайп впрао -> копирование
                     ItemTouchHelper.RIGHT -> {
                         setViewAdapter.notifyItemChanged(viewHolder.adapterPosition)
-                        val sets = presenter.getAllSetsTitles()
-                        showCopyCardDialog(sets, position)
+                        val sets = presenter.onRightSwipe()
+                        showDialog(sets, position)
 
                     }
                 }
@@ -457,11 +477,27 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
     /**
      * вызов диалога для копирования слова
      */
-    private fun showCopyCardDialog(sets: List<Sett>?, position: Int) {
+    override fun showDialog(sets: List<Sett>?, position: Int) {
         val copyCardDialog =
             CopyCardDialog(sets!!, wordsDisplayed[position], openedSett!!, dbhelper)
         copyCardDialog.show(supportFragmentManager, "Copy card dialog")
     }
+
+    override fun setSettData(resultSett: Sett) {
+        supportActionBar?.title = resultSett.settTitle
+        setTitle = resultSett.settTitle
+        openedSett = resultSett
+        hasAutoSuggest = resultSett.hasAutoSuggest
+        presenter.loadLanguagesData(resultSett)
+    }
+
+    override fun setLanguageData(inputLang: Language, outputLang: Language) {
+        inputLanguage =inputLang
+        outputLanguage = outputLang
+        inputLanguageText = inputLanguage.languageTitle
+        outputLanguageText = outputLanguage.languageTitle
+    }
+
 
     /**
      * функция проверки состояния подключения к интернету
@@ -478,13 +514,11 @@ class SetViewActivity : AppCompatActivity(), ISetViewView, SettGetAsyncTask.Task
                 }
             }
         } else {
-            Toast.makeText(
-                this,
-                "Can't load available languages for translation! Check internet connection!",
-                Toast.LENGTH_SHORT
-            ).show()
+            showToast("Can't load available languages for translation! Check internet connection!")
+
         }
     }
+
 
     private fun ConnectivityProvider.NetworkState.hasInternet(): Boolean {
         return (this as? ConnectivityProvider.NetworkState.ConnectedState)?.hasInternet == true
