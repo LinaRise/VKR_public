@@ -111,7 +111,8 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
 
     override fun onSetClicked(position: Int) {
         val listKeys: List<Sett> = ArrayList<Sett>(setsDisplayed.keys)
-        var intent = Intent(requireContext(), SetViewActivity::class.java)
+        val intent = Intent(requireContext(), SetViewActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
         intent.putExtra("settId", listKeys[position].settId)
         startActivity(intent)
     }

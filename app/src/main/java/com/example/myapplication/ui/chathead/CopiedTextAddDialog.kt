@@ -73,6 +73,7 @@ class CopiedTextAddDialog(
                     ArrayList<Long>(setsTitlesMapCopyTo.keys)[spinner.selectedItemPosition]
 
                 val intent = Intent(requireContext(), SetViewActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 intent.putExtra("copiedText", word?.originalWord)
                 intent.putExtra("settId", pickedSetId)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
