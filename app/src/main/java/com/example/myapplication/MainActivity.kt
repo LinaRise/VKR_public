@@ -24,18 +24,43 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.notification.ReminderBroadcast
+import com.example.myapplication.ui.DependencyInjectorImpl
 import com.example.myapplication.ui.chathead.ChatHeadService
+import com.example.myapplication.ui.study.SetStudyContract
+import com.example.myapplication.ui.study.SetStudyPresenter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.util.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), MainContract.View {
     lateinit var dbhelper: DBHelper
     private var switchAB: ToggleButton? = null
+    private lateinit var presenter:MainContract.Presenter
+    override fun showDrawOverAppPermission() {
+      Toast.makeText(this,"Draw over other app permission not available. Closing the application",Toast.LENGTH_SHORT).show()
+    }
+
+    override fun showTranslateBubbleOn() {
+        Toast.makeText(this,"Translate bubble on",Toast.LENGTH_SHORT).show()
+
+    }
+
+    override fun showTranslateBubbleOff() {
+        Toast.makeText(this,"Translate bubble off",Toast.LENGTH_SHORT).show()
+
+    }
+
+    override fun setPresenter(presenter: MainContract.Presenter) {
+        this.presenter = presenter
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         dbhelper = DBHelper(this)
+        setPresenter(MainPresenter(this, DependencyInjectorImpl(dbhelper)))
+
         //находим файл xml с BottomNavigationView
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
         // находим файл xml с фрагментом к которму будет прикреплять BottomNavigationView
@@ -81,14 +106,12 @@ class MainActivity : AppCompatActivity() {
         switchAB = item.actionView.findViewById(R.id.toggle_btn)
         switchAB?.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                Toast.makeText(application, "Translate bubble on", Toast.LENGTH_SHORT)
-                    .show()
+               showTranslateBubbleOn()
                 startService(Intent(this@MainActivity, ChatHeadService::class.java))
             } else {
                 val myService = Intent(this@MainActivity, ChatHeadService::class.java)
                 stopService(myService)
-                Toast.makeText(application, "Translate bubble off", Toast.LENGTH_SHORT)
-                    .show()
+                showTranslateBubbleOff()
             }
         }
         return true
@@ -107,11 +130,7 @@ class MainActivity : AppCompatActivity() {
             ) {
 //                initializeView()
             } else { //Permission is not available
-                Toast.makeText(
-                    this,
-                    "Draw over other app permission not available. Closing the application",
-                    Toast.LENGTH_SHORT
-                ).show()
+               showDrawOverAppPermission()
                 finish()
             }
         } else {

@@ -17,11 +17,10 @@ import com.example.myapplication.R
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.ui.DependencyInjectorImpl
-import com.example.myapplication.ui.setCreate.SetUpDialog
+import com.example.myapplication.ui.setCreate.setUpDialog.SetUpDialog
 import com.example.myapplication.ui.setView.SetViewActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.LinkedHashMap
 

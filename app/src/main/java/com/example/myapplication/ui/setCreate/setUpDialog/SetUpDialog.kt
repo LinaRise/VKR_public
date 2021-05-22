@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.setCreate
+package com.example.myapplication.ui.setCreate.setUpDialog
 
 import android.app.Dialog
 import android.content.DialogInterface
@@ -11,15 +11,19 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDialogFragment
 import com.example.myapplication.R
 import com.example.myapplication.connectivity.base.ConnectivityProvider
+import com.example.myapplication.ui.setCreate.SetCreateActivity
+import com.example.myapplication.ui.setCreate.SetCreateContract
 import com.google.auth.oauth2.GoogleCredentials
-import com.google.cloud.translate.Language
 import com.google.cloud.translate.Translate
 import com.google.cloud.translate.TranslateOptions
 import java.io.IOException
 import java.util.concurrent.Executors
 
 
-class SetUpDialog : AppCompatDialogFragment(), ConnectivityProvider.ConnectivityStateListener {
+class SetUpDialog : AppCompatDialogFragment(), SetUpContract.View,
+    ConnectivityProvider.ConnectivityStateListener {
+
+    private lateinit var presenter: SetUpContract.Presenter
 
     private val provider: ConnectivityProvider by lazy {
         ConnectivityProvider.createProvider(
@@ -71,6 +75,8 @@ class SetUpDialog : AppCompatDialogFragment(), ConnectivityProvider.Connectivity
         val alertDialogBuilder = AlertDialog.Builder(requireActivity())
         val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.set_parameters, null)
+
+        setPresenter(SetUpPresenter(this))
 
         //инициализайия
         editTextTitle = view.findViewById(R.id.edit_set_title)
@@ -152,20 +158,12 @@ class SetUpDialog : AppCompatDialogFragment(), ConnectivityProvider.Connectivity
         executor.execute {
             if (hasInternet) {
                 if (languagesSourceNames.isEmpty()) {
-                    loadAvailableLanguagesForTranslation()
+                    translateService
+                  presenter.onViewCreated(translate)
                 }
             }
             handler.post {
                 if (languagesSourceNames.isNotEmpty()) {
-                    /*val languagesTarget =
-                        translate!!.listSupportedLanguages(
-                            Translate.LanguageListOption.targetLanguage(
-                                languageTitleAndCode[editTextInputLang!!.text.toString()]
-                            )
-                        )*/
-
-//                    val languagesTargetNames = languagesTarget.map { it.name }.toTypedArray()
-
 
                     val adapterSource = ArrayAdapter(
                         requireContext(),
@@ -183,14 +181,18 @@ class SetUpDialog : AppCompatDialogFragment(), ConnectivityProvider.Connectivity
                     editTextOutputLang!!.setAdapter(adapterTarget)
 
                 } else {
-                    Toast.makeText(
-                        requireContext(),
-                        "Can't load available languages for translation! No internet connection!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    showNoInternetConnectionToast()
                 }
             }
         }
+    }
+
+    override fun showNoInternetConnectionToast(){
+        Toast.makeText(
+            requireContext(),
+            "No internet connection!",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     override fun onStop() {
@@ -213,16 +215,16 @@ class SetUpDialog : AppCompatDialogFragment(), ConnectivityProvider.Connectivity
     override fun onStateChange(state: ConnectivityProvider.NetworkState) {
         hasInternet = state.hasInternet()
         if (!hasInternet)
-            Toast.makeText(
-                requireContext(),
-                "No internet connection!",
-                Toast.LENGTH_SHORT
-            ).show()
+            showNoInternetConnectionToast()
 
     }
 
     private fun ConnectivityProvider.NetworkState.hasInternet(): Boolean {
         return (this as? ConnectivityProvider.NetworkState.ConnectedState)?.hasInternet == true
+    }
+
+    override fun setPresenter(presenter: SetUpContract.Presenter) {
+        this.presenter = presenter
     }
 }
 
