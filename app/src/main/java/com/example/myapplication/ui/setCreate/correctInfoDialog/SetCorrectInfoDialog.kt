@@ -1,10 +1,9 @@
-package com.example.myapplication.ui.setCreate
+package com.example.myapplication.ui.setCreate.correctInfoDialog
 
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -17,15 +16,18 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDialogFragment
 import com.example.myapplication.R
 import com.example.myapplication.connectivity.base.ConnectivityProvider
+import com.example.myapplication.ui.setCreate.ISetInputData
+import com.example.myapplication.ui.setCreate.setUpDialog.SetUpContract
 import com.google.auth.oauth2.GoogleCredentials
-import com.google.cloud.translate.Language
 import com.google.cloud.translate.Translate
 import com.google.cloud.translate.TranslateOptions
 import java.io.IOException
 import java.util.concurrent.Executors
 
-class SetCorrectInfoDialog : AppCompatDialogFragment(),
+class SetCorrectInfoDialog : AppCompatDialogFragment(),SetCorrectInfoContract.View,
     ConnectivityProvider.ConnectivityStateListener {
+
+    private lateinit var presenter: SetCorrectInfoContract.Presenter
 
     private val provider: ConnectivityProvider by lazy {
         ConnectivityProvider.createProvider(
@@ -79,10 +81,13 @@ class SetCorrectInfoDialog : AppCompatDialogFragment(),
 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        var alertDialogBuilder = AlertDialog.Builder(requireActivity())
+        val alertDialogBuilder = AlertDialog.Builder(requireActivity())
         val inflater = requireActivity().layoutInflater
 
         val view = inflater.inflate(R.layout.set_parameters, null)
+
+        setPresenter(SetCorrectInfoPresenter(this))
+
         val setTitleReceived = requireArguments().getString("settTitle")
         editTextTitle = view.findViewById(R.id.edit_set_title)
         editTextInputLang = view.findViewById(R.id.edit_language_input) as AutoCompleteTextView
@@ -179,81 +184,74 @@ class SetCorrectInfoDialog : AppCompatDialogFragment(),
         provider.addListener(this)
 
         //загрузка доступных языков
-        val executor = Executors.newSingleThreadExecutor()
-        val handler = Handler(Looper.getMainLooper())
-        executor.execute {
             if (hasInternet) {
                 if (languagesSourceNames.isEmpty()) {
-                    loadAvailableLanguagesForTranslation()
+                    translateService
+                    presenter.onViewCreated(translate)
+
                 }
             }
-            handler.post {
-                if (languagesSourceNames.isNotEmpty()) {
-                    /*val languagesTarget =
-                        translate!!.listSupportedLanguages(
-                            Translate.LanguageListOption.targetLanguage(
-                                languageTitleAndCode[editTextInputLang!!.text.toString()]
-                            )
-                        )*/
-
-//                    val languagesTargetNames = languagesTarget.map { it.name }.toTypedArray()
 
 
-                    val adapterSource = ArrayAdapter(
-                        requireContext(),
-                        android.R.layout.simple_list_item_1,
-                        languagesSourceNames
-
-                    )
-                    val adapterTarget = ArrayAdapter(
-                        requireContext(),
-                        android.R.layout.simple_list_item_1,
-                        languagesSourceNames
-
-                    )
-                    editTextInputLang!!.setAdapter(adapterSource)
-                    editTextOutputLang!!.setAdapter(adapterTarget)
-
-                } else {
-                    Toast.makeText(
-                        requireContext(),
-                        "Can't load available languages for translation! No internet connection!",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
             }
+    override fun showNoInternetConnectionToast(){
+        Toast.makeText(
+            requireContext(),
+            "No internet connection!",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    override fun setAvailableLanguagesInfo(languagesSourceNames: Array<String>,languageTitleAndCode: Map<String, String>) {
+        this.languagesSourceNames = languagesSourceNames
+        this.languageTitleAndCode = languageTitleAndCode
+
+        if (languagesSourceNames.isNotEmpty()) {
+
+            val adapterSource = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_list_item_1,
+                languagesSourceNames
+
+            )
+            val adapterTarget = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_list_item_1,
+                languagesSourceNames
+
+            )
+            editTextInputLang!!.setAdapter(adapterSource)
+            editTextOutputLang!!.setAdapter(adapterTarget)
+
+        } else {
+            showNoInternetConnectionToast()
         }
     }
+
+
 
     override fun onStop() {
         super.onStop()
         provider.removeListener(this)
     }
-
-
-    private fun loadAvailableLanguagesForTranslation() {
-        translateService
-        if (translate != null) {
-            val languages = translate!!.listSupportedLanguages()
-            languagesSourceNames = languages.map { it.name }.toTypedArray()
-            languageTitleAndCode = languages.map { it.name to it.code }.toMap()
-        }
-
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
     }
 
 
     override fun onStateChange(state: ConnectivityProvider.NetworkState) {
         hasInternet = state.hasInternet()
         if (!hasInternet)
-            Toast.makeText(
-                requireContext(),
-                "No internet connection!",
-                Toast.LENGTH_SHORT
-            ).show()
+           showNoInternetConnectionToast()
 
     }
 
     private fun ConnectivityProvider.NetworkState.hasInternet(): Boolean {
         return (this as? ConnectivityProvider.NetworkState.ConnectedState)?.hasInternet == true
+    }
+
+    override fun setPresenter(presenter: SetCorrectInfoContract.Presenter) {
+        this.presenter = presenter
     }
 }

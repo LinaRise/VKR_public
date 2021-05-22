@@ -153,41 +153,16 @@ class SetUpDialog : AppCompatDialogFragment(), SetUpContract.View,
     override fun onStart() {
         super.onStart()
         provider.addListener(this)
-        val executor = Executors.newSingleThreadExecutor()
-        val handler = Handler(Looper.getMainLooper())
-        executor.execute {
-            if (hasInternet) {
-                if (languagesSourceNames.isEmpty()) {
-                    translateService
-                  presenter.onViewCreated(translate)
-                }
-            }
-            handler.post {
-                if (languagesSourceNames.isNotEmpty()) {
-
-                    val adapterSource = ArrayAdapter(
-                        requireContext(),
-                        android.R.layout.simple_list_item_1,
-                        languagesSourceNames
-
-                    )
-                    val adapterTarget = ArrayAdapter(
-                        requireContext(),
-                        android.R.layout.simple_list_item_1,
-                        languagesSourceNames
-
-                    )
-                    editTextInputLang!!.setAdapter(adapterSource)
-                    editTextOutputLang!!.setAdapter(adapterTarget)
-
-                } else {
-                    showNoInternetConnectionToast()
-                }
+        if (hasInternet) {
+            if (languagesSourceNames.isEmpty()) {
+                translateService
+                presenter.onViewCreated(translate)
             }
         }
+
     }
 
-    override fun showNoInternetConnectionToast(){
+    override fun showNoInternetConnectionToast() {
         Toast.makeText(
             requireContext(),
             "No internet connection!",
@@ -195,13 +170,43 @@ class SetUpDialog : AppCompatDialogFragment(), SetUpContract.View,
         ).show()
     }
 
+    override fun setAvailableLanguagesInfo(languagesSourceNames: Array<String>,languageTitleAndCode: Map<String, String>) {
+        this.languagesSourceNames = languagesSourceNames
+        this.languageTitleAndCode = languageTitleAndCode
+
+        if (languagesSourceNames.isNotEmpty()) {
+
+            val adapterSource = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_list_item_1,
+                languagesSourceNames
+
+            )
+            val adapterTarget = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_list_item_1,
+                languagesSourceNames
+
+            )
+            editTextInputLang!!.setAdapter(adapterSource)
+            editTextOutputLang!!.setAdapter(adapterTarget)
+
+        } else {
+            showNoInternetConnectionToast()
+        }
+    }
+
     override fun onStop() {
         super.onStop()
         provider.removeListener(this)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
+    }
 
-    private fun loadAvailableLanguagesForTranslation() {
+    /*private fun loadAvailableLanguagesForTranslation() {
         translateService
         if (translate != null) {
             val languages = translate!!.listSupportedLanguages()
@@ -210,7 +215,7 @@ class SetUpDialog : AppCompatDialogFragment(), SetUpContract.View,
         }
 
 
-    }
+    }*/
 
     override fun onStateChange(state: ConnectivityProvider.NetworkState) {
         hasInternet = state.hasInternet()

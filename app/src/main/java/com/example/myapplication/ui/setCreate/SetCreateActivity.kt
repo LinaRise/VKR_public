@@ -2,7 +2,6 @@ package com.example.myapplication.ui.setCreate
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Message
 import android.os.StrictMode
 import android.view.Menu
 import android.view.MenuItem
@@ -18,6 +17,7 @@ import com.example.myapplication.connectivity.base.ConnectivityProvider
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.Word
 import com.example.myapplication.ui.DependencyInjectorImpl
+import com.example.myapplication.ui.setCreate.correctInfoDialog.SetCorrectInfoDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.auth.oauth2.GoogleCredentials

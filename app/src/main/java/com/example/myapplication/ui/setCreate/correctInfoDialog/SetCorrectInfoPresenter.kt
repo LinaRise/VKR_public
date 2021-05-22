@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.setCreate.setUpDialog
+package com.example.myapplication.ui.setCreate.correctInfoDialog
 
 import android.os.Handler
 import android.os.Looper
@@ -6,10 +6,10 @@ import com.example.myapplication.entity.Sett
 import com.google.cloud.translate.Translate
 import java.util.concurrent.Executors
 
-class SetUpPresenter(
-    view: SetUpContract.View,
-) : SetUpContract.Presenter {
-    private var mView: SetUpContract.View? = view
+class SetCorrectInfoPresenter(
+    view: SetCorrectInfoContract.View,
+) : SetCorrectInfoContract.Presenter {
+    private var mView: SetCorrectInfoContract.View? = view
     private var set: Sett = Sett()
     override fun onViewCreated(translate: Translate?) {
         if (translate != null) {
@@ -27,7 +27,6 @@ class SetUpPresenter(
             }
 
         }
-
     }
 
 

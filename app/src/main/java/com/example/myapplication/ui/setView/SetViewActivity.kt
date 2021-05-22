@@ -25,7 +25,8 @@ import com.example.myapplication.entity.Word
 import com.example.myapplication.ui.DependencyInjectorImpl
 import com.example.myapplication.ui.setCreate.ISetInputData
 import com.example.myapplication.ui.setCreate.InstantAutoComplete
-import com.example.myapplication.ui.setCreate.SetCorrectInfoDialog
+import com.example.myapplication.ui.setCreate.correctInfoDialog.SetCorrectInfoDialog
+import com.example.myapplication.ui.setView.copyCardDialog.CopyCardDialog
 import com.example.myapplication.ui.study.StudyActivity
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
@@ -481,7 +482,7 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
      */
     override fun showDialog(sets: List<Sett>?, position: Int) {
         val copyCardDialog =
-            CopyCardDialog(sets!!, wordsDisplayed[position], openedSett!!, dbhelper)
+            CopyCardDialog(sets!!, wordsDisplayed[position], openedSett!!)
         copyCardDialog.show(supportFragmentManager, "Copy card dialog")
     }
 

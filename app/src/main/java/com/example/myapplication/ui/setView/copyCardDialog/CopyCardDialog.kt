@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.setView
+package com.example.myapplication.ui.setView.copyCardDialog
 
 import android.app.Dialog
 import android.content.DialogInterface
@@ -13,18 +13,16 @@ import androidx.appcompat.app.AppCompatDialogFragment
 import com.example.myapplication.R
 import com.example.myapplication.connectivity.base.ConnectivityProvider
 import com.example.myapplication.database.DBHelper
-import com.example.myapplication.database.repo.sett.SettRepo
-import com.example.myapplication.database.repo.word.WordRepo
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
+import com.example.myapplication.ui.DependencyInjectorImpl
 
 
 class CopyCardDialog(
     var setsList: List<Sett>,
     var word: Word?,
     var openedSet: Sett?,
-    var dbhelper: DBHelper
-) : AppCompatDialogFragment(),
+) : AppCompatDialogFragment(), CopyCardContract.View,
     ConnectivityProvider.ConnectivityStateListener, AdapterView.OnItemSelectedListener {
     private val provider: ConnectivityProvider by lazy {
         ConnectivityProvider.createProvider(
@@ -32,14 +30,19 @@ class CopyCardDialog(
         )
     }
 
+   private lateinit var dbhelper: DBHelper
+
+    private lateinit var presenter: CopyCardContract.Presenter
+
     private var hasInternet: Boolean = false
-    var mWordRepo: WordRepo = WordRepo(dbhelper)
-    var mSettRepo: SettRepo = SettRepo(dbhelper)
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val alertDialogBuilder = AlertDialog.Builder(requireActivity())
         val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.set_pick_up, null)
+
+        dbhelper = DBHelper(requireContext())
+        setPresenter(CopyCardPresenter(this, DependencyInjectorImpl(dbhelper)))
 
         val spinner = view.findViewById<Spinner>(R.id.sets_titles_spinner)
         val setsTitlesMapCopyTo: LinkedHashMap<Long, String> =
@@ -65,11 +68,9 @@ class CopyCardDialog(
                 val pickedSetId =
                     ArrayList<Long>(setsTitlesMapCopyTo.keys)[spinner.selectedItemPosition]
                 word!!.settId = pickedSetId
-                mWordRepo.create(word!!)
                 val pickedSet = setsList.filter { it.settId == pickedSetId }
                 pickedSet[0].wordsAmount = pickedSet[0].wordsAmount + 1
-                mSettRepo.update(pickedSet[0])
-                Toast.makeText(requireContext(), "Saved", Toast.LENGTH_SHORT).show()
+                presenter.onAddWordClicked(word, pickedSet[0])
             })
 
         return alertDialogBuilder.create()
@@ -89,6 +90,14 @@ class CopyCardDialog(
     }
 
 
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
+        dbhelper.close()
+
+
+    }
+
     override fun onStateChange(state: ConnectivityProvider.NetworkState) {
         hasInternet = state.hasInternet()
     }
@@ -103,6 +112,15 @@ class CopyCardDialog(
 
     override fun onNothingSelected(p0: AdapterView<*>?) {
         TODO("Not yet implemented")
+    }
+
+    override fun showCopiedWordToSetToast() {
+        Toast.makeText(requireContext(), getString(R.string.copied), Toast.LENGTH_SHORT).show()
+
+    }
+
+    override fun setPresenter(presenter: CopyCardContract.Presenter) {
+        this.presenter = presenter
     }
 }
 
