@@ -1,12 +1,9 @@
 package com.example.myapplication.ui.profile
 
-import com.example.myapplication.entity.Language
-import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.StudyProgress
-import com.example.myapplication.entity.Word
 import com.example.myapplication.ui.BasePresenter
 import com.example.myapplication.ui.BaseView
-import com.google.cloud.translate.Translate
+import com.github.mikephil.charting.data.BarEntry
 
 interface ProfileContract {
     interface Presenter : BasePresenter {
@@ -14,7 +11,11 @@ interface ProfileContract {
     }
 
     interface View : BaseView<Presenter> {
-        fun setData(list: List<StudyProgress>)
+        fun setData(
+            list: List<StudyProgress>,
+            values: ArrayList<BarEntry>,
+            labels: ArrayList<String>
+        )
 
     }
 }

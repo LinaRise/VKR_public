@@ -330,7 +330,9 @@ class ProfileFragment : Fragment(), ProfileContract.View,
         return colors
     }
 
-
+    /**
+     * для создания напоминания о занятии
+     */
     private fun callTimePicker() {
         // получаем текущее время
         val cal = Calendar.getInstance()
@@ -404,23 +406,13 @@ class ProfileFragment : Fragment(), ProfileContract.View,
         }
     }
 
-    override fun setData(list: List<StudyProgress>) {
-
+    override fun setData(
+        list: List<StudyProgress>,
+        values: ArrayList<BarEntry>,
+        labels: ArrayList<String>
+    ) {
         chart?.xAxis?.valueFormatter = IndexAxisValueFormatter(list.map { it.date.toString() })
 
-        val values: ArrayList<BarEntry> = ArrayList()
-        var labels: ArrayList<String> = ArrayList()
-        for (i in list.indices) {
-            values.add(
-                BarEntry(
-                    (list.size - i - 1).toFloat(),
-                    ((list[i].rightAnswers.toFloat() * 100) / (list[i].rightAnswers.toFloat() + list[i].wrongAnswers.toFloat()))
-                )
-            )
-            labels.add(list[i].date.toString().split("-", limit = 2)[1])
-        }
-
-        labels = labels.reversed() as ArrayList<String>
         Log.d(
             "valuesData",
             (((list[0].rightAnswers.toFloat() * 100) / (list[0].rightAnswers.toFloat() + list[0].wrongAnswers.toFloat())).toString())
