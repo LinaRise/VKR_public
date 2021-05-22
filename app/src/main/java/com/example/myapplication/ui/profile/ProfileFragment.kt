@@ -22,6 +22,7 @@ import com.example.myapplication.connectivity.base.ConnectivityProvider
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.StudyProgress
 import com.example.myapplication.notification.ReminderBroadcast
+import com.example.myapplication.ui.DependencyInjectorImpl
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
@@ -39,14 +40,14 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class ProfileFragment : Fragment(), IProfileFragmentView,
+class ProfileFragment : Fragment(), ProfileContract.View,
     ConnectivityProvider.ConnectivityStateListener,
 //    SeekBar.OnSeekBarChangeListener,
     OnChartValueSelectedListener,
     ActivityCompat.OnRequestPermissionsResultCallback {
 
     private var xAxis: XAxis? = null
-    lateinit var presenter: ProfilePresenter
+    private lateinit var presenter: ProfileContract.Presenter
     lateinit var dbhelper: DBHelper
 
     lateinit var set1: BarDataSet
@@ -89,16 +90,7 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
         val root = inflater.inflate(R.layout.fragment_profile, container, false)
 
         dbhelper = DBHelper(requireContext())
-        presenter = ProfilePresenter(this, dbhelper)
-
-        /*val root = inflater.inflate(R.layout.fragment_profile, container, false)
-        val textView: TextView = root.findViewById(R.id.text_notifications)
-        notificationsViewModel.text.observe(viewLifecycleOwner, {
-            textView.text = it
-        })
-
-*/
-
+        setPresenter(ProfilePresenter(this, DependencyInjectorImpl(dbhelper)))
 
         tvX = root.findViewById(R.id.tvXMax)
         tvY = root.findViewById(R.id.tvYMax)
@@ -130,12 +122,11 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
 //        chart?.moveViewToX(10f);
 //        seekBarY!!.progress = 100
 
-        presenter.loadStudyProgressData()
+        presenter.onViewCreated()
 
 
         // if more than 7 entries are displayed in the chart, no values will be
         // drawn
-
 
 
         setHasOptionsMenu(true)
@@ -422,11 +413,11 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
         for (i in list.indices) {
             values.add(
                 BarEntry(
-                    (list.size-i-1).toFloat() ,
+                    (list.size - i - 1).toFloat(),
                     ((list[i].rightAnswers.toFloat() * 100) / (list[i].rightAnswers.toFloat() + list[i].wrongAnswers.toFloat()))
                 )
             )
-            labels.add(list[i].date.toString().split("-",limit = 2)[1])
+            labels.add(list[i].date.toString().split("-", limit = 2)[1])
         }
 
         labels = labels.reversed() as ArrayList<String>
@@ -460,7 +451,7 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
 
         Log.d("labelss", labels.toString())
         xAxis?.labelCount = values.size
-        xAxis!!.valueFormatter =  IndexAxisValueFormatter(labels)
+        xAxis!!.valueFormatter = IndexAxisValueFormatter(labels)
         // add a nice and smooth animation
         chart?.animateY(1500)
 
@@ -468,6 +459,16 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
 
     }
 
+    override fun setPresenter(presenter: ProfileContract.Presenter) {
+        this.presenter = presenter
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
+        dbhelper.close()
+
+    }
 
 }
 

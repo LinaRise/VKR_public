@@ -5,26 +5,33 @@ import android.os.Looper
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.repo.studyProgress.StudyProgressRepo
 import com.example.myapplication.entity.StudyProgress
+import com.example.myapplication.ui.DependencyInjector
+import com.example.myapplication.ui.study.SetStudyContract
 import java.util.concurrent.Executors
 
 class ProfilePresenter(
-    view: IProfileFragmentView,
-    dbhelper: DBHelper
-) {
+    view: ProfileContract.View,
+    dependencyInjector: DependencyInjector
+):ProfileContract.Presenter {
 
-    private var mView: IProfileFragmentView = view
-    var mStudyProgress: StudyProgressRepo = StudyProgressRepo(dbhelper)
+    private var mView: ProfileContract.View? = view
+    var mStudyProgressRepo: StudyProgressRepo = dependencyInjector.studyProgressRepository()
 
-    fun loadStudyProgressData() {
+
+    override fun onViewCreated() {
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
         var list: List<StudyProgress>
         executor.execute {
-            list = mStudyProgress.getAll()
+            list = mStudyProgressRepo.getAll()
             handler.post {
-                mView.setData(list)
+                mView?.setData(list)
             }
         }
+    }
+
+    override fun onDestroy() {
+        this.mView = null
     }
 
 
