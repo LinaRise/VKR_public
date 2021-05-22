@@ -30,6 +30,8 @@
     <string name="animate_x">Animate X</string>
     <string name="animate_y">Animate Y</string>
     <string name="animate_xy">Animate XY</string>
+    <string name="sets">Sets</string>
+    <string name="set_up_dialog">Set Up Dialog</string>
     <string-array name="available_translation_languages">
         <item>Russian</item>
         <item>English</item>

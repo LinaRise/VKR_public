@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         dbhelper = DBHelper(this)
         //находим файл xml с BottomNavigationView
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
@@ -49,7 +50,6 @@ class MainActivity : AppCompatActivity() {
         //с [NavController].
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-
 
         //Check if the application has draw over other apps permission or not?
         //This permission is by default available for API<23. But for API > 23
