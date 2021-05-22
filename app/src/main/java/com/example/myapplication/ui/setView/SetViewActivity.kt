@@ -179,39 +179,41 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
 
         translatedText.onFocusChangeListener = View.OnFocusChangeListener { p0, p1 ->
             if (p1) {
-                if (hasAutoSuggest == 1) {
-                    if (hasInternet) {
-                        if (translate != null) {
-                            receivedTranslation = presenter.onTranslate(
-                                translate!!,
-                                languageTitleAndCode,
-                                originalText.text.toString(),
-                                inputLanguageText!!.trim(),
-                                outputLanguageText!!.trim()
-                            )
-                        } else {
-                            showToast("Problems with translation server initialization")
-                        }
-                        Log.d("receivedTranslation", receivedTranslation)
-
-                        val array = arrayOf(
-                            receivedTranslation
-                        )
-                        adapter =
-                            ArrayAdapter(
-                                this@SetViewActivity,
-                                android.R.layout.simple_list_item_1,
-                                array
-                            )
-                        adapter.notifyDataSetChanged()
-                        translatedText.setAdapter(adapter)
-                        translatedText.showDropDown()
-
-                    }
+                if (translate != null) {
+                    receivedTranslation = presenter.onTranslate(
+                        translate!!,
+                        languageTitleAndCode,
+                        originalText.text.toString(),
+                        inputLanguageText!!.trim(),
+                        outputLanguageText!!.trim(),
+                        hasAutoSuggest,
+                        hasInternet
+                    )
+                } else {
+                    showNoTranslationServiceAvailable()
                 }
+                Log.d("receivedTranslation", receivedTranslation)
+
+                val array = arrayOf(
+                    receivedTranslation
+                )
+                adapter =
+                    ArrayAdapter(
+                        this@SetViewActivity,
+                        android.R.layout.simple_list_item_1,
+                        array
+                    )
+                adapter.notifyDataSetChanged()
+                translatedText.setAdapter(adapter)
+                translatedText.showDropDown()
+
             }
         }
+    }
 
+    override fun showNoTranslationServiceAvailable() {
+        Toast.makeText(this, "Problems with translation server initialization", Toast.LENGTH_SHORT)
+            .show()
     }
 
 
@@ -410,10 +412,10 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
     }
 
 
-    override fun showToast(message: String) {
+    override fun showCheckInternetConnection() {
         Toast.makeText(
             this@SetViewActivity,
-            message,
+            "Can't load available languages for translation! Check internet connection!",
             Toast.LENGTH_SHORT
         ).show()
     }
@@ -492,7 +494,7 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
     }
 
     override fun setLanguageData(inputLang: Language, outputLang: Language) {
-        inputLanguage =inputLang
+        inputLanguage = inputLang
         outputLanguage = outputLang
         inputLanguageText = inputLanguage.languageTitle
         outputLanguageText = outputLanguage.languageTitle
@@ -514,7 +516,7 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
                 }
             }
         } else {
-            showToast("Can't load available languages for translation! Check internet connection!")
+            showCheckInternetConnection()
 
         }
     }

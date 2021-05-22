@@ -1,26 +1,19 @@
-package com.example.myapplication.ui.setView
+package com.example.myapplication.ui.setCreate
 
-import com.example.myapplication.entity.Language
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
 import com.example.myapplication.ui.BasePresenter
 import com.example.myapplication.ui.BaseView
 import com.google.cloud.translate.Translate
 
-interface SetViewContract {
+interface SetCreateContract {
     interface Presenter : BasePresenter {
-        fun onViewCreated(settId: Long)
         fun onSaveClicked(
-            wordsDisplayed: List<Word?>,
-            wordsOriginal: List<Word?>,
-            sett: Sett?,
-            inputLanguage: String,
-            outputLanguage: String,
-            hasAutoSuggest: Int,
+            wordsDisplayed: List<Word>, setTitle: String, inputLanguage: String,
+            outputLanguage: String, hasAutoSuggest: Int
         )
 
         fun onLeftSwipe(position: Int)
-        fun onRightSwipe(): List<Sett>?
         fun onTranslate(
             translate: Translate,
             languageTitleAndCode: Map<String, String>,
@@ -32,7 +25,6 @@ interface SetViewContract {
         ): String
 
         fun onAddWordClicked(original: String, translated: String)
-        fun loadLanguagesData(sett: Sett)
     }
 
     interface View : BaseView<Presenter> {
@@ -42,11 +34,6 @@ interface SetViewContract {
         fun showUndoDeleteWord(position: Int)
         fun hideKeyboard()
         fun cleanInputFields()
-        fun setData(result: List<Word>?)
-        fun showNoTranslationServiceAvailable()
-        fun showCheckInternetConnection()
-        fun showDialog(sets: List<Sett>?, position: Int)
-        fun setSettData(resultSett:Sett)
-        fun setLanguageData(inputLang: Language, outputLanguage:Language)
+        fun showSuccessSavedToast()
     }
 }

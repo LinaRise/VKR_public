@@ -13,17 +13,20 @@ import com.example.myapplication.R
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.StudyProgress
 import com.example.myapplication.entity.Word
+import com.example.myapplication.ui.DependencyInjectorImpl
+import com.example.myapplication.ui.setView.SetViewContract
+import com.example.myapplication.ui.setView.SetViewPresenter
 import kotlinx.android.synthetic.main.activity_study.*
 import java.util.*
 import kotlin.collections.ArrayList
 
 
-class StudyActivity : AppCompatActivity(), ISetStudyView {
+class StudyActivity : AppCompatActivity(), SetStudyContract.View {
     private var wrongAnswersCount: Int = 0
 
     private var rightAnswersCount: Int = 0
     private lateinit var asked: List<Boolean>
-    lateinit var presenter: SetStudyPresenter
+    private lateinit var presenter: SetStudyContract.Presenter
 
     lateinit var frontAnim: AnimatorSet
     lateinit var backAnim: AnimatorSet
@@ -75,7 +78,9 @@ class StudyActivity : AppCompatActivity(), ISetStudyView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_study)
         dbhelper = DBHelper(this)
-        presenter = SetStudyPresenter(this, dbhelper)
+
+        setPresenter(SetStudyPresenter(this, DependencyInjectorImpl(dbhelper)))
+
 
 
         questionTV = findViewById<TextView>(R.id.question_textView)
@@ -483,6 +488,17 @@ class StudyActivity : AppCompatActivity(), ISetStudyView {
         setStudyEnd.arguments = args
         val manager = supportFragmentManager
         setStudyEnd.show(manager, "Set study")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
+        dbhelper.close()
+
+    }
+
+    override fun setPresenter(presenter: SetStudyContract.Presenter) {
+        this.presenter = presenter
     }
 
 }

@@ -2,6 +2,7 @@ package com.example.myapplication.ui.setCreate
 
 import com.example.myapplication.entity.Word
 
+/*
 interface ISetCreateView {
     fun updateRecyclerViewInserted(word: Word)
     fun updateRecyclerViewDeleted(position: Int)
@@ -10,4 +11,4 @@ interface ISetCreateView {
     fun hideKeyboard()
     fun cleanInputFields()
     fun showToastMessage(line:String)
-}
+}*/

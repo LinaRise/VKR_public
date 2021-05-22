@@ -3,10 +3,9 @@ package com.example.myapplication.ui.setView
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.repo.language.LanguageRepo
 import com.example.myapplication.database.repo.sett.SettRepo
-import com.example.myapplication.database.repo.word.*
+import com.example.myapplication.database.repo.word.WordRepo
 import com.example.myapplication.entity.Language
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
@@ -55,15 +54,22 @@ class SetViewPresenter(
         languageTitleAndCode: Map<String, String>,
         originalText: String,
         sourceLanguage: String,
-        targetLanguage: String
+        targetLanguage: String,
+        hasAutoSuggest: Int,
+        hasInternet: Boolean
     ): String {
-        return TranslationUtils.translate(
-            translate,
-            languageTitleAndCode,
-            originalText,
-            sourceLanguage,
-            targetLanguage
-        )
+        if (hasAutoSuggest == 1) {
+            if (hasInternet) {
+                return TranslationUtils.translate(
+                    translate,
+                    languageTitleAndCode,
+                    originalText,
+                    sourceLanguage,
+                    targetLanguage
+                )
+            }
+        }
+        return ""
 
     }
 
@@ -192,7 +198,7 @@ class SetViewPresenter(
             result = mWordRepo.getWordsOfSet(settId = settId)
             resultSet = mSettRepo.get(settId)
             handler.post {
-                if (resultSet!=null) {
+                if (resultSet != null) {
                     mView?.setSettData(resultSet!!)
                 }
                 mView?.setData(result)
@@ -209,7 +215,7 @@ class SetViewPresenter(
             inputLanguage = mLanguageRepo.get(sett.languageInput_id)
             outputLanguage = mLanguageRepo.get(sett.languageOutput_id)
             handler.post {
-                if (inputLanguage!=null && outputLanguage!=null) {
+                if (inputLanguage != null && outputLanguage != null) {
                     mView?.setLanguageData(inputLanguage!!, outputLanguage!!)
                 }
             }

@@ -2,28 +2,25 @@ package com.example.myapplication.ui.setCreate
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
-import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.repo.language.LanguageRepo
 import com.example.myapplication.database.repo.sett.SettRepo
-import com.example.myapplication.database.repo.word.WordCreateManyAsyncTask
 import com.example.myapplication.database.repo.word.WordRepo
 import com.example.myapplication.entity.Language
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
 import com.example.myapplication.translation.TranslationUtils
+import com.example.myapplication.ui.DependencyInjector
 import com.google.cloud.translate.Translate
 import java.util.concurrent.Executors
 
 class SetCreatePresenter(
-    view: ISetCreateView,
-    private var dbhelper: DBHelper
-) {
-    private var mView: ISetCreateView = view
-    var mLanguageRepo: LanguageRepo = LanguageRepo(dbhelper)
-    var mWordRepo: WordRepo = WordRepo(dbhelper)
-    var mSettRepo: SettRepo = SettRepo(dbhelper)
-    private var word: Word = Word()
+    view: SetCreateContract.View,
+    dependencyInjector: DependencyInjector
+) : SetCreateContract.Presenter {
+    private var mView: SetCreateContract.View? = view
+    private val mSettRepo: SettRepo = dependencyInjector.settRepository()
+    private val mLanguageRepo: LanguageRepo = dependencyInjector.languageRepository()
+    private val mWordRepo: WordRepo = dependencyInjector.wordRepository()
     private var set: Sett = Sett()
 
 
@@ -36,14 +33,29 @@ class SetCreatePresenter(
      * @param targetLanguage - язык на который нужно перевести
      * @return String перевод
      */
-    fun translate(translate: Translate,
-                  languageTitleAndCode: Map<String, String>,
-                  originalText: String,
-                  sourceLanguage: String,
-                  targetLanguage: String): String {
-        return  TranslationUtils.translate(translate,languageTitleAndCode,originalText,sourceLanguage,targetLanguage)
-
+    override fun onTranslate(
+        translate: Translate,
+        languageTitleAndCode: Map<String, String>,
+        originalText: String,
+        sourceLanguage: String,
+        targetLanguage: String,
+        hasAutoSuggest: Int,
+        hasInternet: Boolean
+    ): String {
+        if (hasAutoSuggest == 1) {
+            if (hasInternet) {
+                return TranslationUtils.translate(
+                    translate,
+                    languageTitleAndCode,
+                    originalText,
+                    sourceLanguage,
+                    targetLanguage
+                )
+            }
+        }
+        return ""
     }
+
     /**
      * Сохранение набора слов
      * @param wordsDisplayed - текущий спсиок слов в наборе
@@ -52,13 +64,13 @@ class SetCreatePresenter(
      * @param outputLanguage - язык на который нужно перевести
      * @param hasAutoSuggest - переменная наличия авто-перевода
      */
-    fun saveSet(
+    override fun onSaveClicked(
         wordsDisplayed: List<Word>, setTitle: String, inputLanguage: String,
         outputLanguage: String, hasAutoSuggest: Int
     ) {
         val languageInputInfo = mLanguageRepo.getByTitle(inputLanguage.trim())
         val languageOutputInfo = mLanguageRepo.getByTitle(outputLanguage.trim())
-        var newSet = Sett(
+        val newSet = Sett(
             0,
             setTitle.trim(),
             wordsAmount = wordsDisplayed.size,
@@ -101,7 +113,7 @@ class SetCreatePresenter(
             }
 
             handler.post {
-                mView.showToastMessage("Saved")
+                mView?.showSuccessSavedToast()
             }
         }
 
@@ -110,37 +122,34 @@ class SetCreatePresenter(
     /**
      * добавление слова
      */
-    fun addNewWord(original: String, translated: String) {
+    override fun onAddWordClicked(original: String, translated: String) {
         if (original == "" || translated == "") {
-            mView.showWordInputError()
+            mView?.showWordInputError()
             return
         }
-        mView.hideKeyboard()
+        mView?.hideKeyboard()
         val word =
             Word(0, original.trim(), translated.trim())
 
-        mView.cleanInputFields()
-        mView.updateRecyclerViewInserted(word)
+        mView?.cleanInputFields()
+        mView?.updateRecyclerViewInserted(word)
     }
+
     /**
      * удаление слова
      */
-    fun deleteWord( position: Int) {
-        mView.updateRecyclerViewDeleted(position)
-        mView.showUndoDeleteWord(position)
+    override fun onLeftSwipe(position: Int) {
+        mView?.updateRecyclerViewDeleted(position)
+        mView?.showUndoDeleteWord(position)
 
     }
 
 
+    override fun onDestroy() {
+        this.mView = null
+    }
 
 
-
-//
-//     fun insertDataToDatabase(words: List<Word>) {
-//        for (word in words){
-//            mWordViewModel.insert(word)
-//        }
-//    }
 
 }
 
