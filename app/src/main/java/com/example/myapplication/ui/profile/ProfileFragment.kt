@@ -92,35 +92,29 @@ class ProfileFragment : Fragment(), ProfileContract.View,
         dbhelper = DBHelper(requireContext())
         setPresenter(ProfilePresenter(this, DependencyInjectorImpl(dbhelper)))
 
-        tvX = root.findViewById(R.id.tvXMax)
-        tvY = root.findViewById(R.id.tvYMax)
+       /* tvX = root.findViewById(R.id.tvXMax)
+        tvY = root.findViewById(R.id.tvYMax)*/
+
 
         seekBarX = root.findViewById(R.id.seekBar1)
-//        seekBarX!!.setOnSeekBarChangeListener(this)
 
-//        seekBarY = root.findViewById(R.id.seekBar2)
-//        seekBarY!!.setOnSeekBarChangeListener(this)
-
+        //инициализация
         chart = root.findViewById(R.id.chart1)
-
+        //отключение описания
         chart?.description?.isEnabled = false
-
-
+        //инициализция и натсройка вида абсциссы
         xAxis = chart?.xAxis
         xAxis?.position = XAxisPosition.BOTTOM
         xAxis?.setDrawGridLines(false)
-
         chart?.axisLeft?.setDrawGridLines(true)
         chart?.axisRight?.isEnabled = false
 
+        //инициализция и натсройка вида ординаты
         val rightYAxis = chart?.axisLeft
         rightYAxis?.axisMaximum = 100f
         rightYAxis?.axisMinimum = 0f
-        // setting data
         seekBarX?.progress = 7
 
-//        chart?.moveViewToX(10f);
-//        seekBarY!!.progress = 100
 
         presenter.onViewCreated()
 
@@ -411,18 +405,9 @@ class ProfileFragment : Fragment(), ProfileContract.View,
         values: ArrayList<BarEntry>,
         labels: ArrayList<String>
     ) {
+        //настройка вида лейблов
         chart?.xAxis?.valueFormatter = IndexAxisValueFormatter(list.map { it.date.toString() })
-
-        Log.d(
-            "valuesData",
-            (((list[0].rightAnswers.toFloat() * 100) / (list[0].rightAnswers.toFloat() + list[0].wrongAnswers.toFloat())).toString())
-        )
-
-        Log.d(
-            "labells",
-            labels.toString()
-        )
-
+        //
         set1 = BarDataSet(values, "Progress")
         set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
         set1.setDrawValues(false)
@@ -432,21 +417,25 @@ class ProfileFragment : Fragment(), ProfileContract.View,
         chart?.data = data
 
         chart?.setVisibleXRangeMinimum(7f)
-        chart?.setVisibleXRangeMaximum(100f)
+        chart?.setVisibleXRangeMaximum(10f)
         chart?.moveViewToX(1f)
         chart?.setFitBars(true)
 
-        // scaling can now only be done on x- and y-axis separately
+        //включаем масштабирование пальцем
         chart?.setPinchZoom(false)
+        //включаем тени
         chart?.setDrawBarShadow(false)
+        //включаем сетку
         chart?.setDrawGridBackground(false)
-
-        Log.d("labelss", labels.toString())
+        //включаем показ лейблов
+        xAxis?.valueFormatter = IndexAxisValueFormatter(labels)
+//        xAxis?.labelCount = values.size
+        xAxis?.labelRotationAngle = -50f
         xAxis?.labelCount = values.size
-        xAxis!!.valueFormatter = IndexAxisValueFormatter(labels)
-        // add a nice and smooth animation
+        chart?.extraBottomOffset = 30f
+        xAxis?.granularity = 1f
+        // включаем анимацию
         chart?.animateY(1500)
-
         chart?.legend?.isEnabled = false
 
     }

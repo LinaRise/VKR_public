@@ -26,7 +26,7 @@ class ProfilePresenter(
             handler.post {
                 if (list != null) {
                     if (list!!.isNotEmpty()){
-                        val values: ArrayList<BarEntry> = ArrayList()
+                        var values: ArrayList<BarEntry> = ArrayList()
                         var labels: ArrayList<String> = ArrayList()
                         for (i in list!!.indices) {
                             values.add(
@@ -38,6 +38,7 @@ class ProfilePresenter(
                             labels.add(list!![i].date.toString().split("-", limit = 2)[1])
                         }
                         labels = labels.reversed() as ArrayList<String>
+                        values = values.reversed() as ArrayList<BarEntry>
                         mView?.setData(list!!,values,labels)
 
                     }

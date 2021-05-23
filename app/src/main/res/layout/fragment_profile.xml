@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/seekBar1" />
 
-    <SeekBar
+   <!-- <SeekBar
         android:id="@+id/seekBar2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -31,9 +31,9 @@
         android:layout_toStartOf="@+id/tvXMax"
         android:layout_marginEnd="5dp"
         android:max="300"
-        android:paddingBottom="12dp" />
+        android:paddingBottom="12dp" />-->
 
-    <TextView
+    <!--<TextView
         android:id="@+id/tvXMax"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
@@ -53,9 +53,9 @@
         android:layout_marginBottom="15dp"
         android:layout_marginEnd="10dp"
         android:gravity="right"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceSmall" /-->
 
-    <TextView
+   <!-- <TextView
         android:id="@+id/description"
         android:layout_width="wrap_content"
         android:text="@string/study_progress"
@@ -65,7 +65,7 @@
         android:layout_marginEnd="10dp"
         android:gravity="center"
         android:layout_centerHorizontal="true"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceSmall" />-->
 
 </RelativeLayout>
 <!--
