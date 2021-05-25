@@ -96,7 +96,6 @@ class ProfileFragment : Fragment(), ProfileContract.View,
         tvY = root.findViewById(R.id.tvYMax)*/
 
 
-        seekBarX = root.findViewById(R.id.seekBar1)
 
         //инициализация
         chart = root.findViewById(R.id.chart1)
@@ -189,7 +188,7 @@ class ProfileFragment : Fragment(), ProfileContract.View,
                 callTimePicker()
                 true
             }
-
+             //управление масштабированием
             R.id.actionTogglePinch -> {
                 if (chart?.isPinchZoomEnabled == true)
                     chart?.setPinchZoom(false);
@@ -199,29 +198,29 @@ class ProfileFragment : Fragment(), ProfileContract.View,
                 chart?.invalidate();
                 true
             }
-
-
+            //анимация по X
             R.id.animateX -> {
                 chart?.animateX(2000);
-                true;
+                true
             }
+            //анимация по Y
             R.id.animateY -> {
                 chart?.animateY(2000);
-                true;
+                true
             }
+            //анимация по X и Y
             R.id.animateXY -> {
-
                 chart?.animateXY(2000, 2000);
-                true;
+                true
             }
-
+            //сохранение графика в виде картинки
             R.id.actionSave -> {
                 if (ContextCompat.checkSelfPermission(
                         requireContext(),
                         Manifest.permission.WRITE_EXTERNAL_STORAGE
                     ) == PackageManager.PERMISSION_GRANTED
                 ) {
-                    saveToGallery(chart!!, "AnotherBarActivity")
+                    chart?.let { saveToGallery(it, "AnotherBarActivity") }
 
                 } else {
                     requestStoragePermission(chart)
