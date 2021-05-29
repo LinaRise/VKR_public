@@ -307,10 +307,10 @@ class SetCreateActivity : AppCompatActivity(), SetCreateContract.View, ISetInput
     override fun showUndoDeleteWord(position: Int) {
         Snackbar.make(
             recyclerView,
-            "${deletedWord.originalWord} is deleted",
+            deletedWord.originalWord +" "+ getText(R.string.is_deleted),
             Snackbar.LENGTH_LONG
         ).setAction(
-            "UNDO"
+            R.string.undo
         ) {
             wordsDisplayed.add(position, deletedWord)
             setCreateAdapter.notifyItemInserted(position)

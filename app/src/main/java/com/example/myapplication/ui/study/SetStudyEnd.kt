@@ -23,8 +23,8 @@ class SetStudyEnd : AppCompatDialogFragment() {
 //        val wordList = requireArguments().getString("wordList")
         resultText!!.text = "You have $rightAnswers right answers and $wrongAnswers wrong"
         alertDialogBuilder.setView(view)
-            .setTitle("Edit Set")
-            .setPositiveButton("ok", DialogInterface.OnClickListener { _, _ ->
+            .setTitle(getString(R.string.result))
+            .setPositiveButton(R.string.ok, DialogInterface.OnClickListener { _, _ ->
                 dialog?.dismiss()
                 (context as Activity).finish()
             })

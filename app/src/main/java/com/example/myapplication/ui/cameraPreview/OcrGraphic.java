@@ -97,13 +97,12 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
         if (textBlock == null) {
             return;
         }
-
-        // Draws the bounding box around the TextBlock.
+        // отрисовка рамки блока текста
         RectF rect = new RectF(textBlock.getBoundingBox());
         rect = translateRect(rect);
         canvas.drawRect(rect, rectPaint);
 
-        // Break the text into multiple lines and draw each one according to its own bounding box.
+        // разбиваем текст на нескольки строк
         List<? extends Text> textComponents = textBlock.getComponents();
         for(Text currentText : textComponents) {
             float left = translateX(currentText.getBoundingBox().left);

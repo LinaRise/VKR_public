@@ -6,7 +6,6 @@
     <string name="set_title_text">Set title</string>
     <string name="language_input_text">Language input</string>
     <string name="language_output_text">Language output</string>
-    <string name="title_hint">Title</string>
     <string name="add_text_on_button">Add</string>
     <string name="fill_in_both_lines">Fill in both lines</string>
     <string name="add_set_button_text">Add set button</string>
@@ -18,7 +17,6 @@
     <string name="study_set">Study set</string>
     <string name="edit_set">Edit set</string>
     <string name="save">Save</string>
-    <string name="translate_bubble">Transalte Bubble</string>
     <string name="backup">Backup</string>
     <string name="activate_bubble_add">Activate bubble add</string>
     <string name="channel_name">notification_channel</string>
@@ -34,6 +32,13 @@
     <string name="set_up_dialog">Set Up Dialog</string>
     <string name="saved">Saved</string>
     <string name="copied">Copied</string>
+    <string name="pick_up_set">Pick up Set</string>
+    <string name="undo">UNDO</string>
+    <string name="is_deleted">is deleted</string>
+    <string name="cancel">Отмена</string>
+    <string name="new_set">New Set</string>
+    <string name="auto_suggest">Auto-Suggest</string>
+    <string name="result">Result</string>
     <string-array name="available_translation_languages">
         <item>Russian</item>
         <item>English</item>

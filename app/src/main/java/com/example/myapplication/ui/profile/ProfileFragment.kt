@@ -356,7 +356,7 @@ class ProfileFragment : Fragment(), ProfileContract.View,
 
                 val alarmManager =
                     activity?.getSystemService(AppCompatActivity.ALARM_SERVICE) as AlarmManager
-                alarmManager.setInexactRepeating(
+                     alarmManager.setInexactRepeating(
                     AlarmManager.RTC_WAKEUP,
                     calendar.timeInMillis,
                     AlarmManager.INTERVAL_DAY,
@@ -406,7 +406,7 @@ class ProfileFragment : Fragment(), ProfileContract.View,
     ) {
         //настройка вида лейблов
         chart?.xAxis?.valueFormatter = IndexAxisValueFormatter(list.map { it.date.toString() })
-        //
+
         set1 = BarDataSet(values, "Progress")
         set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
         set1.setDrawValues(false)

@@ -40,7 +40,6 @@ class ProfilePresenter(
                         labels = labels.reversed() as ArrayList<String>
                         values = values.reversed() as ArrayList<BarEntry>
                         mView?.setData(list!!,values,labels)
-
                     }
                 }
             }

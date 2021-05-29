@@ -6,12 +6,9 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.Nullable
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.recyclerview.selection.ItemDetailsLookup
 import androidx.recyclerview.selection.ItemKeyProvider
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.widget.RecyclerView
@@ -21,16 +18,9 @@ import com.example.myapplication.ui.setCreate.InstantAutoComplete
 import com.google.android.material.textfield.TextInputEditText
 
 
-class SetViewAdapter(setViewActivity: SetViewActivity) : RecyclerView.Adapter<SetViewAdapter.SetViewHolder>() {
+class SetViewAdapter : RecyclerView.Adapter<SetViewAdapter.SetViewHolder>() {
    private lateinit var context: Context
     private var words = ArrayList<Word?>()
-    private var selectionTracker: SelectionTracker<Long>? = null
-
-    fun setSelectionTracker(
-        selectionTracker: SelectionTracker<Long>?
-    ) {
-        this.selectionTracker = selectionTracker
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SetViewHolder {
         val view =

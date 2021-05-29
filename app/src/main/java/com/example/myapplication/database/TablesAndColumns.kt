@@ -3,12 +3,10 @@ package com.example.myapplication.database
 import android.provider.BaseColumns
 
 object TablesAndColumns {
-    // Table contents are grouped together in an anonymous object.
     object LanguageEntry : BaseColumns {
         const val TABLE_NAME = "language"
         const val COL_LANGUAGE_TITLE = "language_title"
     }
-
     object WordEntry : BaseColumns {
         const val TABLE_NAME = "word"
         const val COL_ORIGINAL_WORD = "original_word"

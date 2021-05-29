@@ -83,7 +83,6 @@ class SetUpDialog : AppCompatDialogFragment(), SetUpContract.View,
         editTextInputLang = view.findViewById(R.id.edit_language_input) as AutoCompleteTextView
         editTextOutputLang = view.findViewById(R.id.edit_language_output) as AutoCompleteTextView
 
-
         var checkBox = view.findViewById<CheckBox>(R.id.checkbox)
             .setOnCheckedChangeListener { _, isChecked ->
                 hasAutoSuggest = if (isChecked) {
@@ -120,10 +119,10 @@ class SetUpDialog : AppCompatDialogFragment(), SetUpContract.View,
 
 
         alertDialogBuilder.setView(view)
-            .setTitle("New Set")
-            .setNegativeButton("cancel",
+            .setTitle(getString(R.string.new_set))
+            .setNegativeButton(R.string.cancel,
                 DialogInterface.OnClickListener { _, _ -> })
-            .setPositiveButton("ok", DialogInterface.OnClickListener { _, _ ->
+            .setPositiveButton(R.string.ok, DialogInterface.OnClickListener { _, _ ->
                 val setTitle: String = editTextTitle?.text.toString()
                 val inputLang: String = editTextInputLang?.text.toString()
                 val outputLang: String = editTextOutputLang?.text.toString()

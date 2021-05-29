@@ -8,13 +8,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/edit_set_title"
-    android:hint="Set title"/>
+    android:hint="@string/set_title_text"/>
 
     <AutoCompleteTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/edit_language_input"
-        android:hint="Input language"
+        android:hint="@string/language_input_text"
         android:layout_below="@+id/edit_set_title"
         android:completionThreshold="1"
         android:completionHint="Choose input language"/>
@@ -26,7 +26,7 @@
         android:completionHint="Choose output language"
         android:completionThreshold="1"
         android:layout_below="@+id/edit_language_input"
-        android:hint="Output language" />
+        android:hint="@string/language_output_text" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -48,7 +48,7 @@
             android:layout_weight="4"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            android:text="Auto-Suggest" />
+            android:text="@string/auto_suggest" />
     </LinearLayout>
 
 

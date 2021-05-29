@@ -65,10 +65,10 @@ class CopiedTextAddDialog(
         }
 
         alertDialogBuilder.setView(view)
-            .setTitle("Pick up Set")
-            .setNegativeButton("cancel",
+            .setTitle(R.string.pick_up_set)
+            .setNegativeButton(getString(R.string.cancel),
                 DialogInterface.OnClickListener { _, _ -> dismiss()})
-            .setPositiveButton("ok", DialogInterface.OnClickListener { _, _ ->
+            .setPositiveButton(R.string.ok, DialogInterface.OnClickListener { _, _ ->
                  val pickedSetId =
                     ArrayList<Long>(setsTitlesMapCopyTo.keys)[spinner.selectedItemPosition]
 

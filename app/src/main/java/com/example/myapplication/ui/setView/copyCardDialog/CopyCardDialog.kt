@@ -61,10 +61,10 @@ class CopyCardDialog(
         }
 
         alertDialogBuilder.setView(view)
-            .setTitle("Pick up Set")
-            .setNegativeButton("cancel",
+            .setTitle(getString(R.string.pick_up_set))
+            .setNegativeButton(getString(R.string.cancel),
                 DialogInterface.OnClickListener { _, _ -> })
-            .setPositiveButton("ok", DialogInterface.OnClickListener { _, _ ->
+            .setPositiveButton(getString(R.string.ok), DialogInterface.OnClickListener { _, _ ->
                 val pickedSetId =
                     ArrayList<Long>(setsTitlesMapCopyTo.keys)[spinner.selectedItemPosition]
                 word!!.settId = pickedSetId

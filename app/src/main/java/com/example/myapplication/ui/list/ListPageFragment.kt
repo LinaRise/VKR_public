@@ -146,7 +146,7 @@ class ListPageFragment : Fragment(), ListPageContract.View, SetAdapter.OnSetList
     }
 
     override fun showUndoDeleteWord(position: Int) {
-        Snackbar.make(recyclerView, "${deletedSett.settTitle} is deleted", Snackbar.LENGTH_LONG)
+        Snackbar.make(recyclerView, deletedSett.settTitle +" "+ getText(R.string.is_deleted), Snackbar.LENGTH_LONG)
             .addCallback(object : Snackbar.Callback() {
                 override fun onDismissed(snackbar: Snackbar, event: Int) {
                     when (event) {
@@ -156,7 +156,7 @@ class ListPageFragment : Fragment(), ListPageContract.View, SetAdapter.OnSetList
                 }
 
             }).setAction(
-                "UNDO"
+                R.string.undo
             ) {
                 setsDisplayed[deletedSett] = deletedSettInfo
                 adapter.notifyItemInserted(position)

@@ -42,20 +42,6 @@ class SetAdapter internal constructor(
         return sets.size
     }
 
-    //конструктор
-   /* class ViewHolder internal constructor(view: View, val onSetListener: OnSetListener) : RecyclerView.ViewHolder(view), View.OnClickListener {
-
-        val setTitle: TextView = view.findViewById(R.id.set_title)
-        val languageInput: TextView = view.findViewById(R.id.language_input)
-        val languageOutput: TextView = view.findViewById(R.id.language_output)
-        val wordsAmount: TextView = view.findViewById(R.id.words_amount)
-
-        override fun onClick(p0: View?) {
-            onSetListener.onSetClicked(adapterPosition)
-        }
-
-    }*/
-
     class ViewHolder(view: View, onNoteListener: OnSetListener) :
         RecyclerView.ViewHolder(view), View.OnClickListener {
         val setTitle: TextView = view.findViewById(R.id.set_title)

@@ -92,6 +92,7 @@ class SetCorrectInfoDialog : AppCompatDialogFragment(),SetCorrectInfoContract.Vi
         editTextTitle = view.findViewById(R.id.edit_set_title)
         editTextInputLang = view.findViewById(R.id.edit_language_input) as AutoCompleteTextView
         editTextOutputLang = view.findViewById(R.id.edit_language_output) as AutoCompleteTextView
+
         val checkBox = view.findViewById<CheckBox>(R.id.checkbox) as CheckBox
         Toast.makeText(requireContext(), setTitleReceived, Toast.LENGTH_SHORT).show()
         val inputLangReceived = requireArguments().getString("inputLanguage")
@@ -141,10 +142,10 @@ class SetCorrectInfoDialog : AppCompatDialogFragment(),SetCorrectInfoContract.Vi
         })
 
         alertDialogBuilder.setView(view)
-            .setTitle("Edit Set")
-            .setNegativeButton("cancel",
+            .setTitle(R.string.edit_set)
+            .setNegativeButton(R.string.cancel,
                 DialogInterface.OnClickListener { _, _ -> })
-            .setPositiveButton("ok", DialogInterface.OnClickListener { _, _ ->
+            .setPositiveButton(R.string.ok, DialogInterface.OnClickListener { _, _ ->
                 val setTitle: String = editTextTitle?.text.toString()
                 val inputLang: String = editTextInputLang?.text.toString()
                 val outputLang: String = editTextOutputLang?.text.toString()

@@ -29,6 +29,7 @@ import com.google.android.gms.vision.text.TextBlock;
 public class OcrDetectorProcessor implements Detector.Processor<TextBlock> {
 
     private GraphicOverlay<OcrGraphic> graphicOverlay;
+    private final String TAG ="OcrDetectorProcessor";
 
     OcrDetectorProcessor(GraphicOverlay<OcrGraphic> ocrGraphicOverlay) {
         graphicOverlay = ocrGraphicOverlay;
@@ -41,6 +42,7 @@ public class OcrDetectorProcessor implements Detector.Processor<TextBlock> {
      * previous frames, or reduce noise by eliminating TextBlocks that have not persisted through
      * multiple detections.
      */
+
     @Override
     public void receiveDetections(Detector.Detections<TextBlock> detections) {
         graphicOverlay.clear();
@@ -48,7 +50,7 @@ public class OcrDetectorProcessor implements Detector.Processor<TextBlock> {
         for (int i = 0; i < items.size(); ++i) {
             TextBlock item = items.valueAt(i);
             if (item != null && item.getValue() != null) {
-                Log.d("OcrDetectorProcessor", "Text detected! " + item.getValue());
+                Log.d(TAG, "Text detected! " + item.getValue());
                 OcrGraphic graphic = new OcrGraphic(graphicOverlay, item);
                 graphicOverlay.add(graphic);
             }
@@ -56,7 +58,7 @@ public class OcrDetectorProcessor implements Detector.Processor<TextBlock> {
     }
 
     /**
-     * Frees the resources associated with this detection processor.
+     * Освобождаем ресурсы связанные с процессом детектирования текста.
      */
     @Override
     public void release() {

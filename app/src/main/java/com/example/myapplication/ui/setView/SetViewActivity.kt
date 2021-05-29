@@ -165,7 +165,7 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
 //        SettGetAsyncTask(dbhelper, this).execute(settId)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
-        setViewAdapter = SetViewAdapter(this)
+        setViewAdapter = SetViewAdapter()
         recyclerView.adapter = setViewAdapter
 
         val itemTouchHelper = ItemTouchHelper(simpleCallBack)
@@ -361,10 +361,10 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
     override fun showUndoDeleteWord(position: Int) {
         Snackbar.make(
             recyclerView,
-            "${deletedWord.originalWord} is deleted",
+            deletedWord.originalWord + " " + getText(R.string.is_deleted),
             Snackbar.LENGTH_LONG
         ).setAction(
-            "UNDO"
+            getString(R.string.undo)
         ) {
             wordsDisplayed.add(position, deletedWord)
             setViewAdapter.notifyItemInserted(position)
@@ -463,7 +463,6 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
                     ItemTouchHelper.LEFT -> {
                         deletedWord = wordsDisplayed[position]!!
                         presenter.onLeftSwipe(position)
-
                     }
                     //свайп впрао -> копирование
                     ItemTouchHelper.RIGHT -> {
