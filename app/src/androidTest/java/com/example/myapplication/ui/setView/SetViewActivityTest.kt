@@ -6,24 +6,22 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.core.app.launchActivity
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.contrib.RecyclerViewActions
+import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.matcher.BoundedMatcher
-import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.example.myapplication.R
-import org.hamcrest.CoreMatchers.not
+import com.example.myapplication.RegexMatcher
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-
-
 
 
 class SetViewActivityTest {
@@ -37,19 +35,13 @@ class SetViewActivityTest {
 
     @Before
     fun setUp() {
-        Intents.init();
-        /* Intents.init()
-         //обращаемся к базе данных
-         var intent = Intent()
-         intent.putExtra("SUBJECT_ID", id)
-         intent.putExtra("SUBJECT_TITLE", subjectTitle)
-         intent.putExtra("SUBJECT_TEACHER", subjectTeacher)
-         mActivityRule.launchActivity(intent)*/
+        Intents.init()
+
     }
 
     @After
     fun tearDown() {
-        Intents.release();
+        Intents.release()
     }
 
     @Test
@@ -58,7 +50,7 @@ class SetViewActivityTest {
             ApplicationProvider.getApplicationContext(),
             SetViewActivity::class.java
         )
-            .putExtra("settId", 1L)
+            .putExtra("settId", 2L)
         var scenario = activityScenarioRule.scenario
         scenario = launchActivity(intent)
         onView(withId(R.id.word_add_button)).perform(click())
@@ -72,12 +64,11 @@ class SetViewActivityTest {
             ApplicationProvider.getApplicationContext(),
             SetViewActivity::class.java
         )
-            .putExtra("settId", "1")
+            .putExtra("settId", 2)
         var scenario = activityScenarioRule.scenario
         scenario = launchActivity(intent)
         onView(withId(R.id.original_input)).perform(replaceText("Рассвет"))
         onView(withId(R.id.translated_input)).perform(replaceText("Dawn"), closeSoftKeyboard())
-        onView(withId(R.id.recyclerivew_set_create))
 
         onView(withId(R.id.word_add_button)).perform(click())
         onView(withId(R.id.recyclerivew_set_create))
@@ -92,15 +83,25 @@ class SetViewActivityTest {
             ApplicationProvider.getApplicationContext(),
             SetViewActivity::class.java
         )
-            .putExtra("settId", 1L)
+            .putExtra("settId", 2L)
         var scenario = activityScenarioRule.scenario
         scenario = launchActivity(intent)
         onView(withId(R.id.original_input)).perform(replaceText("Рассвет"))
         onView(withId(R.id.translated_input)).perform(replaceText("Dawn"), closeSoftKeyboard())
-        onView(withId(R.id.recyclerivew_set_create)).perform(swipeLeft())
+        onView(withId(R.id.word_add_button)).perform(click())
 
+       /* onView(withId(R.id.recyclerivew_set_create)).perform(
+            actionOnItemAtPosition(
+                0, GeneralSwipeAction(
+                    Swipe.SLOW, GeneralLocation.BOTTOM_RIGHT, GeneralLocation.BOTTOM_LEFT,
+                    Press.FINGER
+                )
+            )
+        )*/
+        onView(withId(R.id.recyclerivew_set_create)).perform(actionOnItemAtPosition<RecyclerView.ViewHolder>(0, swipeLeft()))
+        fun withPattern(regex: String): Matcher<in View>? = RegexMatcher(regex)
         onView(withId(com.google.android.material.R.id.snackbar_text))
-            .check(matches(withText("\\w+ ${R.string.is_deleted}")))
+            .check(matches(withText("Рассвет удален")))
 
     }
     private fun atPosition(position: Int, itemMatcher: Matcher<View?>): Matcher<View?>? {

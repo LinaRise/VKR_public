@@ -75,10 +75,10 @@ class ListPageFragment : Fragment(), ListPageContract.View, SetAdapter.OnSetList
     }
 
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
+    /*override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         (activity as AppCompatActivity?)!!.supportActionBar?.title = getString(R.string.sets)
-    }
+    }*/
 
 
     override fun setData(setsInfo: LinkedHashMap<Sett, List<String>>) {
