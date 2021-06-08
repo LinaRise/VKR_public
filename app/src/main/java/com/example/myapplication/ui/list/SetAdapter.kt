@@ -27,7 +27,6 @@ class SetAdapter internal constructor(
 
     // передаем информацию для отображения
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-//        val state: Sett = sets[position]
         val listValues: List<List<String>> = ArrayList<List<String>>(sets.values)
         val listKeys: List<Sett> = ArrayList<Sett>(sets.keys)
         val langList: List<*> = listValues[position]

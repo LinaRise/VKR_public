@@ -38,8 +38,6 @@ class ConnectivityProviderLegacyImpl(
 
     private inner class ConnectivityReceiver : BroadcastReceiver() {
         override fun onReceive(c: Context, intent: Intent) {
-            // on some devices ConnectivityManager.getActiveNetworkInfo() does not provide the correct network state
-            // https://issuetracker.google.com/issues/37137911
             val networkInfo = cm.activeNetworkInfo
             val fallbackNetworkInfo: NetworkInfo? = intent.getParcelableExtra(EXTRA_NETWORK_INFO)
             // a set of dirty workarounds

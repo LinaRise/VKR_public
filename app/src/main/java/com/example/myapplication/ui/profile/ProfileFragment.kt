@@ -128,40 +128,6 @@ class ProfileFragment : Fragment(), ProfileContract.View,
     }
 
 
-    /*  override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-          tvX!!.text = seekBarX!!.progress.toString()
-  //        tvY!!.text = seekBarY!!.progress.toString()
-          val values: ArrayList<BarEntry> = ArrayList()
-          for (i in 0 until seekBarX!!.progress) {
-  //            val multi = (seekBarY!!.progress + 1).toFloat()
-  //            val `val` = (Math.random() * multi).toFloat() + multi / 3
-              values.add(BarEntry(i.toFloat(), i.toFloat()))
-          }
-          val set1: BarDataSet
-          if (chart!!.data != null &&
-              chart!!.data.dataSetCount > 0
-          ) {
-              set1 = chart!!.data.getDataSetByIndex(0) as BarDataSet
-              set1.values = values
-              chart!!.data.notifyDataChanged()
-              chart!!.notifyDataSetChanged()
-          } else {
-              set1 = BarDataSet(values, "Data Set")
-              set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
-              set1.setDrawValues(false)
-              val dataSets: ArrayList<IBarDataSet> = ArrayList()
-              dataSets.add(set1)
-              val data = BarData(dataSets)
-              chart?.data = data
-              // if more than 7 entries are displayed in the chart, no values will be
-              // drawn
-              chart?.setMaxVisibleValueCount(7)
-              chart?.setFitBars(true)
-          }
-          chart!!.invalidate()
-      }*/
-
-
     override fun onStart() {
         super.onStart()
         provider.addListener(this)
@@ -286,10 +252,6 @@ class ProfileFragment : Fragment(), ProfileContract.View,
     }
 
 
-    /* override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-
-     override fun onStopTrackingTouch(seekBar: SeekBar?) {}*/
-
     override fun onValueSelected(e: Entry?, h: Highlight?) {
         val entry = e as BarEntry
 
@@ -370,7 +332,6 @@ class ProfileFragment : Fragment(), ProfileContract.View,
 
 
     private fun createNotificationChannel() {
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = resources.getString(R.string.channel_name)
             val descriptionText = resources.getString(R.string.channel_description)

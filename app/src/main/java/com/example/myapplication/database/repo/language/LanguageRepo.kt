@@ -16,6 +16,7 @@ class LanguageRepo(val dbhelper: DBHelper) : IRepository<Language> {
     private val TAG = "LanguageRepo"
 
     lateinit var db: SQLiteDatabase
+
     override fun create(entity: Language): Long {
         db = dbhelper.writableDatabase
         db.beginTransaction()
@@ -31,7 +32,6 @@ class LanguageRepo(val dbhelper: DBHelper) : IRepository<Language> {
         } finally {
             db.endTransaction()
             return id
-
         }
     }
 

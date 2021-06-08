@@ -99,11 +99,11 @@ class ChatHeadService : Service() {
 
                             //close the service and remove the chat heads
 //                            stopSelf()
-                        } else Toast.makeText(
+                        } /*else Toast.makeText(
                             applicationContext, "It's not a click !",
                             Toast.LENGTH_LONG
                         )
-                            .show()
+                            .show()*/
                         lastAction = event.action
                         return true
 

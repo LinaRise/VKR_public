@@ -38,8 +38,13 @@
     <string name="is_deleted">удален</string>
     <string name="cancel">Отмена</string>
     <string name="new_set">Новый набор</string>
-    <string name="auto_suggest">Авто перевод</string>
+    <string name="auto_suggest">Автоперевод</string>
     <string name="result">Результат</string>
+    <string name="you_have">У вас</string>
+    <string name="right_answers_and">"правильных(ый) ответа и"</string>
+    <string name="wrong">неправильных(ый)</string>
+    <string name="need_5_words">Необходимо минимум 5 карточек для начала обучения</string>
+
     <string-array name="available_translation_languages">
         <item>Russian</item>
         <item>English</item>

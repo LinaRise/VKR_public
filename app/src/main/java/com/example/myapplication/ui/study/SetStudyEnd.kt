@@ -12,7 +12,9 @@ import com.example.myapplication.R
 class SetStudyEnd : AppCompatDialogFragment() {
     private var resultText: TextView? = null
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        var alertDialogBuilder = AlertDialog.Builder(requireActivity())
+        val alertDialogBuilder = AlertDialog.Builder(requireActivity())
+        alertDialogBuilder.setCancelable(false)
+
         val inflater = requireActivity().layoutInflater
 
 
@@ -21,14 +23,14 @@ class SetStudyEnd : AppCompatDialogFragment() {
         val rightAnswers = requireArguments().getInt("rightAnswers")
         val wrongAnswers = requireArguments().getInt("wrongAnswers")
 //        val wordList = requireArguments().getString("wordList")
-        resultText!!.text = "You have $rightAnswers right answers and $wrongAnswers wrong"
+        resultText!!.text = getString(R.string.you_have)+" "+rightAnswers +" "+getString(R.string.right_answers_and)+" "+wrongAnswers +" "+ getString(
+                    R.string.wrong)
         alertDialogBuilder.setView(view)
             .setTitle(getString(R.string.result))
             .setPositiveButton(R.string.ok, DialogInterface.OnClickListener { _, _ ->
                 dialog?.dismiss()
                 (context as Activity).finish()
             })
-
         return alertDialogBuilder.create()
 
 

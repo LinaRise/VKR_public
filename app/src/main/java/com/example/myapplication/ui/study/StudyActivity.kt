@@ -126,7 +126,6 @@ class StudyActivity : AppCompatActivity(), SetStudyContract.View {
                         TableRow.LayoutParams.WRAP_CONTENT,
                         TableRow.LayoutParams.WRAP_CONTENT, 1f
                     )
-
                     textView.id = progressBarIds[i]
                     textView.width = 0
                     textView.height = (10 * scale + 0.5f).toInt()

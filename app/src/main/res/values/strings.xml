@@ -39,6 +39,10 @@
     <string name="new_set">New Set</string>
     <string name="auto_suggest">Auto-Suggest</string>
     <string name="result">Result</string>
+    <string name="you_have">You have</string>
+    <string name="right_answers_and">" right answers and"</string>
+    <string name="wrong">wrong</string>
+    <string name="need_5_words">You need at least 5 cards to start studying</string>
     <string-array name="available_translation_languages">
         <item>Russian</item>
         <item>English</item>

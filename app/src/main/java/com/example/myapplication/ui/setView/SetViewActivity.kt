@@ -284,7 +284,7 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
                 if (wordsDisplayed.size < 5) {
                     Snackbar.make(
                         recyclerView,
-                        "You need at least 5 words to start studying",
+                        getString(R.string.need_5_words),
                         Snackbar.LENGTH_LONG
                     ).show()
                 } else {

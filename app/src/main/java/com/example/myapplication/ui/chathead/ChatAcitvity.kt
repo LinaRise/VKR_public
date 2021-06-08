@@ -25,13 +25,11 @@ class ChatActivity : AppCompatActivity(), IChatActivityView {
         val copiedText = clipboard.getClipboardText(this)
         return copiedText ?: ""
     }
-
     private fun ClipboardManager.getClipboardText(context: Context): String? {
         if (hasPrimaryClip()) {
             val clip = primaryClip
             if (clip != null && clip.itemCount > 0) {
                 val clipboardTextItem = clip.getItemAt(0).coerceToText(context)
-
                 if (clipboardTextItem != null)
                     return clipboardTextItem.toString()
             }
