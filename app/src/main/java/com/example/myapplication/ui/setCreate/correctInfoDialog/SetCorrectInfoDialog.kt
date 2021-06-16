@@ -16,6 +16,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDialogFragment
 import com.example.myapplication.R
 import com.example.myapplication.connectivity.base.ConnectivityProvider
+import com.example.myapplication.database.DBHelper
+import com.example.myapplication.ui.DependencyInjectorImpl
 import com.example.myapplication.ui.setCreate.ISetInputData
 import com.example.myapplication.ui.setCreate.setUpDialog.SetUpContract
 import com.google.auth.oauth2.GoogleCredentials
@@ -24,7 +26,7 @@ import com.google.cloud.translate.TranslateOptions
 import java.io.IOException
 import java.util.concurrent.Executors
 
-class SetCorrectInfoDialog : AppCompatDialogFragment(),SetCorrectInfoContract.View,
+class SetCorrectInfoDialog : AppCompatDialogFragment(), SetCorrectInfoContract.View,
     ConnectivityProvider.ConnectivityStateListener {
 
     private lateinit var presenter: SetCorrectInfoContract.Presenter
@@ -35,6 +37,7 @@ class SetCorrectInfoDialog : AppCompatDialogFragment(),SetCorrectInfoContract.Vi
         )
     }
     var languageTitleAndCode: Map<String, String> = hashMapOf()
+    lateinit var dbhelper: DBHelper
 
 
     private var hasInternet: Boolean = false
@@ -77,16 +80,14 @@ class SetCorrectInfoDialog : AppCompatDialogFragment(),SetCorrectInfoContract.Vi
     private var editTextOutputLang: AutoCompleteTextView? = null
     private var hasAutoSuggest = 0
 
-    var languagesSourceNames: Array<String> = arrayOf()
-
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val alertDialogBuilder = AlertDialog.Builder(requireActivity())
         val inflater = requireActivity().layoutInflater
 
         val view = inflater.inflate(R.layout.set_parameters, null)
-
-        setPresenter(SetCorrectInfoPresenter(this))
+        dbhelper = DBHelper(requireContext())
+        setPresenter(SetCorrectInfoPresenter(this, DependencyInjectorImpl(dbhelper)))
 
         val setTitleReceived = requireArguments().getString("settTitle")
         editTextTitle = view.findViewById(R.id.edit_set_title)
@@ -94,8 +95,8 @@ class SetCorrectInfoDialog : AppCompatDialogFragment(),SetCorrectInfoContract.Vi
         editTextOutputLang = view.findViewById(R.id.edit_language_output) as AutoCompleteTextView
 
         val checkBox = view.findViewById<CheckBox>(R.id.checkbox) as CheckBox
-        Toast.makeText(requireContext(), setTitleReceived, Toast.LENGTH_SHORT).show()
-        val inputLangReceived = requireArguments().getString("inputLanguage")
+//        Toast.makeText(requireContext(), setTitleReceived, Toast.LENGTH_SHORT).show()
+        val inputLangReceived =   requireArguments().getString("inputLanguage")
         val outputLangReceived = requireArguments().getString("outputLanguage")
         val hasAutoSuggestReceived = requireArguments().getInt("hasAutoSuggest")
 
@@ -185,17 +186,18 @@ class SetCorrectInfoDialog : AppCompatDialogFragment(),SetCorrectInfoContract.Vi
         provider.addListener(this)
 
         //загрузка доступных языков
-            if (hasInternet) {
-                if (languagesSourceNames.isEmpty()) {
-                    translateService
-                    presenter.onViewCreated(translate)
-
-                }
-            }
-
+        if (hasInternet) {
+            if (languageTitleAndCode.values.isEmpty()) {
+                translateService
+                presenter.onViewCreated(translate)
 
             }
-    override fun showNoInternetConnectionToast(){
+        }
+
+
+    }
+
+    override fun showNoInternetConnectionToast() {
         Toast.makeText(
             requireContext(),
             "No internet connection!",
@@ -203,23 +205,21 @@ class SetCorrectInfoDialog : AppCompatDialogFragment(),SetCorrectInfoContract.Vi
         ).show()
     }
 
-    override fun setAvailableLanguagesInfo(languagesSourceNames: Array<String>,languageTitleAndCode: Map<String, String>) {
-        this.languagesSourceNames = languagesSourceNames
+    override fun setAvailableLanguagesInfo(languageTitleAndCode: Map<String, String>) {
         this.languageTitleAndCode = languageTitleAndCode
 
-        if (languagesSourceNames.isNotEmpty()) {
+        if (languageTitleAndCode.values.isNotEmpty()) {
 
             val adapterSource = ArrayAdapter(
                 requireContext(),
                 android.R.layout.simple_list_item_1,
-                languagesSourceNames
+                languageTitleAndCode.values.toTypedArray()
 
             )
             val adapterTarget = ArrayAdapter(
                 requireContext(),
                 android.R.layout.simple_list_item_1,
-                languagesSourceNames
-
+                languageTitleAndCode.values.toTypedArray()
             )
             editTextInputLang!!.setAdapter(adapterSource)
             editTextOutputLang!!.setAdapter(adapterTarget)
@@ -230,11 +230,11 @@ class SetCorrectInfoDialog : AppCompatDialogFragment(),SetCorrectInfoContract.Vi
     }
 
 
-
     override fun onStop() {
         super.onStop()
         provider.removeListener(this)
     }
+
     override fun onDestroy() {
         super.onDestroy()
         presenter.onDestroy()
@@ -244,8 +244,7 @@ class SetCorrectInfoDialog : AppCompatDialogFragment(),SetCorrectInfoContract.Vi
     override fun onStateChange(state: ConnectivityProvider.NetworkState) {
         hasInternet = state.hasInternet()
         if (!hasInternet)
-           showNoInternetConnectionToast()
-
+            showNoInternetConnectionToast()
     }
 
     private fun ConnectivityProvider.NetworkState.hasInternet(): Boolean {

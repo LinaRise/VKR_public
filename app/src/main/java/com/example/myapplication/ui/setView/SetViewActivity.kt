@@ -73,7 +73,7 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
     private var hasAutoSuggest = 0
 
     var translate: Translate? = null
-    var languageTitleAndCode: Map<String, String> = hashMapOf()
+    var languageCodeAndTitle: Map<String, String> = hashMapOf()
     private var receivedTranslation: String = ""
 
 
@@ -162,7 +162,6 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
         provider.addListener(this)
 
         presenter.onViewCreated(settId)
-//        SettGetAsyncTask(dbhelper, this).execute(settId)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         setViewAdapter = SetViewAdapter()
@@ -183,7 +182,7 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
                 if (translate != null) {
                     receivedTranslation = presenter.onTranslate(
                         translate!!,
-                        languageTitleAndCode,
+                        languageCodeAndTitle,
                         originalText.text.toString(),
                         inputLanguageText!!.trim(),
                         outputLanguageText!!.trim(),
@@ -260,7 +259,6 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
             }
             R.id.check_icon -> {
                 Log.d("SetViewActivity", "check_icon clicked")
-
                 presenter.onSaveClicked(
                     wordsDisplayed,
                     wordsOriginal,
@@ -269,7 +267,6 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
                     outputLanguage.languageTitle,
                     hasAutoSuggest
                 )
-
                 finish()
                 return true
             }
@@ -493,9 +490,9 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
         presenter.loadLanguagesData(resultSett)
     }
 
-    override fun setLanguageData(inputLang: Language, outputLang: Language) {
-        inputLanguage = inputLang
-        outputLanguage = outputLang
+    override fun setLanguageData(inputLang: String, outputLang: String) {
+        inputLanguage.languageTitle = inputLang
+        outputLanguage.languageTitle = outputLang
         inputLanguageText = inputLanguage.languageTitle
         outputLanguageText = outputLanguage.languageTitle
     }
@@ -509,10 +506,10 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
         if (hasInternet) {
             translateService
             if (translate != null) {
-                if (languageTitleAndCode.isEmpty()) {
+                if (languageCodeAndTitle.isEmpty()) {
                     val languages: List<com.google.cloud.translate.Language> =
                         translate!!.listSupportedLanguages()
-                    languageTitleAndCode = languages.map { it.name to it.code }.toMap()
+                    languageCodeAndTitle = languages.map { it.code to it.name }.toMap()
                 }
             }
         } else {

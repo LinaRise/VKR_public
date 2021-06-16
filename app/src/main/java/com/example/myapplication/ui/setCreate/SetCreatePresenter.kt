@@ -68,8 +68,8 @@ class SetCreatePresenter(
         wordsDisplayed: List<Word>, setTitle: String, inputLanguage: String,
         outputLanguage: String, hasAutoSuggest: Int
     ) {
-        val languageInputInfo = mLanguageRepo.getByTitle(inputLanguage.trim())
-        val languageOutputInfo = mLanguageRepo.getByTitle(outputLanguage.trim())
+        val languageInputInfo = mLanguageRepo.getByLocaleTitle(inputLanguage.trim())
+        val languageOutputInfo = mLanguageRepo.getByLocaleTitle(outputLanguage.trim())
         val newSet = Sett(
             0,
             setTitle.trim(),
@@ -77,22 +77,20 @@ class SetCreatePresenter(
             hasAutoSuggest = hasAutoSuggest
         )
         if (languageInputInfo != null) {
-            if (languageInputInfo.languageId != 0L) {
+            if (languageInputInfo.languageId.isNotEmpty()) {
                 newSet.languageInput_id = languageInputInfo.languageId
             } else {
-                val newInputLangId =
                     mLanguageRepo.create(Language(languageTitle = inputLanguage.trim()))
-                newSet.languageInput_id = newInputLangId
+                newSet.languageInput_id = inputLanguage.trim()
             }
         }
         if (languageOutputInfo != null) {
-            if (languageOutputInfo.languageId != 0L) {
+            if (languageOutputInfo.languageId.isNotEmpty()) {
                 newSet.languageOutput_id = languageOutputInfo.languageId
             } else {
                 if (outputLanguage.trim() != inputLanguage.trim()) {
-                    val newOutputLangId =
                         mLanguageRepo.create(Language(languageTitle = outputLanguage.trim()))
-                    newSet.languageOutput_id = newOutputLangId
+                    newSet.languageOutput_id = outputLanguage.trim()
                 } else {
                     newSet.languageOutput_id = newSet.languageInput_id
                 }

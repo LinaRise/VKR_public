@@ -65,7 +65,6 @@ class SetCreateActivity : AppCompatActivity(), SetCreateContract.View, ISetInput
             val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
             StrictMode.setThreadPolicy(policy)
             try {
-
                 resources.openRawResource(R.raw.credentials).use { `is` ->
                     val myCredentials = GoogleCredentials.fromStream(`is`)
                     val translateOptions =

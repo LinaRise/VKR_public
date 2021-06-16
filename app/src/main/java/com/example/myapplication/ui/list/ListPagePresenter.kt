@@ -6,7 +6,10 @@ import com.example.myapplication.database.repo.language.LanguageRepo
 import com.example.myapplication.database.repo.sett.SettRepo
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.ui.DependencyInjector
+import java.util.*
 import java.util.concurrent.Executors
+import kotlin.collections.ArrayList
+import kotlin.collections.LinkedHashMap
 
 class ListPagePresenter(view: ListPageContract.View, dependencyInjector: DependencyInjector) :
     ListPageContract.Presenter {
@@ -32,17 +35,11 @@ class ListPagePresenter(view: ListPageContract.View, dependencyInjector: Depende
         if (setList != null) {
             val languagesList = LinkedHashMap<Sett, List<String>>()
             for (sett in setList) {
-                val inputLang = mLanguageRepo.get(sett.languageInput_id)
-                val outputLang = mLanguageRepo.get(sett.languageOutput_id)
+                val inputLang = mLanguageRepo.getLanguageTitleLocale(sett.languageInput_id,Locale.getDefault().language)
+                val outputLang = mLanguageRepo.getLanguageTitleLocale(sett.languageOutput_id,Locale.getDefault().language)
                 val list = ArrayList<String>()
-                if (inputLang != null)
-                    list.add(inputLang.languageTitle)
-                else
-                    list.add("-")
-                if (outputLang != null)
-                    list.add(outputLang.languageTitle)
-                else
-                    list.add("-")
+                list.add(inputLang)
+                list.add(outputLang)
                 languagesList[sett] = list
             }
             mView?.setData(languagesList)

@@ -12,7 +12,9 @@ import com.example.myapplication.entity.Word
 import com.example.myapplication.translation.TranslationUtils
 import com.example.myapplication.ui.DependencyInjector
 import com.google.cloud.translate.Translate
+import java.util.*
 import java.util.concurrent.Executors
+import kotlin.collections.ArrayList
 
 class SetViewPresenter(
     view: SetViewContract.View,
@@ -51,21 +53,23 @@ class SetViewPresenter(
      */
     override fun onTranslate(
         translate: Translate,
-        languageTitleAndCode: Map<String, String>,
+        languageCodeAndTitle: Map<String, String>,
         originalText: String,
         sourceLanguage: String,
         targetLanguage: String,
         hasAutoSuggest: Int,
         hasInternet: Boolean
     ): String {
+        val sourceLangCode = mLanguageRepo.getByLocaleTitle(sourceLanguage)!!.languageId
+        val targetLangCode = mLanguageRepo.getByLocaleTitle(targetLanguage)!!.languageId
         if (hasAutoSuggest == 1) {
             if (hasInternet) {
                 return TranslationUtils.translate(
                     translate,
-                    languageTitleAndCode,
+                    languageCodeAndTitle,
                     originalText,
-                    sourceLanguage,
-                    targetLanguage
+                    sourceLangCode,
+                    targetLangCode
                 )
             }
         }
@@ -116,12 +120,11 @@ class SetViewPresenter(
         val languageOutputInfo = mLanguageRepo.getByTitle(outputLanguage.trim())
         if (sett != null) {
             if (languageInputInfo != null) {
-                if (languageInputInfo.languageId != 0L) {
+                if (languageInputInfo.languageId.isNotEmpty()) {
                     sett.languageInput_id = languageInputInfo.languageId
                 } else {
-                    val newInputLangId =
                         mLanguageRepo.create(Language(languageTitle = inputLanguage.trim()))
-                    sett.languageInput_id = newInputLangId
+                    sett.languageInput_id = inputLanguage.trim()
                 }
             }
 
@@ -129,13 +132,12 @@ class SetViewPresenter(
             sett.wordsAmount = wordsDisplayed.size
 
             if (languageOutputInfo != null) {
-                if (languageOutputInfo.languageId != 0L) {
+                if (languageOutputInfo.languageId.isNotEmpty()) {
                     sett.languageOutput_id = languageOutputInfo.languageId
                 } else {
                     if (outputLanguage.trim() != inputLanguage.trim()) {
-                        val newOutputLangId =
                             mLanguageRepo.create(Language(languageTitle = outputLanguage.trim()))
-                        sett.languageOutput_id = newOutputLangId
+                        sett.languageOutput_id = outputLanguage.trim()
                     } else {
                         sett.languageOutput_id = sett.languageInput_id
                     }
@@ -209,11 +211,11 @@ class SetViewPresenter(
     override fun loadLanguagesData(sett: Sett) {
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
-        var inputLanguage: Language?
-        var outputLanguage: Language?
+        var inputLanguage: String?
+        var outputLanguage: String?
         executor.execute {
-            inputLanguage = mLanguageRepo.get(sett.languageInput_id)
-            outputLanguage = mLanguageRepo.get(sett.languageOutput_id)
+            inputLanguage = mLanguageRepo.getLanguageTitleLocale(sett.languageInput_id,Locale.getDefault().language)
+            outputLanguage = mLanguageRepo.getLanguageTitleLocale(sett.languageOutput_id,Locale.getDefault().language)
             handler.post {
                 if (inputLanguage != null && outputLanguage != null) {
                     mView?.setLanguageData(inputLanguage!!, outputLanguage!!)

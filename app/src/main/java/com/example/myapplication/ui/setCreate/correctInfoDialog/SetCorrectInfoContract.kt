@@ -12,6 +12,6 @@ interface SetCorrectInfoContract {
 
     interface View : BaseView<Presenter> {
         fun showNoInternetConnectionToast()
-        fun setAvailableLanguagesInfo(languagesSourceNames: Array<String>,languageTitleAndCode: Map<String, String>)
+        fun setAvailableLanguagesInfo(languageTitleAndCode: Map<String, String>)
     }
 }

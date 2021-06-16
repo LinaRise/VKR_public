@@ -5,8 +5,16 @@ import android.provider.BaseColumns
 object TablesAndColumns {
     object LanguageEntry : BaseColumns {
         const val TABLE_NAME = "language"
-        const val COL_LANGUAGE_TITLE = "language_title"
     }
+
+    object LanguageTranslationEntry : BaseColumns {
+        const val TABLE_NAME = "languageTr"
+        const val COL_LANGUAGE_CODE = "language_code"
+        const val COL_LANGUAGETR_CODE = "languageTr_code"
+        const val COL_LANGUAGETR_IS_DEFAULT = "is_default"
+        const val COL_LANGUAGETR_TITLE = "languageTR_title"
+    }
+
     object WordEntry : BaseColumns {
         const val TABLE_NAME = "word"
         const val COL_ORIGINAL_WORD = "original_word"

@@ -35,7 +35,7 @@
     <string name="pick_up_set">Pick up Set</string>
     <string name="undo">UNDO</string>
     <string name="is_deleted">is deleted</string>
-    <string name="cancel">Отмена</string>
+    <string name="cancel">Cancel</string>
     <string name="new_set">New Set</string>
     <string name="auto_suggest">Auto-Suggest</string>
     <string name="result">Result</string>

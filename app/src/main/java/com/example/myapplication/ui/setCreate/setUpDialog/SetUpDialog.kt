@@ -1,8 +1,10 @@
 package com.example.myapplication.ui.setCreate.setUpDialog
 
 import android.app.Dialog
+import android.content.ContentValues
 import android.content.DialogInterface
 import android.content.Intent
+import android.database.sqlite.SQLiteDatabase
 import android.os.*
 import android.text.Editable
 import android.text.TextWatcher
@@ -11,19 +13,21 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDialogFragment
 import com.example.myapplication.R
 import com.example.myapplication.connectivity.base.ConnectivityProvider
+import com.example.myapplication.database.DBHelper
+import com.example.myapplication.database.TablesAndColumns
+import com.example.myapplication.ui.DependencyInjectorImpl
 import com.example.myapplication.ui.setCreate.SetCreateActivity
-import com.example.myapplication.ui.setCreate.SetCreateContract
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.translate.Translate
 import com.google.cloud.translate.TranslateOptions
 import java.io.IOException
-import java.util.concurrent.Executors
 
 
 class SetUpDialog : AppCompatDialogFragment(), SetUpContract.View,
     ConnectivityProvider.ConnectivityStateListener {
 
     private lateinit var presenter: SetUpContract.Presenter
+    lateinit var dbhelper: DBHelper
 
     private val provider: ConnectivityProvider by lazy {
         ConnectivityProvider.createProvider(
@@ -68,7 +72,6 @@ class SetUpDialog : AppCompatDialogFragment(), SetUpContract.View,
     private var editTextOutputLang: AutoCompleteTextView? = null
 
     var languageTitleAndCode: Map<String, String> = hashMapOf()
-    var languagesSourceNames: Array<String> = arrayOf()
 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -76,9 +79,10 @@ class SetUpDialog : AppCompatDialogFragment(), SetUpContract.View,
         val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.set_parameters, null)
 
-        setPresenter(SetUpPresenter(this))
+        dbhelper = DBHelper(requireContext())
+        setPresenter(SetUpPresenter(this, DependencyInjectorImpl(dbhelper)))
 
-        //инициализайия
+        //инициализация
         editTextTitle = view.findViewById(R.id.edit_set_title)
         editTextInputLang = view.findViewById(R.id.edit_language_input) as AutoCompleteTextView
         editTextOutputLang = view.findViewById(R.id.edit_language_output) as AutoCompleteTextView
@@ -123,9 +127,9 @@ class SetUpDialog : AppCompatDialogFragment(), SetUpContract.View,
             .setNegativeButton(R.string.cancel,
                 DialogInterface.OnClickListener { _, _ -> })
             .setPositiveButton(R.string.ok, DialogInterface.OnClickListener { _, _ ->
-                val setTitle: String = editTextTitle?.text.toString()
-                val inputLang: String = editTextInputLang?.text.toString()
-                val outputLang: String = editTextOutputLang?.text.toString()
+                val setTitle: String = editTextTitle?.text.toString().trim()
+                val inputLang: String = editTextInputLang?.text.toString().trim()
+                val outputLang: String = editTextOutputLang?.text.toString().trim()
                 val intent = Intent(activity, SetCreateActivity::class.java)
                 intent.putExtra("setTitle", setTitle)
                 intent.putExtra("inputLanguage", inputLang)
@@ -153,7 +157,7 @@ class SetUpDialog : AppCompatDialogFragment(), SetUpContract.View,
         super.onStart()
         provider.addListener(this)
         if (hasInternet) {
-            if (languagesSourceNames.isEmpty()) {
+            if (languageTitleAndCode.values.isEmpty()) {
                 translateService
                 presenter.onViewCreated(translate)
             }
@@ -169,23 +173,23 @@ class SetUpDialog : AppCompatDialogFragment(), SetUpContract.View,
         ).show()
     }
 
-    override fun setAvailableLanguagesInfo(languagesSourceNames: Array<String>,languageTitleAndCode: Map<String, String>) {
-        this.languagesSourceNames = languagesSourceNames
+    override fun setAvailableLanguagesInfo(
+        languageTitleAndCode: Map<String, String>
+    ) {
         this.languageTitleAndCode = languageTitleAndCode
 
-        if (languagesSourceNames.isNotEmpty()) {
+        if (languageTitleAndCode.values.isNotEmpty()) {
 
             val adapterSource = ArrayAdapter(
                 requireContext(),
                 android.R.layout.simple_list_item_1,
-                languagesSourceNames
+                languageTitleAndCode.values.toTypedArray()
 
             )
             val adapterTarget = ArrayAdapter(
                 requireContext(),
                 android.R.layout.simple_list_item_1,
-                languagesSourceNames
-
+                languageTitleAndCode.values.toTypedArray()
             )
             editTextInputLang!!.setAdapter(adapterSource)
             editTextOutputLang!!.setAdapter(adapterTarget)

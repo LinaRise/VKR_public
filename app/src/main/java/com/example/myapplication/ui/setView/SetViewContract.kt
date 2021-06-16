@@ -47,6 +47,6 @@ interface SetViewContract {
         fun showCheckInternetConnection()
         fun showDialog(sets: List<Sett>?, position: Int)
         fun setSettData(resultSett:Sett)
-        fun setLanguageData(inputLang: Language, outputLanguage:Language)
+        fun setLanguageData(inputLang: String, outputLanguage:String)
     }
 }
