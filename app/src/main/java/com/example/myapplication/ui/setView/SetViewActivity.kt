@@ -40,6 +40,7 @@ import java.io.IOException
 class SetViewActivity : AppCompatActivity(), SetViewContract.View,
     ISetInputData, ConnectivityProvider.ConnectivityStateListener {
 
+    private var saveShouldBeEnabled: Boolean = false
     private lateinit var presenter: SetViewContract.Presenter
     lateinit var dbhelper: DBHelper
     private lateinit var setViewAdapter: SetViewAdapter
@@ -133,28 +134,6 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
 
     }
 
-    /*var mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent) {
-            // Get extra data included in the Intent
-            wordsDisplayed = intent.getParcelableArrayListExtra("data")
-            for (word in wordsDisplayed)
-                if (word != null) {
-                    wordsOriginal.add(
-                        Word(
-                            word.wordId,
-                            word.originalWord,
-                            word.translatedWord,
-                            settId = word.settId,
-                            recallPoint = word.recallPoint
-                        )
-                    )
-                    Log.d("wordsOriginal", wordsOriginal.size.toString())
-                }
-            Log.d("wordsOriginal", wordsOriginal.size.toString())
-        }
-
-
-    }*/
 
     override fun onStart() {
         super.onStart()
@@ -223,6 +202,8 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
         adapter.clear()
         adapter.notifyDataSetChanged()
         presenter.onAddWordClicked(original, translated)
+        invalidateOptionsMenu()
+        saveShouldBeEnabled = true
     }
 
 
@@ -246,6 +227,18 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
 
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
+        return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        val item = menu.findItem(R.id.check_icon)
+        if (saveShouldBeEnabled) {
+            item.isEnabled = true
+            item.icon.alpha = (255)
+        } else {
+            item.isEnabled = false
+            item.icon.alpha = 130;
+        }
         return true
     }
 
@@ -285,9 +278,18 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
                         Snackbar.LENGTH_LONG
                     ).show()
                 } else {
+                    presenter.onSaveClicked(
+                        wordsDisplayed,
+                        wordsOriginal,
+                        openedSett,
+                        inputLanguage.languageTitle,
+                        outputLanguage.languageTitle,
+                        hasAutoSuggest
+                    )
                     val intent = Intent(this, StudyActivity::class.java)
                     intent.putExtra("wordsDisplayed", wordsDisplayed)
                     startActivity(intent)
+                    finish()
                 }
                 return true
 
@@ -333,14 +335,16 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
     override fun updateRecyclerViewInserted(word: Word) {
         wordsDisplayed.add(word)
         setViewAdapter.notifyItemInserted(wordsDisplayed.size - 1)
-
+        invalidateOptionsMenu()
+        saveShouldBeEnabled = true
 
     }
-
 
     override fun updateRecyclerViewDeleted(position: Int) {
         setViewAdapter.notifyItemRemoved(position)
         wordsDisplayed.removeAt(position)
+        invalidateOptionsMenu()
+        saveShouldBeEnabled = true
 
     }
 
@@ -460,12 +464,16 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
                     ItemTouchHelper.LEFT -> {
                         deletedWord = wordsDisplayed[position]!!
                         presenter.onLeftSwipe(position)
+                        invalidateOptionsMenu()
+                        saveShouldBeEnabled = true
                     }
                     //свайп впрао -> копирование
                     ItemTouchHelper.RIGHT -> {
                         setViewAdapter.notifyItemChanged(viewHolder.adapterPosition)
                         val sets = presenter.onRightSwipe()
                         showDialog(sets, position)
+                        invalidateOptionsMenu()
+                        saveShouldBeEnabled = true
 
                     }
                 }

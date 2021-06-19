@@ -14,8 +14,6 @@ import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.StudyProgress
 import com.example.myapplication.entity.Word
 import com.example.myapplication.ui.DependencyInjectorImpl
-import com.example.myapplication.ui.setView.SetViewContract
-import com.example.myapplication.ui.setView.SetViewPresenter
 import kotlinx.android.synthetic.main.activity_study.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -81,8 +79,6 @@ class StudyActivity : AppCompatActivity(), SetStudyContract.View {
 
         setPresenter(SetStudyPresenter(this, DependencyInjectorImpl(dbhelper)))
 
-
-
         questionTV = findViewById<TextView>(R.id.question_textView)
         answerTV = findViewById<TextView>(R.id.answer_textView)
         option1B = findViewById<Button>(R.id.option1)
@@ -108,16 +104,12 @@ class StudyActivity : AppCompatActivity(), SetStudyContract.View {
         listToSelectFrom = ArrayList<Word>(wordsDisplayed)
         (listToSelectFrom as ArrayList<Word>).sortBy { it.recallPoint }
 
-        val (newOrForgotten, others) = listToSelectFrom.partition { it.recallPoint < 4 }
-        val (average, wellKnown) = others.partition { it.recallPoint < 8 }
+        var (newOrForgotten, others) = listToSelectFrom.partition { it.recallPoint <= 10 }
+        val (average, wellKnown) = others.partition { it.recallPoint > 10 }
 
         if (wordsDisplayed.isNotEmpty()) {
             linearLayout = findViewById<View>(R.id.progress_icons_lines) as LinearLayout
             if (wordsDisplayed.size < 20) {
-
-                //количество проверяемых слов
-                /* val newSize: Int =
-                     newOrForgotten.size + (average.size / 3).toInt() + (wellKnown.size / 4).toInt()*/
 
                 //textView для отображения верных и неверных ответов
                 for (i in 0 until wordsDisplayed.size) {
@@ -133,20 +125,7 @@ class StudyActivity : AppCompatActivity(), SetStudyContract.View {
                     linearLayout.addView(textView)
                 }
 
-                newList = ArrayList<Word>()
-                (newList as ArrayList<Word>).addAll(newOrForgotten)
-                (newList as ArrayList<Word>).addAll(
-                    returnRandomSeries(
-                        average,
-                        (average.size / 3).toInt()
-                    )
-                )
-                (newList as ArrayList<Word>).addAll(
-                    returnRandomSeries(
-                        others,
-                        (average.size / 4).toInt()
-                    )
-                )
+                newList = ArrayList<Word>(wordsDisplayed)
                 (newList as ArrayList<Word>).shuffle()
                 val optionsTaken = ArrayList<Word>()
                 rightAnswer = (1..4).random()
@@ -212,43 +191,43 @@ class StudyActivity : AppCompatActivity(), SetStudyContract.View {
                 } /**/
 
             } else {
-                for (i in 0..19) {
-                    val textView = TextView(this)
-                    textView.layoutParams = TableLayout.LayoutParams(
-                        TableRow.LayoutParams.WRAP_CONTENT,
-                        TableRow.LayoutParams.WRAP_CONTENT, 1f
-                    )
-                    textView.id = progressBarIds[i]
-                    textView.width = 0
-                    textView.height = (10 * scale + 0.5f).toInt()
-                    textView.setBackgroundResource(R.drawable.style_points)
-                    linearLayout.addView(textView)
-                }
+
 
                 newList = ArrayList<Word>()
                 if (newOrForgotten.size >= 20) {
-                    if ((average.size + wellKnown.size) > 10) {
+                    if (others.isEmpty()) {
                         (newList as ArrayList<Word>).addAll(
-                            returnRandomSeries(
-                                newOrForgotten,
-                                10
-                            )
+                            newOrForgotten.shuffled()
                         )
-
+                    } else if (others.size >= 5) {
                         (newList as ArrayList<Word>).addAll(
-                            returnRandomSeries(
-                                (average + wellKnown),
-                                10
-                            )
+                            newOrForgotten.shuffled().take(15)
+                        )
+                        (newList as ArrayList<Word>).addAll(
+                            others.shuffled().take(15)
                         )
                     } else {
-
+                        var leftSize = 20 - newOrForgotten.size
                         (newList as ArrayList<Word>).addAll(
-                            newOrForgotten
+                            newOrForgotten.shuffled().take(newOrForgotten.size)
+                        )
+                        (newList as ArrayList<Word>).addAll(
+                            others.shuffled().take(leftSize)
                         )
                     }
 
-
+                    for (i in 0..newList.size) {
+                        val textView = TextView(this)
+                        textView.layoutParams = TableLayout.LayoutParams(
+                            TableRow.LayoutParams.WRAP_CONTENT,
+                            TableRow.LayoutParams.WRAP_CONTENT, 1f
+                        )
+                        textView.id = progressBarIds[i]
+                        textView.width = 0
+                        textView.height = (10 * scale + 0.5f).toInt()
+                        textView.setBackgroundResource(R.drawable.style_points)
+                        linearLayout.addView(textView)
+                    }
                     newList.shuffled()
                     val optionsTaken = ArrayList<Word>()
                     rightAnswer = (1..4).random()
@@ -327,7 +306,7 @@ class StudyActivity : AppCompatActivity(), SetStudyContract.View {
 
     private fun returnRandomSeries(wordsList: List<Word>, randomSeriesLength: Int): List<Word> {
         wordsList.toMutableList().shuffle()
-        return wordsList.subList(0, randomSeriesLength)
+        return wordsList.subList(10, randomSeriesLength)
     }
 
     override fun onBackPressed() {
@@ -343,135 +322,139 @@ class StudyActivity : AppCompatActivity(), SetStudyContract.View {
         frontAnim.start()
         backAnim.start()
 
-        frontAnim.setTarget(answerTV)
-        backAnim.setTarget(questionTV)
-        backAnim.start()
-        frontAnim.start()
+        questionTV.postDelayed(Runnable {
+            frontAnim.setTarget(answerTV)
 
-        if (currentQuestion > newList.size - 1) {
+            backAnim.setTarget(questionTV)
+            backAnim.start()
+            frontAnim.start()
+            if (currentQuestion > newList.size - 1) {
 
-        } else {
-            if (rightAnswer == buttonNumber) {
-                rightWrong[currentQuestion] = true
-            }
-            for (i in 0 until listToSelectFrom.size) {
-                val tv = linearLayout.findViewById<TextView>(progressBarIds[i])
-                tv.setBackgroundResource(R.drawable.style_points)
-            }
-            for (i in 0..currentQuestion) {
-                val tv = linearLayout.findViewById<TextView>(progressBarIds[i])
-                if (rightWrong[i])
-                    tv.setBackgroundResource(R.drawable.style_points_green)
-                else
-                    tv.setBackgroundResource(R.drawable.style_points_red)
-            }
-            // присваиваем значение в тексовое поле вопроса
-            questionTV.text = newList[currentQuestion].originalWord
-            answerTV.text = newList[currentQuestion].translatedWord
-            var option: Word
-            //выбираем рандомно какой ответ будет праильным
-            rightAnswer = (1..4).random()
-            Log.d("rightAnswer = ", rightAnswer.toString())
-            var optionsTaken = ArrayList<Word>()
-            //присваиваем значение в текстовые поля ответов
-            while (true) {
-                if (rightAnswer != 1) {
-                    option = listToSelectFrom.random()
-                    if (option !== newList[currentQuestion] && !optionsTaken.contains(
-                            option
-                        )
-                    ) {
-                        option1.text = option.translatedWord
-                        optionsTaken.add(option)
+            } else {
+                if (rightAnswer == buttonNumber) {
+                    rightWrong[currentQuestion] = true
+                }
+                for (i in 0 until listToSelectFrom.size) {
+                    val tv = linearLayout.findViewById<TextView>(progressBarIds[i])
+                    tv.setBackgroundResource(R.drawable.style_points)
+                }
+                for (i in 0..currentQuestion) {
+                    val tv = linearLayout.findViewById<TextView>(progressBarIds[i])
+                    if (rightWrong[i])
+                        tv.setBackgroundResource(R.drawable.style_points_green)
+                    else
+                        tv.setBackgroundResource(R.drawable.style_points_red)
+                }
+                // присваиваем значение в тексовое поле вопроса
+                questionTV.text = newList[currentQuestion].originalWord
+                answerTV.text = newList[currentQuestion].translatedWord
+                var option: Word
+                //выбираем рандомно какой ответ будет праильным
+                rightAnswer = (1..4).random()
+                Log.d("rightAnswer = ", rightAnswer.toString())
+                var optionsTaken = ArrayList<Word>()
+                //присваиваем значение в текстовые поля ответов
+                while (true) {
+                    if (rightAnswer != 1) {
+                        option = listToSelectFrom.random()
+                        if (option !== newList[currentQuestion] && !optionsTaken.contains(
+                                option
+                            )
+                        ) {
+                            option1.text = option.translatedWord
+                            optionsTaken.add(option)
+                            break
+                        }
+                    } else {
+                        option1.text = newList[currentQuestion].translatedWord
+                        optionsTaken.add(newList[currentQuestion])
                         break
                     }
-                } else {
-                    option1.text = newList[currentQuestion].translatedWord
-                    optionsTaken.add(newList[currentQuestion])
-                    break
                 }
-            }
-            while (true) {
-                if (rightAnswer != 2) {
-                    option = listToSelectFrom.random()
-                    if (option !== newList[currentQuestion] && !optionsTaken.contains(
-                            option
-                        )
-                    ) {
-                        option2.text = option.translatedWord
-                        optionsTaken.add(option)
+                while (true) {
+                    if (rightAnswer != 2) {
+                        option = listToSelectFrom.random()
+                        if (option !== newList[currentQuestion] && !optionsTaken.contains(
+                                option
+                            )
+                        ) {
+                            option2.text = option.translatedWord
+                            optionsTaken.add(option)
+                            break
+                        }
+                    } else {
+                        option2.text = newList[currentQuestion].translatedWord
+                        optionsTaken.add(newList[currentQuestion])
                         break
                     }
-                } else {
-                    option2.text = newList[currentQuestion].translatedWord
-                    optionsTaken.add(newList[currentQuestion])
-                    break
                 }
-            }
-            while (true) {
-                if (rightAnswer != 3) {
-                    option = listToSelectFrom.random()
-                    if (option !== newList[currentQuestion] && !optionsTaken.contains(
-                            option
-                        )
-                    ) {
-                        option3.text = option.translatedWord
-                        optionsTaken.add(option)
+                while (true) {
+                    if (rightAnswer != 3) {
+                        option = listToSelectFrom.random()
+                        if (option !== newList[currentQuestion] && !optionsTaken.contains(
+                                option
+                            )
+                        ) {
+                            option3.text = option.translatedWord
+                            optionsTaken.add(option)
+                            break
+                        }
+                    } else {
+                        option3.text = newList[currentQuestion].translatedWord
+                        optionsTaken.add(newList[currentQuestion])
                         break
                     }
-                } else {
-                    option3.text = newList[currentQuestion].translatedWord
-                    optionsTaken.add(newList[currentQuestion])
-                    break
                 }
-            }
-            while (true) {
-                if (rightAnswer != 4) {
-                    option = listToSelectFrom.random()
-                    if (option !== newList[currentQuestion] && !optionsTaken.contains(
-                            option
-                        )
-                    ) {
-                        option4.text = option.translatedWord
-                        optionsTaken.add(option)
+                while (true) {
+                    if (rightAnswer != 4) {
+                        option = listToSelectFrom.random()
+                        if (option !== newList[currentQuestion] && !optionsTaken.contains(
+                                option
+                            )
+                        ) {
+                            option4.text = option.translatedWord
+                            optionsTaken.add(option)
+                            break
+                        }
+                    } else {
+                        option4.text = newList[currentQuestion].translatedWord
+                        optionsTaken.add(newList[currentQuestion])
                         break
                     }
-                } else {
-                    option4.text = newList[currentQuestion].translatedWord
-                    optionsTaken.add(newList[currentQuestion])
-                    break
                 }
-            }
-            currentQuestion++
-            if (currentQuestion == newList.size) {
-                Log.d("here", "here")
-                Log.d("StudyActivity", Date().toString())
+                currentQuestion++
+                if (currentQuestion == newList.size) {
+                    Log.d("here", "here")
+                    Log.d("StudyActivity", Date().toString())
 
-                showSetStudyEnd()
+                    showSetStudyEnd()
 
-                presenter.updateStudyProgress(
-                    StudyProgress(
-                        java.time.LocalDate.now(),
-                        rightAnswersCount,
-                        wrongAnswersCount
+                    presenter.updateStudyProgress(
+                        StudyProgress(
+                            java.time.LocalDate.now(),
+                            rightAnswersCount,
+                            wrongAnswersCount
+                        )
                     )
-                )
-                for ((index, word) in newList.withIndex()) {
-                    println("The element at $index is $word")
-                    if (asked[index])
-                        word.recallPoint = word.recallPoint + 1
-                    else {
-                        if (word.recallPoint > 1)
-                            word.recallPoint = word.recallPoint - 2
+                    for ((index, word) in newList.withIndex()) {
+                        println("The element at $index is $word")
+                        if (asked[index])
+                            word.recallPoint = word.recallPoint + 1
+                        else {
+                            if (word.recallPoint > 1)
+                                word.recallPoint = word.recallPoint - 2
 
+                        }
                     }
+                    presenter.updateWordsPoints(newList)
+
                 }
-                presenter.updateWordsPoints(newList)
+
 
             }
+        }, 2000)
 
 
-        }
     }
 
     private fun showSetStudyEnd() {

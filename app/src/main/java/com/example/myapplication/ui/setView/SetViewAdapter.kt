@@ -47,11 +47,11 @@ class SetViewAdapter : RecyclerView.Adapter<SetViewAdapter.SetViewHolder>() {
             this.words = word as ArrayList<Word?>
             notifyDataSetChanged()
 
-        val intent = Intent("sending-list")
+       /* val intent = Intent("sending-list")
         val bundle = Bundle()
         bundle.putParcelableArrayList("data", words)
         intent.putExtras(bundle)
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);*/
         }
     }
 

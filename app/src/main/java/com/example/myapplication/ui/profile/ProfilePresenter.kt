@@ -37,9 +37,7 @@ class ProfilePresenter(
                             )
                             labels.add(list!![i].date.toString().split("-", limit = 2)[1])
                         }
-                        labels = labels.reversed() as ArrayList<String>
-                        values = values.reversed() as ArrayList<BarEntry>
-                        mView?.setData(list!!,values,labels)
+                        mView?.setData(list!!,values.reversed(),labels.reversed())
                     }
                 }
             }

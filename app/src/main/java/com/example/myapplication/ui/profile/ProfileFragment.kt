@@ -264,7 +264,7 @@ class ProfileFragment : Fragment(), ProfileContract.View,
 
     private fun saveToGallery(chart: BarChart, name: String) {
         if (chart.saveToGallery(name + "_" + System.currentTimeMillis(), 70)) Toast.makeText(
-            requireContext(), "Saving SUCCESSFUL!",
+            requireContext(), R.string.saved,
             Toast.LENGTH_SHORT
         ).show() else Toast.makeText(
             requireContext(),
@@ -362,8 +362,8 @@ class ProfileFragment : Fragment(), ProfileContract.View,
 
     override fun setData(
         list: List<StudyProgress>,
-        values: ArrayList<BarEntry>,
-        labels: ArrayList<String>
+        values: List<BarEntry>,
+        labels: List<String>
     ) {
         //настройка вида лейблов
         chart?.xAxis?.valueFormatter = IndexAxisValueFormatter(list.map { it.date.toString() })

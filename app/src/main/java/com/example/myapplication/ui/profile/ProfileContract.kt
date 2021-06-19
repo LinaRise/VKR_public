@@ -13,8 +13,8 @@ interface ProfileContract {
     interface View : BaseView<Presenter> {
         fun setData(
             list: List<StudyProgress>,
-            values: ArrayList<BarEntry>,
-            labels: ArrayList<String>
+            values: List<BarEntry>,
+            labels: List<String>
         )
 
     }
