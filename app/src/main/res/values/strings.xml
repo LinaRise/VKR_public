@@ -43,6 +43,9 @@
     <string name="right_answers_and">" right answers and"</string>
     <string name="wrong">wrong</string>
     <string name="need_5_words">You need at least 5 cards to start studying</string>
+    <string name="draw_permission">Draw over other app permission not available. Closing the application</string>
+    <string name="translate_bubble_on">Копирование включено</string>
+    <string name="translate_bubble_off">Копирование выключено</string>
     <string-array name="available_translation_languages">
         <item>Russian</item>
         <item>English</item>

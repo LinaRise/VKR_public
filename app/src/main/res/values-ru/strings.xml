@@ -44,6 +44,9 @@
     <string name="right_answers_and">"правильных(ый) ответа и"</string>
     <string name="wrong">неправильных(ый)</string>
     <string name="need_5_words">Необходимо минимум 5 карточек для начала обучения</string>
+    <string name="draw_permission">Отображение поверх других приложений недоступно. Закрытие приложения</string>
+    <string name="translate_bubble_on">Translate bubble on</string>
+    <string name="translate_bubble_off">Translate bubble off</string>
 
     <string-array name="available_translation_languages">
         <item>Russian</item>

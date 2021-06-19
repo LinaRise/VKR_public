@@ -111,7 +111,6 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
             )
         } finally {
             db.endTransaction()
-            db.close()
             return sett
         }
 
@@ -168,7 +167,6 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
             );
         } finally {
             db.endTransaction()
-            db.close()
             return settList
         }
     }

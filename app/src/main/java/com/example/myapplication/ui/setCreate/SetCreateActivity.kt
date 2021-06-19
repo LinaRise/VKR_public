@@ -55,7 +55,7 @@ class SetCreateActivity : AppCompatActivity(), SetCreateContract.View, ISetInput
 
     lateinit var adapter: ArrayAdapter<Any>
 
-    var languageTitleAndCode: Map<String, String> = hashMapOf()
+    var languageCodeAndTitle: Map<String, String> = hashMapOf()
 
     // которые отображаются на экране
     var wordsDisplayed = ArrayList<Word>()
@@ -121,7 +121,7 @@ class SetCreateActivity : AppCompatActivity(), SetCreateContract.View, ISetInput
             if (p1) {
                 receivedTranslation = presenter.onTranslate(
                     translate!!,
-                    languageTitleAndCode,
+                    languageCodeAndTitle,
                     originalText.text.toString(),
                     inputLanguage.trim(),
                     outputLanguage.trim(),
@@ -365,10 +365,10 @@ class SetCreateActivity : AppCompatActivity(), SetCreateContract.View, ISetInput
         if (hasInternet) {
             translateService
             if (translate != null) {
-                if (languageTitleAndCode.isEmpty()) {
+                if (languageCodeAndTitle.isEmpty()) {
                     val languages: List<Language> =
                         translate!!.listSupportedLanguages()
-                    languageTitleAndCode = languages.map { it.name to it.code }.toMap()
+                    languageCodeAndTitle = languages.map { it.code to it.name }.toMap()
                 }
             }
         } else {

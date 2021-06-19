@@ -431,6 +431,8 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
      * функция присваивания данных
      */
     override fun onInputedData(list: ArrayList<Any>) {
+        invalidateOptionsMenu()
+        saveShouldBeEnabled = true
         setTitle = (list[0] as String).trim()
         inputLanguageText = (list[1] as String).trim()
         outputLanguageText = (list[2] as String).trim()

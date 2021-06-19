@@ -10,7 +10,7 @@ class TranslationUtils {
         /**
          * Метод для перевода текста
          * @param translate переменная библиотеки класса перевода
-         * @param languageTitleAndCode Map поддерживаемых языков перевода и их кодов
+         * @param languageCodeAndTitle Map поддерживаемых языков перевода и их кодов
          * @param originalText текст для перевода
          * @param sourceLanguage язык с которого необходим перевод
          * @param targetLanguage язык на который нужно перевести

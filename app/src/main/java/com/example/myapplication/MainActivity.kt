@@ -36,16 +36,16 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     private var switchAB: ToggleButton? = null
     private lateinit var presenter:MainContract.Presenter
     override fun showDrawOverAppPermission() {
-      Toast.makeText(this,"Draw over other app permission not available. Closing the application",Toast.LENGTH_SHORT).show()
+      Toast.makeText(this,getString(R.string.draw_permission),Toast.LENGTH_SHORT).show()
     }
 
     override fun showTranslateBubbleOn() {
-        Toast.makeText(this,"Translate bubble on",Toast.LENGTH_SHORT).show()
+        Toast.makeText(this,getString(R.string.translate_bubble_on),Toast.LENGTH_SHORT).show()
 
     }
 
     override fun showTranslateBubbleOff() {
-        Toast.makeText(this,"Translate bubble off",Toast.LENGTH_SHORT).show()
+        Toast.makeText(this,getString(R.string.translate_bubble_off),Toast.LENGTH_SHORT).show()
 
     }
 

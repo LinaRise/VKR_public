@@ -155,8 +155,6 @@ class SetCorrectInfoDialog : AppCompatDialogFragment(), SetCorrectInfoContract.V
                 list.add(inputLang)
                 list.add(outputLang)
                 list.add(hasAutoSuggest)
-                Toast.makeText(requireContext(), hasAutoSuggest.toString(), Toast.LENGTH_SHORT)
-                    .show()
                 mCallback?.onInputedData(list)
             })
 

@@ -190,6 +190,7 @@ class LanguageRepo(val dbhelper: DBHelper) : IRepository<Language> {
         var langauge: Language? = null
         if (cursor != null) {
             langauge = Language()
+
             if (cursor.moveToFirst()) {
                 langauge.languageId = cursor.getString(0)
                 langauge.languageTitle = title

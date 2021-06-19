@@ -42,14 +42,16 @@ class SetCreatePresenter(
         hasAutoSuggest: Int,
         hasInternet: Boolean
     ): String {
+        val sourceLangCode = mLanguageRepo.getByLocaleTitle(sourceLanguage)!!.languageId
+        val targetLangCode = mLanguageRepo.getByLocaleTitle(targetLanguage)!!.languageId
         if (hasAutoSuggest == 1) {
             if (hasInternet) {
                 return TranslationUtils.translate(
                     translate,
                     languageTitleAndCode,
                     originalText,
-                    sourceLanguage,
-                    targetLanguage
+                    sourceLangCode,
+                    targetLangCode
                 )
             }
         }
