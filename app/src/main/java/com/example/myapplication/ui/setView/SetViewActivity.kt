@@ -119,11 +119,6 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
         }
 
 
-        /*LocalBroadcastManager.getInstance(this).registerReceiver(
-            mMessageReceiver,
-            IntentFilter("sending-list")
-        )*/
-
         //инициализация элементов
         wordAddButton = findViewById(R.id.word_add_button)
         wordAddButton.setOnClickListener { onAddWordBtnClick() }
@@ -237,7 +232,7 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
             item.icon.alpha = (255)
         } else {
             item.isEnabled = false
-            item.icon.alpha = 130;
+            item.icon.alpha = 130
         }
         return true
     }
@@ -473,9 +468,18 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
                     ItemTouchHelper.RIGHT -> {
                         setViewAdapter.notifyItemChanged(viewHolder.adapterPosition)
                         val sets = presenter.onRightSwipe()
-                        showDialog(sets, position)
-                        invalidateOptionsMenu()
-                        saveShouldBeEnabled = true
+                        if (sets.isNullOrEmpty() || sets.size == 1) {
+                            Toast.makeText(
+                                this@SetViewActivity,
+                                R.string.no_set_available,
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                        } else {
+                            showDialog(sets, position)
+                            invalidateOptionsMenu()
+                            saveShouldBeEnabled = true
+                        }
 
                     }
                 }

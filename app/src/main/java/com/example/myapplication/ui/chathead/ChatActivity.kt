@@ -12,19 +12,25 @@ import com.example.myapplication.R
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
+import com.example.myapplication.ui.DependencyInjectorImpl
 import java.util.concurrent.Executors
 
 
-class ChatActivity : AppCompatActivity(), IChatActivityView {
+class ChatActivity : AppCompatActivity(), TranslateBubbleContract.View {
 
     private lateinit var clipboard: ClipboardManager
-    lateinit var presenter: ChatActivityPresenter
+    private lateinit var presenter: TranslateBubbleContract.Presenter
+    override fun setPresenter(presenter: TranslateBubbleContract.Presenter) {
+        this.presenter = presenter
+    }
+
     lateinit var dbhelper: DBHelper
 
     private fun getCopy(): String {
         val copiedText = clipboard.getClipboardText(this)
         return copiedText ?: ""
     }
+
     private fun ClipboardManager.getClipboardText(context: Context): String? {
         if (hasPrimaryClip()) {
             val clip = primaryClip
@@ -45,7 +51,7 @@ class ChatActivity : AppCompatActivity(), IChatActivityView {
         //буфер обмена
         clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         dbhelper = DBHelper(this)
-        presenter = ChatActivityPresenter(dbhelper)
+        setPresenter(TranslateBubblePresenter(this, DependencyInjectorImpl(dbhelper)))
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -68,7 +74,6 @@ class ChatActivity : AppCompatActivity(), IChatActivityView {
                     copiedTextAddDialog.show(supportFragmentManager, "Add copied word")
                 }
             }
-
 
 
         }

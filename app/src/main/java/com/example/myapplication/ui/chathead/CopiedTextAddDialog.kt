@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.chathead
 
+import android.app.Activity
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
@@ -10,13 +11,14 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDialogFragment
+import com.example.myapplication.MainActivity
 import com.example.myapplication.R
 import com.example.myapplication.connectivity.base.ConnectivityProvider
 import com.example.myapplication.database.DBHelper
-import com.example.myapplication.database.repo.sett.SettRepo
 import com.example.myapplication.database.repo.word.WordRepo
 import com.example.myapplication.entity.Sett
 import com.example.myapplication.entity.Word
+import com.example.myapplication.ui.list.ListPageFragment
 import com.example.myapplication.ui.setView.SetViewActivity
 
 
@@ -44,14 +46,11 @@ class CopiedTextAddDialog(
 
         val spinner = view.findViewById<Spinner>(R.id.sets_titles_spinner)
 
-        val setsFiltered: List<Sett>? = setsList?.filter { it.settId != openedSet?.settId }
-        val setsTitlesMapCopyTo: LinkedHashMap<Long, String> =  LinkedHashMap()
+        val setsTitlesMapCopyTo: LinkedHashMap<Long, String> = LinkedHashMap()
 
-        for (i in setsFiltered?.indices!!){
-            setsTitlesMapCopyTo[setsFiltered[i].settId] = setsFiltered[i].settTitle
+        for (i in setsList?.indices!!) {
+            setsTitlesMapCopyTo[setsList!![i].settId] = setsList!![i].settTitle
         }
-
-
 
         ArrayAdapter(
             requireContext(),
@@ -67,9 +66,14 @@ class CopiedTextAddDialog(
         alertDialogBuilder.setView(view)
             .setTitle(R.string.pick_up_set)
             .setNegativeButton(getString(R.string.cancel),
-                DialogInterface.OnClickListener { _, _ -> dismiss()})
+                DialogInterface.OnClickListener { _, _ ->
+                    dismiss()
+                    val intent = Intent(context, MainActivity::class.java)
+                    requireContext().startActivity(intent)
+                    (context as Activity).finish()
+                })
             .setPositiveButton(R.string.ok, DialogInterface.OnClickListener { _, _ ->
-                 val pickedSetId =
+                val pickedSetId =
                     ArrayList<Long>(setsTitlesMapCopyTo.keys)[spinner.selectedItemPosition]
 
                 val intent = Intent(requireContext(), SetViewActivity::class.java)

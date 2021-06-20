@@ -23,7 +23,7 @@ interface SetViewContract {
         fun onRightSwipe(): List<Sett>?
         fun onTranslate(
             translate: Translate,
-            languageTitleAndCode: Map<String, String>,
+            languageCodeAndTitle: Map<String, String>,
             originalText: String,
             sourceLanguage: String,
             targetLanguage: String,

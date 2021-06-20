@@ -200,10 +200,15 @@ class CameraFragment : Fragment(), ICameraFragmentView {
         // Creates and starts the camera.  Note that this uses a higher resolution in comparison
         // to other detection examples to enable the text recognizer to detect small pieces of text.
         cameraSource = CameraSource.Builder(requireActivity().applicationContext, textRecognizer)
+            //задняя камера
             .setFacing(CameraSource.CAMERA_FACING_BACK)
+            //разрешение
             .setRequestedPreviewSize(1280, 1024)
+            //fps
             .setRequestedFps(2.0f)
+            //вспышка
             .setFlashMode(if (useFlash) Camera.Parameters.FLASH_MODE_TORCH else null)
+            //постоянная фокусировка
             .setFocusMode(if (autoFocus) Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO else null)
             .build()
     }
@@ -339,14 +344,22 @@ class CameraFragment : Fragment(), ICameraFragmentView {
                 // Speak the string.
                 tts!!.speak(text.value, TextToSpeech.QUEUE_ADD, null, "DEFAULT")
                 val sets = presenter.getAllSetsTitles()
-                val copiedTextAddDialog =
-                    CopiedTextAddDialog(
-                        sets,
-                        Word(originalWord = text.value, translatedWord = ""),
-                        null,
-                        dbhelper
-                    )
-                copiedTextAddDialog.show(childFragmentManager, "Add copied word")
+                if (!sets.isNullOrEmpty()) {
+                    val copiedTextAddDialog =
+                        CopiedTextAddDialog(
+                            sets,
+                            Word(originalWord = text.value, translatedWord = ""),
+                            null,
+                            dbhelper
+                        )
+                    copiedTextAddDialog.show(childFragmentManager, "Add copied word")
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.no_set_available),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             } else {
                 Log.d(TAG, "text data is null")
             }

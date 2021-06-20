@@ -36,7 +36,7 @@ class SetCorrectInfoDialog : AppCompatDialogFragment(), SetCorrectInfoContract.V
             requireContext()
         )
     }
-    var languageTitleAndCode: Map<String, String> = hashMapOf()
+    var languageCodeAndTitle: Map<String, String> = hashMapOf()
     lateinit var dbhelper: DBHelper
 
 
@@ -185,7 +185,7 @@ class SetCorrectInfoDialog : AppCompatDialogFragment(), SetCorrectInfoContract.V
 
         //загрузка доступных языков
         if (hasInternet) {
-            if (languageTitleAndCode.values.isEmpty()) {
+            if (languageCodeAndTitle.values.isEmpty()) {
                 translateService
                 presenter.onViewCreated(translate)
 
@@ -203,21 +203,21 @@ class SetCorrectInfoDialog : AppCompatDialogFragment(), SetCorrectInfoContract.V
         ).show()
     }
 
-    override fun setAvailableLanguagesInfo(languageTitleAndCode: Map<String, String>) {
-        this.languageTitleAndCode = languageTitleAndCode
+    override fun setAvailableLanguagesInfo(languageCodeAndTitle: Map<String, String>) {
+        this.languageCodeAndTitle = languageCodeAndTitle
 
-        if (languageTitleAndCode.values.isNotEmpty()) {
+        if (languageCodeAndTitle.values.isNotEmpty()) {
 
             val adapterSource = ArrayAdapter(
                 requireContext(),
                 android.R.layout.simple_list_item_1,
-                languageTitleAndCode.values.toTypedArray()
+                languageCodeAndTitle.values.toTypedArray()
 
             )
             val adapterTarget = ArrayAdapter(
                 requireContext(),
                 android.R.layout.simple_list_item_1,
-                languageTitleAndCode.values.toTypedArray()
+                languageCodeAndTitle.values.toTypedArray()
             )
             editTextInputLang!!.setAdapter(adapterSource)
             editTextOutputLang!!.setAdapter(adapterTarget)

@@ -45,7 +45,7 @@ class SetViewPresenter(
     /**
      * Перевод слова
      * @param translate - переменная сервиса перевода
-     * @param languageTitleAndCode - код и название языков
+     * @param languageCodeAndTitle - код и название языков
      * @param originalText - текст для перевода
      * @param sourceLanguage - язык с которого нужен перевод
      * @param targetLanguage - язык на который нужно перевести

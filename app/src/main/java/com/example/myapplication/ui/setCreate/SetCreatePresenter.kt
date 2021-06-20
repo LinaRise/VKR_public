@@ -27,7 +27,7 @@ class SetCreatePresenter(
     /**
      * Перевод слова
      * @param translate - переменная сервиса перевода
-     * @param languageTitleAndCode - код и название языков
+     * @param languageCodeAndTitle - код и название языков
      * @param originalText - текст для перевода
      * @param sourceLanguage - язык с которого нужен перевод
      * @param targetLanguage - язык на который нужно перевести
@@ -35,7 +35,7 @@ class SetCreatePresenter(
      */
     override fun onTranslate(
         translate: Translate,
-        languageTitleAndCode: Map<String, String>,
+        languageCodeAndTitle: Map<String, String>,
         originalText: String,
         sourceLanguage: String,
         targetLanguage: String,
@@ -48,7 +48,7 @@ class SetCreatePresenter(
             if (hasInternet) {
                 return TranslationUtils.translate(
                     translate,
-                    languageTitleAndCode,
+                    languageCodeAndTitle,
                     originalText,
                     sourceLangCode,
                     targetLangCode

@@ -26,7 +26,7 @@ import com.google.android.gms.vision.CameraSource;
 import java.util.HashSet;
 import java.util.Set;
 
-
+//для отрисовки
 public class GraphicOverlay<T extends com.example.myapplication.ui.cameraPreview.camera.GraphicOverlay.Graphic> extends View {
     private final Object lock = new Object();
     private int previewWidth;

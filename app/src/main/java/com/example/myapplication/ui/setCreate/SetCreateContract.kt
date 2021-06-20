@@ -16,7 +16,7 @@ interface SetCreateContract {
         fun onLeftSwipe(position: Int)
         fun onTranslate(
             translate: Translate,
-            languageTitleAndCode: Map<String, String>,
+            languageCodeAndTitle: Map<String, String>,
             originalText: String,
             sourceLanguage: String,
             targetLanguage: String,

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">FlashCards</string>
     <string name="title_list">List</string>
     <string name="title_camera">Camera</string>
     <string name="title_profile">Profile</string>
@@ -46,6 +46,8 @@
     <string name="draw_permission">Draw over other app permission not available. Closing the application</string>
     <string name="translate_bubble_on">Копирование включено</string>
     <string name="translate_bubble_off">Копирование выключено</string>
+    <string name="no_set_available">No set available</string>
+    <string name="state">state</string>
     <string-array name="available_translation_languages">
         <item>Russian</item>
         <item>English</item>

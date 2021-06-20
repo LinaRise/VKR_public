@@ -189,6 +189,9 @@ class SetCreateActivity : AppCompatActivity(), SetCreateContract.View, ISetInput
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.add_new_activity_bar, menu)
+        val item = menu?.findItem(R.id.check_icon)
+        item?.icon?.alpha = (255)
+
         return true
     }
 
@@ -306,7 +309,7 @@ class SetCreateActivity : AppCompatActivity(), SetCreateContract.View, ISetInput
     override fun showUndoDeleteWord(position: Int) {
         Snackbar.make(
             recyclerView,
-            deletedWord.originalWord +" "+ getText(R.string.is_deleted),
+            deletedWord.originalWord + " " + getText(R.string.is_deleted),
             Snackbar.LENGTH_LONG
         ).setAction(
             R.string.undo
