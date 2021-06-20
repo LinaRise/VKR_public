@@ -33,7 +33,7 @@ public class OcrDetectorProcessor implements Detector.Processor<TextBlock> {
     }
 
     /**
-     * полчаем распознанные данные
+     * получаем распознанные данные
      */
 
     @Override

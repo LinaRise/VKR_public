@@ -48,5 +48,6 @@ interface SetViewContract {
         fun showDialog(sets: List<Sett>?, position: Int)
         fun setSettData(resultSett:Sett)
         fun setLanguageData(inputLang: String, outputLanguage:String)
+
     }
 }

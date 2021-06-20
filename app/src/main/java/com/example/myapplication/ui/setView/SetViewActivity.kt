@@ -197,8 +197,6 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
         adapter.clear()
         adapter.notifyDataSetChanged()
         presenter.onAddWordClicked(original, translated)
-        invalidateOptionsMenu()
-        saveShouldBeEnabled = true
     }
 
 
@@ -222,18 +220,6 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
 
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
-        return true
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        val item = menu.findItem(R.id.check_icon)
-        if (saveShouldBeEnabled) {
-            item.isEnabled = true
-            item.icon.alpha = (255)
-        } else {
-            item.isEnabled = false
-            item.icon.alpha = 130
-        }
         return true
     }
 
@@ -330,16 +316,11 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
     override fun updateRecyclerViewInserted(word: Word) {
         wordsDisplayed.add(word)
         setViewAdapter.notifyItemInserted(wordsDisplayed.size - 1)
-        invalidateOptionsMenu()
-        saveShouldBeEnabled = true
-
     }
 
     override fun updateRecyclerViewDeleted(position: Int) {
         setViewAdapter.notifyItemRemoved(position)
         wordsDisplayed.removeAt(position)
-        invalidateOptionsMenu()
-        saveShouldBeEnabled = true
 
     }
 
@@ -409,6 +390,8 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
     }
 
 
+
+
     override fun showCheckInternetConnection() {
         Toast.makeText(
             this@SetViewActivity,
@@ -426,8 +409,6 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
      * функция присваивания данных
      */
     override fun onInputedData(list: ArrayList<Any>) {
-        invalidateOptionsMenu()
-        saveShouldBeEnabled = true
         setTitle = (list[0] as String).trim()
         inputLanguageText = (list[1] as String).trim()
         outputLanguageText = (list[2] as String).trim()
@@ -461,8 +442,6 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
                     ItemTouchHelper.LEFT -> {
                         deletedWord = wordsDisplayed[position]!!
                         presenter.onLeftSwipe(position)
-                        invalidateOptionsMenu()
-                        saveShouldBeEnabled = true
                     }
                     //свайп впрао -> копирование
                     ItemTouchHelper.RIGHT -> {
@@ -477,8 +456,6 @@ class SetViewActivity : AppCompatActivity(), SetViewContract.View,
                                 .show()
                         } else {
                             showDialog(sets, position)
-                            invalidateOptionsMenu()
-                            saveShouldBeEnabled = true
                         }
 
                     }

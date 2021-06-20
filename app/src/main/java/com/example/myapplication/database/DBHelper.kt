@@ -17,7 +17,7 @@ class DBHelper(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     companion object {
         const val DATABASE_NAME = "wordsAndProgressDB.db"
-        const val DATABASE_VERSION = 13
+        const val DATABASE_VERSION = 14
 
 
         private const val CREATE_TABLE_LANGUAGE =

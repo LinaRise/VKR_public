@@ -168,10 +168,6 @@ class CameraFragment : Fragment(), ICameraFragmentView {
     private fun createCameraSource(autoFocus: Boolean, useFlash: Boolean) {
         val context: Context = requireActivity().applicationContext
 
-        // A text recognizer is created to find text.  An associated multi-processor instance
-        // is set to receive the text recognition results, track the text, and maintain
-        // graphics for each text block on screen.  The factory is used by the multi-processor to
-        // create a separate tracker instance for each text block.
         val textRecognizer = TextRecognizer.Builder(context).build()
         textRecognizer.setProcessor(OcrDetectorProcessor(graphicOverlay))
         if (!textRecognizer.isOperational) {

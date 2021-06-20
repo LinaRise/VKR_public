@@ -92,6 +92,7 @@ class SetViewAdapter : RecyclerView.Adapter<SetViewAdapter.SetViewHolder>() {
 
                 override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
                     words[adapterPosition]!!.translatedWord = translated.text.toString()
+
                 }
 
                 override fun afterTextChanged(editable: Editable) {}
