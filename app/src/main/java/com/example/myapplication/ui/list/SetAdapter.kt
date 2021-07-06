@@ -27,7 +27,6 @@ class SetAdapter internal constructor(
 
     // передаем информацию для отображения
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-//        val state: Sett = sets[position]
         val listValues: List<List<String>> = ArrayList<List<String>>(sets.values)
         val listKeys: List<Sett> = ArrayList<Sett>(sets.keys)
         val langList: List<*> = listValues[position]
@@ -41,20 +40,6 @@ class SetAdapter internal constructor(
     override fun getItemCount(): Int {
         return sets.size
     }
-
-    //конструктор
-   /* class ViewHolder internal constructor(view: View, val onSetListener: OnSetListener) : RecyclerView.ViewHolder(view), View.OnClickListener {
-
-        val setTitle: TextView = view.findViewById(R.id.set_title)
-        val languageInput: TextView = view.findViewById(R.id.language_input)
-        val languageOutput: TextView = view.findViewById(R.id.language_output)
-        val wordsAmount: TextView = view.findViewById(R.id.words_amount)
-
-        override fun onClick(p0: View?) {
-            onSetListener.onSetClicked(adapterPosition)
-        }
-
-    }*/
 
     class ViewHolder(view: View, onNoteListener: OnSetListener) :
         RecyclerView.ViewHolder(view), View.OnClickListener {

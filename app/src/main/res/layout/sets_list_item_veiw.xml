@@ -43,7 +43,8 @@
                    android:id="@+id/language_input"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
+                    android:maxLength="12"
+                    android:layout_marginStart="20dp"
                     android:text="@string/language_input_text"
                     android:textColor="#404040"
                     android:textSize="20sp" />
@@ -52,8 +53,9 @@
                     android:id="@+id/language_output"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginRight="20dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="20dp"
+                    android:maxLength="12"
                     android:textColor="#404040"
                     android:textSize="20sp"
                     android:text="@string/language_output_text" />

@@ -1,9 +1,7 @@
 package com.example.myapplication.ui.list
 
 import android.content.Intent
-import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,18 +16,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.Sett
-import com.example.myapplication.ui.setCreate.SetUpDialog
+import com.example.myapplication.ui.DependencyInjectorImpl
+import com.example.myapplication.ui.setCreate.setUpDialog.SetUpDialog
 import com.example.myapplication.ui.setView.SetViewActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.LinkedHashMap
 
 
-class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
+class ListPageFragment : Fragment(), ListPageContract.View, SetAdapter.OnSetListener {
 
-    private lateinit var presenter: ListPagePresenter
+    private lateinit var presenter: ListPageContract.Presenter
     private lateinit var homeViewModel: HomeViewModel
 
     private lateinit var addSetButton: FloatingActionButton
@@ -54,12 +52,12 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
         recyclerView = root.findViewById(R.id.set_list)
         emptyTextView = root.findViewById(R.id.empty_view) as TextView
         addSetButton = root.findViewById(R.id.fab)
-
         dbhelper = DBHelper(requireContext())
 
-        presenter = ListPagePresenter(this, dbhelper)
+//        presenter = ListPagePresenter(this, dbhelper)
+        setPresenter(ListPagePresenter(this, DependencyInjectorImpl(dbhelper)))
 
-        addSetButton.setOnClickListener { clickOnAddSetButton() }
+        addSetButton.setOnClickListener { presenter.onCreateSettTapped() }
 
         return root
     }
@@ -67,7 +65,7 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
     override fun onStart() {
         super.onStart()
         setsDisplayed.clear()
-        getSetsList()
+        presenter.onViewCreated()
         recyclerView.layoutManager = LinearLayoutManager(this.context)
         adapter = SetAdapter(this.context, this, setsDisplayed)
         recyclerView.adapter = adapter
@@ -77,31 +75,21 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
     }
 
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
+    /*override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        (activity as AppCompatActivity?)!!.supportActionBar?.title = "Sets"
-    }
+        (activity as AppCompatActivity?)!!.supportActionBar?.title = getString(R.string.sets)
+    }*/
 
-    private fun clickOnAddSetButton() {
-        presenter.openSet()
-    }
-
-    private fun getSetsList() {
-        presenter.loadData()
-    }
 
     override fun setData(setsInfo: LinkedHashMap<Sett, List<String>>) {
         recyclerView.visibility = View.VISIBLE;
         emptyTextView.visibility = View.GONE;
         setsDisplayed = setsInfo
-//        adapter.notifyDataSetChanged()
     }
 
-    override fun openDialogForSetCreation() {
+    override fun openDialog() {
         val setUpDialog = SetUpDialog()
-        setUpDialog.show(parentFragmentManager, "Set Up Dialog")
-//        val intent = Intent(activity, SetCreateActivity::class.java)
-//        startActivity(intent)
+        setUpDialog.show(parentFragmentManager, getString(R.string.set_up_dialog))
     }
 
     override fun showMessage() {
@@ -111,20 +99,22 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
 
     override fun onSetClicked(position: Int) {
         val listKeys: List<Sett> = ArrayList<Sett>(setsDisplayed.keys)
-        var intent = Intent(requireContext(), SetViewActivity::class.java)
+        val intent = Intent(requireContext(), SetViewActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
         intent.putExtra("settId", listKeys[position].settId)
         startActivity(intent)
     }
 
-//    override fun onDestroy() {
-//        super.onDestroy()
-//        dbhelper.close()
-//
-//    }
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
+        dbhelper.close()
+
+    }
 
     private var simpleCallBack =
         object : ItemTouchHelper.SimpleCallback(
-          0.or(0),
+            0.or(0),
             ItemTouchHelper.LEFT.or(0)
         ) {
 
@@ -133,7 +123,7 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean {
-               return false
+                return false
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -142,9 +132,7 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
                     ItemTouchHelper.LEFT -> {
                         deletedSett = ArrayList<Sett>(setsDisplayed.keys)[position]
                         deletedSettInfo = setsDisplayed[deletedSett]!!
-                        presenter.deleteSettShow(position)
-
-
+                        presenter.onLeftSwipe(position)
                     }
                 }
             }
@@ -158,22 +146,26 @@ class ListPageFragment : Fragment(), IListPageView, SetAdapter.OnSetListener {
     }
 
     override fun showUndoDeleteWord(position: Int) {
-               Snackbar.make(recyclerView, "${deletedSett.settTitle} is deleted", Snackbar.LENGTH_LONG)
+        Snackbar.make(recyclerView, deletedSett.settTitle +" "+ getText(R.string.is_deleted), Snackbar.LENGTH_LONG)
             .addCallback(object : Snackbar.Callback() {
                 override fun onDismissed(snackbar: Snackbar, event: Int) {
                     when (event) {
                         DISMISS_EVENT_TIMEOUT ->
-                            presenter.deleteSettFromDb(deletedSett)
+                            presenter.onSettDelete(deletedSett)
                     }
                 }
 
             }).setAction(
-                "UNDO"
+                R.string.undo
             ) {
                 setsDisplayed[deletedSett] = deletedSettInfo
                 adapter.notifyItemInserted(position)
             }.show()
 
+    }
+
+    override fun setPresenter(presenter: ListPageContract.Presenter) {
+        this.presenter = presenter
     }
 
 

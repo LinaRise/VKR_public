@@ -2,75 +2,84 @@ package com.example.myapplication.ui.list
 
 import android.os.Handler
 import android.os.Looper
-import com.example.myapplication.database.DBHelper
 import com.example.myapplication.database.repo.language.LanguageRepo
 import com.example.myapplication.database.repo.sett.SettRepo
 import com.example.myapplication.entity.Sett
+import com.example.myapplication.ui.DependencyInjector
+import java.util.*
 import java.util.concurrent.Executors
+import kotlin.collections.ArrayList
+import kotlin.collections.LinkedHashMap
 
-class ListPagePresenter(view: IListPageView, var dbhelper: DBHelper) {
-    private var mView: IListPageView = view
+class ListPagePresenter(view: ListPageContract.View, dependencyInjector: DependencyInjector) :
+    ListPageContract.Presenter {
+    //    private var mView: IListPageView = view
     private var set: Sett = Sett()
-
-    private var sets = ArrayList<Sett>()
-    var mSettRepo: SettRepo = SettRepo(dbhelper)
-    var mLanguageRepo: LanguageRepo = LanguageRepo(dbhelper)
+    private var mView: ListPageContract.View? = view
+    private val mSettRepo: SettRepo = dependencyInjector.settRepository()
+    private val mLanguageRepo: LanguageRepo = dependencyInjector.languageRepository()
+    /*  var mSettRepo: SettRepo = SettRepo(dbhelper)
+      var mLanguageRepo: LanguageRepo = LanguageRepo(dbhelper)*/
 
     /**
      * получение данных из бд
      */
-    fun loadData() {
+    override fun onViewCreated() {
+        loadSettsList()
+    }
+
+
+    private fun loadSettsList() {
         //обращение к бд
         val setList = mSettRepo.getAll()
-
         if (setList != null) {
-            var languagesList = LinkedHashMap<Sett, List<String>>()
+            val languagesList = LinkedHashMap<Sett, List<String>>()
             for (sett in setList) {
-                val inputLang = mLanguageRepo.get(sett.languageInput_id)
-                val outputLang = mLanguageRepo.get(sett.languageOutput_id)
-                var list = ArrayList<String>()
-                if (inputLang != null)
-                    list.add(inputLang.languageTitle)
-                else
-                    list.add("-")
-                if (outputLang != null)
-                    list.add(outputLang.languageTitle)
-                else
-                    list.add("-")
+                val inputLang = mLanguageRepo.getLanguageTitleLocale(sett.languageInput_id,Locale.getDefault().language)
+                val outputLang = mLanguageRepo.getLanguageTitleLocale(sett.languageOutput_id,Locale.getDefault().language)
+                val list = ArrayList<String>()
+                list.add(inputLang)
+                list.add(outputLang)
                 languagesList[sett] = list
             }
-            mView.setData(languagesList)
+            mView?.setData(languagesList)
 
         } else {
-            //показать сообщение, что спсиок сетов пустой
-            mView.showMessage()
+            mView?.showMessage()
         }
     }
 
     /**
      * открытие диалога создания сет слов
      */
-    fun openSet() {
-        mView.openDialogForSetCreation()
+    override fun onCreateSettTapped() {
+        mView?.openDialog()
+
     }
+
 
     /**
      * удалени набора слов из списка
      */
-    fun deleteSettShow(position: Int) {
-        mView.updateRecyclerViewDeleted(position)
-        mView.showUndoDeleteWord(position)
+    override fun onLeftSwipe(position: Int) {
+        mView?.updateRecyclerViewDeleted(position)
+        mView?.showUndoDeleteWord(position)
 
     }
+
     /**
      * удаление набора слов из БД
      */
-    fun deleteSettFromDb(sett:Sett){
+    override fun onSettDelete(sett: Sett) {
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
         executor.execute {
             val wordId = mSettRepo.delete(sett)
         }
+    }
+
+    override fun onDestroy() {
+        this.mView = null
     }
 
 }

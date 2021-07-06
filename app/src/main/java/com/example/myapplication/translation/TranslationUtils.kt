@@ -10,7 +10,7 @@ class TranslationUtils {
         /**
          * Метод для перевода текста
          * @param translate переменная библиотеки класса перевода
-         * @param languageTitleAndCode Map поддерживаемых языков перевода и их кодов
+         * @param languageCodeAndTitle Map поддерживаемых языков перевода и их кодов
          * @param originalText текст для перевода
          * @param sourceLanguage язык с которого необходим перевод
          * @param targetLanguage язык на который нужно перевести
@@ -18,15 +18,15 @@ class TranslationUtils {
          */
         fun translate(
             translate: Translate,
-            languageTitleAndCode: Map<String, String>,
+            languageCodeAndTitle: Map<String, String>,
             originalText: String,
             sourceLanguage: String,
             targetLanguage: String
         ): String {
 
             if (originalText != "") {
-                if (sourceLanguage != "" && languageTitleAndCode.containsKey(sourceLanguage)) {
-                    return if (targetLanguage != "" && languageTitleAndCode.containsKey(
+                if (sourceLanguage != "" && languageCodeAndTitle.containsKey(sourceLanguage)) {
+                    return if (targetLanguage != "" && languageCodeAndTitle.containsKey(
                             targetLanguage
                         )
                     ) {
@@ -34,8 +34,8 @@ class TranslationUtils {
                             val translation: com.google.cloud.translate.Translation =
                                 translate.translate(
                                     originalText,
-                                    Translate.TranslateOption.sourceLanguage(languageTitleAndCode[sourceLanguage]),
-                                    Translate.TranslateOption.targetLanguage(languageTitleAndCode[targetLanguage])
+                                    Translate.TranslateOption.sourceLanguage(sourceLanguage),
+                                    Translate.TranslateOption.targetLanguage(targetLanguage)
                                 )
                             translation.translatedText;
                         } catch (e: Exception) {
@@ -47,8 +47,8 @@ class TranslationUtils {
                             val translation: com.google.cloud.translate.Translation =
                                 translate.translate(
                                     originalText,
-                                    Translate.TranslateOption.sourceLanguage(languageTitleAndCode[sourceLanguage]),
-                                    Translate.TranslateOption.targetLanguage(languageTitleAndCode["English"])
+                                    Translate.TranslateOption.sourceLanguage(sourceLanguage),
+                                    Translate.TranslateOption.targetLanguage("en")
                                 )
                             translation.translatedText;
                         } catch (e: Exception) {
@@ -56,7 +56,7 @@ class TranslationUtils {
                         }
                     }
                 } else {
-                    return if (targetLanguage != "" && languageTitleAndCode.containsKey(
+                    return if (targetLanguage != "" && languageCodeAndTitle.containsKey(
                             targetLanguage
                         )
                     ) {
@@ -64,7 +64,7 @@ class TranslationUtils {
                             val translation: com.google.cloud.translate.Translation =
                                 translate.translate(
                                     originalText,
-                                    Translate.TranslateOption.targetLanguage(languageTitleAndCode[targetLanguage])
+                                    Translate.TranslateOption.targetLanguage(targetLanguage)
                                 )
                             translation.translatedText;
                         } catch (e: Exception) {
@@ -75,7 +75,7 @@ class TranslationUtils {
                             val translation: com.google.cloud.translate.Translation =
                                 translate.translate(
                                     originalText,
-                                    Translate.TranslateOption.targetLanguage(languageTitleAndCode["English"])
+                                    Translate.TranslateOption.targetLanguage("en")
                                 )
                             translation.translatedText;
                         } catch (e: Exception) {

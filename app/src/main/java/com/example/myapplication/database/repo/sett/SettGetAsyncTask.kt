@@ -6,6 +6,7 @@ import com.example.myapplication.entity.Sett
 import java.lang.ref.WeakReference
 
 
+/*
 class SettGetAsyncTask(dbhelper: DBHelper, taskListener: TaskListener) :
     AsyncTask<Long, Unit, Sett>() {
     var mTaskListenerRef: WeakReference<TaskListener>? = WeakReference(taskListener)
@@ -33,4 +34,4 @@ class SettGetAsyncTask(dbhelper: DBHelper, taskListener: TaskListener) :
     interface TaskListener {
         fun onSettReceived(sett: Sett?)
     }
-}
+}*/

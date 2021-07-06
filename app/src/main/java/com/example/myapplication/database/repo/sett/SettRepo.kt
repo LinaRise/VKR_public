@@ -67,6 +67,8 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
     }
 
 
+
+
     override fun get(id: Long): Sett? {
         db = dbhelper.readableDatabase
 
@@ -93,8 +95,8 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
                 if (cursor.moveToFirst()) {
                     sett.settId = cursor.getLong(0)
                     sett.settTitle = cursor.getString(colSetTitle)
-                    sett.languageInput_id = cursor.getLong(colLangInputId)
-                    sett.languageOutput_id = cursor.getLong(colLangOutputId)
+                    sett.languageInput_id = cursor.getString(colLangInputId)
+                    sett.languageOutput_id = cursor.getString(colLangOutputId)
                     sett.wordsAmount = cursor.getInt(colWordsAmount)
                     sett.hasAutoSuggest = cursor.getInt(colAutoSuggest)
 
@@ -109,7 +111,6 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
             )
         } finally {
             db.endTransaction()
-            db.close()
             return sett
         }
 
@@ -148,8 +149,8 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
                     sett = Sett()
                     sett.settId = cursor.getLong(0)
                     sett.settTitle = cursor.getString(colSetTitle)
-                    sett.languageInput_id = cursor.getLong(colLangInputId)
-                    sett.languageOutput_id = cursor.getLong(colLangOutputId)
+                    sett.languageInput_id = cursor.getString(colLangInputId)
+                    sett.languageOutput_id = cursor.getString(colLangOutputId)
                     sett.wordsAmount = cursor.getInt(colWordsAmount)
                     sett.hasAutoSuggest = cursor.getInt(colAutoSuggest)
                     settList.add(sett)
@@ -166,7 +167,6 @@ class SettRepo(val dbhelper: DBHelper) : IRepository<Sett> {
             );
         } finally {
             db.endTransaction()
-            db.close()
             return settList
         }
     }

@@ -22,6 +22,7 @@ import com.example.myapplication.connectivity.base.ConnectivityProvider
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.StudyProgress
 import com.example.myapplication.notification.ReminderBroadcast
+import com.example.myapplication.ui.DependencyInjectorImpl
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
@@ -39,14 +40,14 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class ProfileFragment : Fragment(), IProfileFragmentView,
+class ProfileFragment : Fragment(), ProfileContract.View,
     ConnectivityProvider.ConnectivityStateListener,
 //    SeekBar.OnSeekBarChangeListener,
     OnChartValueSelectedListener,
     ActivityCompat.OnRequestPermissionsResultCallback {
 
     private var xAxis: XAxis? = null
-    lateinit var presenter: ProfilePresenter
+    private lateinit var presenter: ProfileContract.Presenter
     lateinit var dbhelper: DBHelper
 
     lateinit var set1: BarDataSet
@@ -89,93 +90,42 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
         val root = inflater.inflate(R.layout.fragment_profile, container, false)
 
         dbhelper = DBHelper(requireContext())
-        presenter = ProfilePresenter(this, dbhelper)
+        setPresenter(ProfilePresenter(this, DependencyInjectorImpl(dbhelper)))
 
-        /*val root = inflater.inflate(R.layout.fragment_profile, container, false)
-        val textView: TextView = root.findViewById(R.id.text_notifications)
-        notificationsViewModel.text.observe(viewLifecycleOwner, {
-            textView.text = it
-        })
-
-*/
+       /* tvX = root.findViewById(R.id.tvXMax)
+        tvY = root.findViewById(R.id.tvYMax)*/
 
 
-        tvX = root.findViewById(R.id.tvXMax)
-        tvY = root.findViewById(R.id.tvYMax)
 
-        seekBarX = root.findViewById(R.id.seekBar1)
-//        seekBarX!!.setOnSeekBarChangeListener(this)
-
-//        seekBarY = root.findViewById(R.id.seekBar2)
-//        seekBarY!!.setOnSeekBarChangeListener(this)
-
+        //инициализация
         chart = root.findViewById(R.id.chart1)
-
+        //отключение описания
         chart?.description?.isEnabled = false
-
-
+        //инициализция и натсройка вида абсциссы
         xAxis = chart?.xAxis
         xAxis?.position = XAxisPosition.BOTTOM
         xAxis?.setDrawGridLines(false)
-
         chart?.axisLeft?.setDrawGridLines(true)
         chart?.axisRight?.isEnabled = false
 
+        //инициализция и натсройка вида ординаты
         val rightYAxis = chart?.axisLeft
         rightYAxis?.axisMaximum = 100f
         rightYAxis?.axisMinimum = 0f
-        // setting data
         seekBarX?.progress = 7
 
-//        chart?.moveViewToX(10f);
-//        seekBarY!!.progress = 100
 
-        presenter.loadStudyProgressData()
+        presenter.onViewCreated()
 
 
         // if more than 7 entries are displayed in the chart, no values will be
         // drawn
 
 
-
         setHasOptionsMenu(true)
 
         return root
     }
-
-
-    /*  override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-          tvX!!.text = seekBarX!!.progress.toString()
-  //        tvY!!.text = seekBarY!!.progress.toString()
-          val values: ArrayList<BarEntry> = ArrayList()
-          for (i in 0 until seekBarX!!.progress) {
-  //            val multi = (seekBarY!!.progress + 1).toFloat()
-  //            val `val` = (Math.random() * multi).toFloat() + multi / 3
-              values.add(BarEntry(i.toFloat(), i.toFloat()))
-          }
-          val set1: BarDataSet
-          if (chart!!.data != null &&
-              chart!!.data.dataSetCount > 0
-          ) {
-              set1 = chart!!.data.getDataSetByIndex(0) as BarDataSet
-              set1.values = values
-              chart!!.data.notifyDataChanged()
-              chart!!.notifyDataSetChanged()
-          } else {
-              set1 = BarDataSet(values, "Data Set")
-              set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
-              set1.setDrawValues(false)
-              val dataSets: ArrayList<IBarDataSet> = ArrayList()
-              dataSets.add(set1)
-              val data = BarData(dataSets)
-              chart?.data = data
-              // if more than 7 entries are displayed in the chart, no values will be
-              // drawn
-              chart?.setMaxVisibleValueCount(7)
-              chart?.setFitBars(true)
-          }
-          chart!!.invalidate()
-      }*/
 
 
     override fun onStart() {
@@ -204,7 +154,7 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
                 callTimePicker()
                 true
             }
-
+             //управление масштабированием
             R.id.actionTogglePinch -> {
                 if (chart?.isPinchZoomEnabled == true)
                     chart?.setPinchZoom(false);
@@ -214,29 +164,29 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
                 chart?.invalidate();
                 true
             }
-
-
+            //анимация по X
             R.id.animateX -> {
                 chart?.animateX(2000);
-                true;
+                true
             }
+            //анимация по Y
             R.id.animateY -> {
                 chart?.animateY(2000);
-                true;
+                true
             }
+            //анимация по X и Y
             R.id.animateXY -> {
-
                 chart?.animateXY(2000, 2000);
-                true;
+                true
             }
-
+            //сохранение графика в виде картинки
             R.id.actionSave -> {
                 if (ContextCompat.checkSelfPermission(
                         requireContext(),
                         Manifest.permission.WRITE_EXTERNAL_STORAGE
                     ) == PackageManager.PERMISSION_GRANTED
                 ) {
-                    saveToGallery(chart!!, "AnotherBarActivity")
+                    chart?.let { saveToGallery(it, "AnotherBarActivity") }
 
                 } else {
                     requestStoragePermission(chart)
@@ -302,10 +252,6 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
     }
 
 
-    /* override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-
-     override fun onStopTrackingTouch(seekBar: SeekBar?) {}*/
-
     override fun onValueSelected(e: Entry?, h: Highlight?) {
         val entry = e as BarEntry
 
@@ -318,7 +264,7 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
 
     private fun saveToGallery(chart: BarChart, name: String) {
         if (chart.saveToGallery(name + "_" + System.currentTimeMillis(), 70)) Toast.makeText(
-            requireContext(), "Saving SUCCESSFUL!",
+            requireContext(), R.string.saved,
             Toast.LENGTH_SHORT
         ).show() else Toast.makeText(
             requireContext(),
@@ -339,7 +285,9 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
         return colors
     }
 
-
+    /**
+     * для создания напоминания о занятии
+     */
     private fun callTimePicker() {
         // получаем текущее время
         val cal = Calendar.getInstance()
@@ -370,7 +318,7 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
 
                 val alarmManager =
                     activity?.getSystemService(AppCompatActivity.ALARM_SERVICE) as AlarmManager
-                alarmManager.setInexactRepeating(
+                     alarmManager.setInexactRepeating(
                     AlarmManager.RTC_WAKEUP,
                     calendar.timeInMillis,
                     AlarmManager.INTERVAL_DAY,
@@ -384,7 +332,6 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
 
 
     private fun createNotificationChannel() {
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = resources.getString(R.string.channel_name)
             val descriptionText = resources.getString(R.string.channel_description)
@@ -413,32 +360,13 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
         }
     }
 
-    override fun setData(list: List<StudyProgress>) {
-
+    override fun setData(
+        list: List<StudyProgress>,
+        values: List<BarEntry>,
+        labels: List<String>
+    ) {
+        //настройка вида лейблов
         chart?.xAxis?.valueFormatter = IndexAxisValueFormatter(list.map { it.date.toString() })
-
-        val values: ArrayList<BarEntry> = ArrayList()
-        var labels: ArrayList<String> = ArrayList()
-        for (i in list.indices) {
-            values.add(
-                BarEntry(
-                    (list.size-i-1).toFloat() ,
-                    ((list[i].rightAnswers.toFloat() * 100) / (list[i].rightAnswers.toFloat() + list[i].wrongAnswers.toFloat()))
-                )
-            )
-            labels.add(list[i].date.toString().split("-",limit = 2)[1])
-        }
-
-        labels = labels.reversed() as ArrayList<String>
-        Log.d(
-            "valuesData",
-            (((list[0].rightAnswers.toFloat() * 100) / (list[0].rightAnswers.toFloat() + list[0].wrongAnswers.toFloat())).toString())
-        )
-
-        Log.d(
-            "labells",
-            labels.toString()
-        )
 
         set1 = BarDataSet(values, "Progress")
         set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
@@ -449,25 +377,39 @@ class ProfileFragment : Fragment(), IProfileFragmentView,
         chart?.data = data
 
         chart?.setVisibleXRangeMinimum(7f)
-        chart?.setVisibleXRangeMaximum(100f)
+        chart?.setVisibleXRangeMaximum(10f)
         chart?.moveViewToX(1f)
         chart?.setFitBars(true)
 
-        // scaling can now only be done on x- and y-axis separately
+        //включаем масштабирование пальцем
         chart?.setPinchZoom(false)
+        //включаем тени
         chart?.setDrawBarShadow(false)
+        //включаем сетку
         chart?.setDrawGridBackground(false)
-
-        Log.d("labelss", labels.toString())
+        //включаем показ лейблов
+        xAxis?.valueFormatter = IndexAxisValueFormatter(labels)
+//        xAxis?.labelCount = values.size
+        xAxis?.labelRotationAngle = -50f
         xAxis?.labelCount = values.size
-        xAxis!!.valueFormatter =  IndexAxisValueFormatter(labels)
-        // add a nice and smooth animation
+        chart?.extraBottomOffset = 30f
+        xAxis?.granularity = 1f
+        // включаем анимацию
         chart?.animateY(1500)
-
         chart?.legend?.isEnabled = false
 
     }
 
+    override fun setPresenter(presenter: ProfileContract.Presenter) {
+        this.presenter = presenter
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
+        dbhelper.close()
+
+    }
 
 }
 

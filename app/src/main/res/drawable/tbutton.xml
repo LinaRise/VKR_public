@@ -3,7 +3,7 @@
     android:enterFadeDuration="@android:integer/config_shortAnimTime"
     android:exitFadeDuration="@android:integer/config_shortAnimTime">
 
-    <item android:drawable="@drawable/ic_off_mode" android:state_checked="false" />
+    <item android:drawable="@drawable/ic_off_mode"  android:state_checked="false" />
     <item android:drawable="@drawable/ic_on_mode" android:state_checked="true">
 
 

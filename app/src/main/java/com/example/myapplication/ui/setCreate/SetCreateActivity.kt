@@ -3,7 +3,6 @@ package com.example.myapplication.ui.setCreate
 import android.content.Context
 import android.os.Bundle
 import android.os.StrictMode
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -17,6 +16,8 @@ import com.example.myapplication.R
 import com.example.myapplication.connectivity.base.ConnectivityProvider
 import com.example.myapplication.database.DBHelper
 import com.example.myapplication.entity.Word
+import com.example.myapplication.ui.DependencyInjectorImpl
+import com.example.myapplication.ui.setCreate.correctInfoDialog.SetCorrectInfoDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.auth.oauth2.GoogleCredentials
@@ -27,7 +28,7 @@ import kotlinx.android.synthetic.main.activity_set_create.*
 import java.io.IOException
 
 
-class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
+class SetCreateActivity : AppCompatActivity(), SetCreateContract.View, ISetInputData,
     ConnectivityProvider.ConnectivityStateListener {
 
     var translate: Translate? = null
@@ -42,7 +43,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
     private lateinit var originalText: TextInputEditText
     private lateinit var translatedText: InstantAutoComplete
 
-    lateinit var presenter: SetCreatePresenter
+    private lateinit var presenter: SetCreateContract.Presenter
     lateinit var dbhelper: DBHelper
 
     private lateinit var setTitle: String
@@ -54,7 +55,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
 
     lateinit var adapter: ArrayAdapter<Any>
 
-    var languageTitleAndCode: Map<String, String> = hashMapOf()
+    var languageCodeAndTitle: Map<String, String> = hashMapOf()
 
     // которые отображаются на экране
     var wordsDisplayed = ArrayList<Word>()
@@ -64,7 +65,6 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
             val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
             StrictMode.setThreadPolicy(policy)
             try {
-
                 resources.openRawResource(R.raw.credentials).use { `is` ->
                     val myCredentials = GoogleCredentials.fromStream(`is`)
                     val translateOptions =
@@ -81,7 +81,8 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
         super.onCreate(savedInstanceState)
 
         dbhelper = DBHelper(this)
-        presenter = SetCreatePresenter(this, dbhelper)
+        setPresenter(SetCreatePresenter(this, DependencyInjectorImpl(dbhelper)))
+
         setContentView(R.layout.activity_set_create)
 
         val extras = intent.extras
@@ -118,33 +119,54 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
 
         translatedText.onFocusChangeListener = View.OnFocusChangeListener { p0, p1 ->
             if (p1) {
-                if (hasAutoSuggest == 1) {
-                    if (hasInternet) {
-                        receivedTranslation =
-                            presenter.translate(
-                                translate!!,
-                                languageTitleAndCode,
-                                originalText.text.toString(),
-                                inputLanguage.trim(),
-                                outputLanguage.trim()
-                            )
-                        Log.d("receivedTranslation", receivedTranslation)
-                        val array = arrayOf(
-                            receivedTranslation
-                        )
-                        adapter =
-                            ArrayAdapter(
-                                this@SetCreateActivity,
-                                android.R.layout.simple_list_item_1,
-                                array
-                            )
-                        adapter.notifyDataSetChanged()
+                receivedTranslation = presenter.onTranslate(
+                    translate!!,
+                    languageCodeAndTitle,
+                    originalText.text.toString(),
+                    inputLanguage.trim(),
+                    outputLanguage.trim(),
+                    hasAutoSuggest,
+                    hasInternet
+                )
+                val array = arrayOf(
+                    receivedTranslation
+                )
+                adapter =
+                    ArrayAdapter(
+                        this@SetCreateActivity,
+                        android.R.layout.simple_list_item_1,
+                        array
+                    )
+                adapter.notifyDataSetChanged()
+                translatedText.setAdapter(adapter)
+                translatedText.showDropDown();
 
-                        translatedText.setAdapter(adapter)
-                        translatedText.showDropDown();
+                /*     if (hasAutoSuggest == 1) {
+                         if (hasInternet) {
+                             receivedTranslation =
+                                 presenter.onTranslate(
+                                     translate!!,
+                                     languageTitleAndCode,
+                                     originalText.text.toString(),
+                                     inputLanguage.trim(),
+                                     outputLanguage.trim()
+                                 )
+                             Log.d("receivedTranslation", receivedTranslation)
+                             val array = arrayOf(
+                                 receivedTranslation
+                             )
+                             adapter =
+                                 ArrayAdapter(
+                                     this@SetCreateActivity,
+                                     android.R.layout.simple_list_item_1,
+                                     array
+                                 )
+                             adapter.notifyDataSetChanged()
+                             translatedText.setAdapter(adapter)
+                             translatedText.showDropDown();
 
-                    }
-                }
+                         }
+                     }*/
             }
         }
     }
@@ -160,9 +182,16 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
         provider.removeListener(this)
     }
 
+    override fun setPresenter(presenter: SetCreateContract.Presenter) {
+        this.presenter = presenter
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.add_new_activity_bar, menu)
+        val item = menu?.findItem(R.id.check_icon)
+        item?.icon?.alpha = (255)
+
         return true
     }
 
@@ -178,7 +207,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
                 return true
             }
             R.id.check_icon -> {
-                presenter.saveSet(
+                presenter.onSaveClicked(
                     wordsDisplayed,
                     setTitle,
                     inputLanguage,
@@ -214,7 +243,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
         val translated: String = translatedText.text.toString().trim()
         adapter.clear()
         adapter.notifyDataSetChanged()
-        presenter.addNewWord(original, translated)
+        presenter.onAddWordClicked(original, translated)
     }
 
 
@@ -239,7 +268,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
                 when (direction) {
                     ItemTouchHelper.LEFT -> {
                         deletedWord = wordsDisplayed[position]
-                        presenter.deleteWord(position)
+                        presenter.onLeftSwipe(position)
                     }
                 }
             }
@@ -269,7 +298,7 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
     override fun showWordInputError() {
         Snackbar.make(
             recyclerView,
-            getString(R.string.fill_in_both_lines),
+            R.string.fill_in_both_lines,
             Snackbar.LENGTH_LONG
         ).show()
     }
@@ -280,10 +309,10 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
     override fun showUndoDeleteWord(position: Int) {
         Snackbar.make(
             recyclerView,
-            "${deletedWord.originalWord} is deleted",
+            deletedWord.originalWord + " " + getText(R.string.is_deleted),
             Snackbar.LENGTH_LONG
         ).setAction(
-            "UNDO"
+            R.string.undo
         ) {
             wordsDisplayed.add(position, deletedWord)
             setCreateAdapter.notifyItemInserted(position)
@@ -313,8 +342,8 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
     /**
      * показать ссообщение
      */
-    override fun showToastMessage(line: String) {
-        Toast.makeText(this, line, Toast.LENGTH_SHORT).show()
+    override fun showSuccessSavedToast() {
+        Toast.makeText(this, getString(R.string.saved), Toast.LENGTH_SHORT).show()
     }
 
     /**
@@ -327,16 +356,22 @@ class SetCreateActivity : AppCompatActivity(), ISetCreateView, ISetInputData,
         hasAutoSuggest = list[3] as Int
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
+        dbhelper.close()
+
+    }
 
     override fun onStateChange(state: ConnectivityProvider.NetworkState) {
         hasInternet = state.hasInternet()
         if (hasInternet) {
             translateService
             if (translate != null) {
-                if (languageTitleAndCode.isEmpty()) {
+                if (languageCodeAndTitle.isEmpty()) {
                     val languages: List<Language> =
                         translate!!.listSupportedLanguages()
-                    languageTitleAndCode = languages.map { it.name to it.code }.toMap()
+                    languageCodeAndTitle = languages.map { it.code to it.name }.toMap()
                 }
             }
         } else {

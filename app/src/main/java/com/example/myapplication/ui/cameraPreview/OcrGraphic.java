@@ -27,8 +27,7 @@ import com.google.android.gms.vision.text.TextBlock;
 import java.util.List;
 
 /**
- * Graphic instance for rendering TextBlock position, size, and ID within an associated graphic
- * overlay view.
+ * для рендеринга текстовых блоков
  */
 public class OcrGraphic extends GraphicOverlay.Graphic {
 
@@ -74,11 +73,7 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
     }
 
     /**
-     * Checks whether a point is within the bounding box of this graphic.
-     * The provided point should be relative to this graphic's containing overlay.
-     * @param x An x parameter in the relative context of the canvas.
-     * @param y A y parameter in the relative context of the canvas.
-     * @return True if the provided point is contained within this graphic's bounding box.
+     *проверка, что точка внутри бокса
      */
     public boolean contains(float x, float y) {
         if (textBlock == null) {
@@ -90,20 +85,19 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
     }
 
     /**
-     * Draws the text block annotations for position, size, and raw value on the supplied canvas.
+     * текстблок отрисовка
      */
     @Override
     public void draw(Canvas canvas) {
         if (textBlock == null) {
             return;
         }
-
-        // Draws the bounding box around the TextBlock.
+        // отрисовка рамки блока текста
         RectF rect = new RectF(textBlock.getBoundingBox());
         rect = translateRect(rect);
         canvas.drawRect(rect, rectPaint);
 
-        // Break the text into multiple lines and draw each one according to its own bounding box.
+        // разбиваем текст на нескольки строк
         List<? extends Text> textComponents = textBlock.getComponents();
         for(Text currentText : textComponents) {
             float left = translateX(currentText.getBoundingBox().left);

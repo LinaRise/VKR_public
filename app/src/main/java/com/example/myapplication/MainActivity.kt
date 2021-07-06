@@ -1,10 +1,5 @@
 package com.example.myapplication
 
-import android.app.AlarmManager
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -15,26 +10,46 @@ import android.view.MenuItem
 import android.widget.Toast
 import android.widget.ToggleButton
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.myapplication.database.DBHelper
-import com.example.myapplication.notification.ReminderBroadcast
-import com.example.myapplication.ui.chathead.ChatHeadService
+import com.example.myapplication.ui.DependencyInjectorImpl
+import com.example.myapplication.ui.chathead.TranslateBubbleService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.util.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), MainContract.View {
     lateinit var dbhelper: DBHelper
     private var switchAB: ToggleButton? = null
+    private lateinit var presenter:MainContract.Presenter
+    override fun showDrawOverAppPermission() {
+      Toast.makeText(this,getString(R.string.draw_permission),Toast.LENGTH_SHORT).show()
+    }
+
+    override fun showTranslateBubbleOn() {
+        Toast.makeText(this,getString(R.string.translate_bubble_on),Toast.LENGTH_SHORT).show()
+
+    }
+
+    override fun showTranslateBubbleOff() {
+        Toast.makeText(this,getString(R.string.translate_bubble_off),Toast.LENGTH_SHORT).show()
+
+    }
+
+    override fun setPresenter(presenter: MainContract.Presenter) {
+        this.presenter = presenter
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         dbhelper = DBHelper(this)
+        setPresenter(MainPresenter(this, DependencyInjectorImpl(dbhelper)))
+
         //находим файл xml с BottomNavigationView
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
         // находим файл xml с фрагментом к которму будет прикреплять BottomNavigationView
@@ -49,7 +64,6 @@ class MainActivity : AppCompatActivity() {
         //с [NavController].
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-
 
         //Check if the application has draw over other apps permission or not?
         //This permission is by default available for API<23. But for API > 23
@@ -81,14 +95,12 @@ class MainActivity : AppCompatActivity() {
         switchAB = item.actionView.findViewById(R.id.toggle_btn)
         switchAB?.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                Toast.makeText(application, "Translate bubble on", Toast.LENGTH_SHORT)
-                    .show()
-                startService(Intent(this@MainActivity, ChatHeadService::class.java))
+                showTranslateBubbleOn()
+                startService(Intent(this@MainActivity, TranslateBubbleService::class.java))
             } else {
-                val myService = Intent(this@MainActivity, ChatHeadService::class.java)
+                val myService = Intent(this@MainActivity, TranslateBubbleService::class.java)
                 stopService(myService)
-                Toast.makeText(application, "Translate bubble off", Toast.LENGTH_SHORT)
-                    .show()
+                showTranslateBubbleOff()
             }
         }
         return true
@@ -107,11 +119,7 @@ class MainActivity : AppCompatActivity() {
             ) {
 //                initializeView()
             } else { //Permission is not available
-                Toast.makeText(
-                    this,
-                    "Draw over other app permission not available. Closing the application",
-                    Toast.LENGTH_SHORT
-                ).show()
+               showDrawOverAppPermission()
                 finish()
             }
         } else {

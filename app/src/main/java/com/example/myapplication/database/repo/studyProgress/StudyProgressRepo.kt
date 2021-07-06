@@ -108,14 +108,14 @@ class StudyProgressRepo(val dbhelper: DBHelper) : IRepository<StudyProgress> {
         }
     }
 
-    override fun getAll(): List<StudyProgress> {
+    override fun getAll(): List<StudyProgress>{
         db = dbhelper.readableDatabase
         db.beginTransaction()
         val settList: ArrayList<StudyProgress> = ArrayList()
         try {
             val cursor: Cursor? =
                 db.rawQuery(
-                    "SELECT * FROM ${TablesAndColumns.StudyProgressEntry.TABLE_NAME}",
+                    "SELECT * FROM ${TablesAndColumns.StudyProgressEntry.TABLE_NAME} ORDER BY date(study_progress_date) DESC",
                     null
                 )
             if (cursor != null) {
